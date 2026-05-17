@@ -29,10 +29,10 @@ services:
       - "traefik.http.routers.modularrdo.tls=true"
       - "traefik.http.routers.modularrdo.tls.certresolver=letsencryptresolver"
       - "traefik.http.services.modularrdo.loadbalancer.server.port=80"
-      - "traefik.docker.network=network_public"
+      - "traefik.docker.network=network"
 
     networks:
-      - network_public
+      - network
 
     deploy:
       mode: replicated
@@ -46,6 +46,6 @@ services:
         max_attempts: 3
 
 networks:
-  network_public:
+  network:
     external: true
-    name: network_public
+    name: network
