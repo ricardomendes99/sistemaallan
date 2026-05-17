@@ -40,9 +40,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            # Gera a tag "latest" automaticamente no branch principal
-            type=raw,value=latest,enable={{is_default_branch}}
-            # Gera uma tag baseada no commit (ex: sha-1234567)
+            type=raw,value=latest
             type=sha
 
       - name: Build and push Docker image
