@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuários — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .header { background: #0F172A; color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: .75rem; }
+    .logo-m { width: 36px; height: 36px; background: #F97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .logo-text h1 { font-size: 1rem; font-weight: 700; }
+    .logo-text p  { font-size: .75rem; color: #64748B; }
+    nav { background: #1E293B; padding: 0 1.5rem; }
+    nav a { color: #94A3B8; padding: .625rem 1rem; font-size: .875rem; font-weight: 500; text-decoration: none; display: inline-block; }
+    nav a:hover { color: #fff; }
+    nav a.active { color: #fff; background: #334155; border-radius: 0 0 .5rem .5rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .user-info { color: #94A3B8; font-size: .875rem; display: flex; align-items: center; gap: 1rem; }
+    .btn-logout { background: none; border: none; color: #64748B; cursor: pointer; font-size: .875rem; padding: .25rem .5rem; border-radius: .375rem; }
+    .btn-logout:hover { color: #fff; background: #334155; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem; }
+    .perfil-badge { padding: .2rem .65rem; border-radius: 9999px; font-size: .72rem; font-weight: 700; }
+    .perfil-admin { background: #EDE9FE; color: #5B21B6; }
+    .perfil-user  { background: #DBEAFE; color: #1E40AF; }
+    .status-ativo   { background: #DCFCE7; color: #166534; padding: .2rem .65rem; border-radius: 9999px; font-size: .72rem; font-weight: 700; }
+    .status-inativo { background: #FEE2E2; color: #991B1B; padding: .2rem .65rem; border-radius: 9999px; font-size: .72rem; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-m">M</div>
+      <div class="logo-text"><h1>Modular Service</h1><p>RDO Digital</p></div>
+    </div>
+    <div class="user-info">
+      <span id="user-name"></span>
+      <button class="btn-logout" onclick="Auth.logout()">Sair</button>
+    </div>
+  </header>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="obras.html">Obras</a>
+    <a href="usuarios.html" class="active">Usuários</a>
+    <a href="historico.html">Histórico RDOs</a>
+    <a href="relatorio-executivo.html">Relatório Executivo</a>
+    <a href="backup.html">Backup</a>
+  </nav>
+
+  <main>
+    <div class="toolbar">
+      <div>
+        <p style="font-size:1.15rem;font-weight:700;color:#1E293B">Gestão de Usuários</p>
+        <p style="font-size:.85rem;color:#64748B" id="count-label"></p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal()">+ Novo Usuário</button>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Função</th>
+            <th>Perfil</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span id="modal-title">Novo Usuário</span>
+        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-id">
+        <div class="field">
+          <label>Nome Completo *</label>
+          <input type="text" id="f-nome" placeholder="João da Silva">
+        </div>
+        <div class="field">
+          <label>E-mail *</label>
+          <input type="email" id="f-email" placeholder="joao@modular.com">
+        </div>
+        <div class="field">
+          <label>Senha *</label>
+          <input type="password" id="f-senha" placeholder="Mínimo 6 caracteres">
+          <p class="hint">Deixe em branco ao editar para manter a senha atual.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="field">
+            <label>Perfil</label>
+            <select id="f-perfil">
+              <option value="USUARIO">Usuário (Campo)</option>
+              <option value="ADMIN">Administrador</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="f-ativo">
+              <option value="1">Ativo</option>
+              <option value="0">Inativo</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Função Principal</label>
+          <select id="f-funcao">
+            <option value="Montador">Montador</option>
+            <option value="Auxiliar Montagem">Auxiliar Montagem</option>
+            <option value="Eletricista">Eletricista</option>
+            <option value="Soldador">Soldador</option>
+            <option value="Encarregado">Encarregado</option>
+            <option value="Técnico Segurança">Técnico Segurança</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="save()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    let me = null;
+    DB.init().then(() => {
+      me = Auth.requireAuth('ADMIN');
+      if (me) {
+        document.getElementById('user-name').textContent = me.nome_completo;
+        render();
+      }
+    });
+
+    function render() {
+      const users = DB.getUsers();
+      document.getElementById('count-label').textContent = `${users.length} usuário(s)`;
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td style="font-weight:600">${u.nome_completo}</td>
+          <td style="color:#64748B;font-size:.875rem">${u.email}</td>
+          <td style="font-size:.875rem">${u.funcao_principal || '—'}</td>
+          <td><span class="perfil-badge ${u.perfil === 'ADMIN' ? 'perfil-admin' : 'perfil-user'}">${u.perfil}</span></td>
+          <td><span class="${u.ativo ? 'status-ativo' : 'status-inativo'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="edit('${u.id}')">Editar</button>
+            ${u.id !== me.id ? `<button class="btn btn-danger btn-sm" onclick="del('${u.id}')" style="margin-left:.4rem">Excluir</button>` : ''}
+          </td>
+        </tr>`).join('');
+    }
+
+    function openModal() {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('modal-title').textContent = 'Novo Usuário';
+      ['f-nome','f-email','f-senha'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-perfil').value = 'USUARIO';
+      document.getElementById('f-funcao').value = 'Montador';
+      document.getElementById('f-ativo').value  = '1';
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function edit(id) {
+      const u = DB.getUserById(id);
+      if (!u) return;
+      document.getElementById('edit-id').value = id;
+      document.getElementById('modal-title').textContent = 'Editar Usuário';
+      document.getElementById('f-nome').value   = u.nome_completo;
+      document.getElementById('f-email').value  = u.email;
+      document.getElementById('f-senha').value  = '';
+      document.getElementById('f-perfil').value = u.perfil;
+      document.getElementById('f-funcao').value = u.funcao_principal || 'Montador';
+      document.getElementById('f-ativo').value  = u.ativo ? '1' : '0';
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function save() {
+      const nome  = document.getElementById('f-nome').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      const senha = document.getElementById('f-senha').value;
+      const id    = document.getElementById('edit-id').value;
+
+      if (!nome || !email) { Utils.toast('Preencha nome e e-mail.', 'error'); return; }
+      if (!id && !senha)   { Utils.toast('Informe a senha para o novo usuário.', 'error'); return; }
+      if (senha && senha.length < 6) { Utils.toast('Senha mínima: 6 caracteres.', 'error'); return; }
+
+      // Check unique email
+      const existing = DB.getUserByEmail(email);
+      if (existing && existing.id !== id) { Utils.toast('E-mail já cadastrado.', 'error'); return; }
+
+      const data = {
+        nome_completo: nome, email,
+        perfil: document.getElementById('f-perfil').value,
+        funcao_principal: document.getElementById('f-funcao').value,
+        ativo: document.getElementById('f-ativo').value === '1'
+      };
+      if (senha) data.senha_hash = btoa(senha);
+
+      if (id) DB.updateUser(id, data);
+      else DB.createUser(data);
+
+      closeModal(); render();
+      Utils.toast(id ? 'Usuário atualizado!' : 'Usuário criado!');
+    }
+
+    function del(id) {
+      if (!confirm('Excluir este usuário?')) return;
+      DB.deleteUser(id); render(); Utils.toast('Usuário excluído.', 'warning');
+    }
+  </script>
+</body>
+</html>

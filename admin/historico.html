@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico RDOs — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .header { background: #0F172A; color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: .75rem; }
+    .logo-m { width: 36px; height: 36px; background: #F97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .logo-text h1 { font-size: 1rem; font-weight: 700; }
+    .logo-text p  { font-size: .75rem; color: #64748B; }
+    nav { background: #1E293B; padding: 0 1.5rem; }
+    nav a { color: #94A3B8; padding: .625rem 1rem; font-size: .875rem; font-weight: 500; text-decoration: none; display: inline-block; }
+    nav a:hover { color: #fff; }
+    nav a.active { color: #fff; background: #334155; border-radius: 0 0 .5rem .5rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .user-info { color: #94A3B8; font-size: .875rem; display: flex; align-items: center; gap: 1rem; }
+    .btn-logout { background: none; border: none; color: #64748B; cursor: pointer; font-size: .875rem; }
+    .filters { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .filters select, .filters input { padding: .5rem .85rem; border: 1.5px solid #CBD5E1; border-radius: .5rem; font-size: .875rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-m">M</div>
+      <div class="logo-text"><h1>Modular Service</h1><p>RDO Digital</p></div>
+    </div>
+    <div class="user-info">
+      <span id="user-name"></span>
+      <button class="btn-logout" onclick="Auth.logout()">Sair</button>
+    </div>
+  </header>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="obras.html">Obras</a>
+    <a href="usuarios.html">Usuários</a>
+    <a href="historico.html" class="active">Histórico RDOs</a>
+    <a href="relatorio-executivo.html">Relatório Executivo</a>
+    <a href="backup.html">Backup</a>
+  </nav>
+
+  <main>
+    <p style="font-size:1.15rem;font-weight:700;color:#1E293B;margin-bottom:1rem">Histórico de RDOs</p>
+
+    <div class="filters">
+      <select id="f-obra" onchange="render()">
+        <option value="">Todas as obras</option>
+      </select>
+      <select id="f-status" onchange="render()">
+        <option value="">Todos os status</option>
+        <option value="Rascunho">Rascunho</option>
+        <option value="Pendente_Assinatura">Pendente Assinatura</option>
+        <option value="Finalizado">Finalizado</option>
+      </select>
+      <input type="date" id="f-data-ini" onchange="render()" placeholder="De">
+      <input type="date" id="f-data-fim" onchange="render()" placeholder="Até">
+      <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Limpar filtros</button>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr><th>Obra</th><th>Data</th><th>Dia</th><th>Criador</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p id="result-count" style="font-size:.8rem;color:#94A3B8;margin-top:.75rem"></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    DB.init().then(() => {
+      const me = Auth.requireAuth('ADMIN');
+      if (me) {
+        document.getElementById('user-name').textContent = me.nome_completo;
+        const sel = document.getElementById('f-obra');
+        DB.getObras().forEach(o => { const opt = document.createElement('option'); opt.value = o.id_obra; opt.textContent = o.nome_obra; sel.appendChild(opt); });
+        render();
+      }
+    });
+
+    function render() {
+      let rdos = [...DB.getRDOs()].reverse();
+      const fObra = document.getElementById('f-obra').value;
+      const fSt   = document.getElementById('f-status').value;
+      const fDe   = document.getElementById('f-data-ini').value;
+      const fAte  = document.getElementById('f-data-fim').value;
+      if (fObra) rdos = rdos.filter(r => r.id_obra === fObra);
+      if (fSt)   rdos = rdos.filter(r => r.status_documento === fSt);
+      if (fDe)   rdos = rdos.filter(r => r.data_apontamento >= fDe);
+      if (fAte)  rdos = rdos.filter(r => r.data_apontamento <= fAte);
+
+      document.getElementById('result-count').textContent = `${rdos.length} RDO(s) encontrado(s)`;
+      const tbody = document.getElementById('tbody');
+      if (rdos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#94A3B8">Nenhum RDO encontrado.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rdos.map(r => {
+        const obra = DB.getObraById(r.id_obra);
+        const cri  = DB.getUserById(r.id_usuario_criador);
+        return `<tr>
+          <td style="font-weight:600">${obra ? obra.nome_obra : '—'}</td>
+          <td>${Utils.formatDate(r.data_apontamento)}</td>
+          <td style="color:#64748B;font-size:.85rem">${Utils.getDayOfWeek(r.data_apontamento)}</td>
+          <td>${cri ? cri.nome_completo : '—'}</td>
+          <td>${Utils.statusBadge(r.status_documento)}</td>
+          <td><a href="rdo-view.html?id=${r.id_rdo}" style="color:#F97316;font-weight:600;font-size:.85rem;text-decoration:none">Ver →</a></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function clearFilters() {
+      ['f-obra','f-status','f-data-ini','f-data-fim'].forEach(id => document.getElementById(id).value = '');
+      render();
+    }
+  </script>
+</body>
+</html>

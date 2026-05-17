@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Selecionar Obra — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    body { background: #F1F5F9; min-height: 100vh; }
+    .top-bar { background: #0F172A; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: .65rem; }
+    .logo-m { width: 32px; height: 32px; background: #F97316; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: .95rem; }
+    .logo-title { color: #fff; font-weight: 700; font-size: .95rem; }
+    .user-chip { background: #1E293B; border-radius: 9999px; padding: .35rem .85rem; display: flex; align-items: center; gap: .5rem; }
+    .user-chip span { color: #94A3B8; font-size: .8rem; }
+    .btn-out { background: none; border: none; color: #64748B; cursor: pointer; font-size: .8rem; font-weight: 600; }
+    .btn-out:hover { color: #fff; }
+    main { padding: 1.25rem; max-width: 600px; margin: 0 auto; }
+    .greeting { font-size: 1.05rem; font-weight: 700; color: #1E293B; margin-bottom: .25rem; }
+    .date-str  { font-size: .85rem; color: #64748B; margin-bottom: 1.25rem; }
+    .obra-card { background: #fff; border: 1.5px solid #E2E8F0; border-radius: .875rem; padding: 1.1rem 1.25rem; margin-bottom: .75rem; cursor: pointer; transition: border-color .2s, box-shadow .2s; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .obra-card:hover, .obra-card:active { border-color: #F97316; box-shadow: 0 4px 16px rgba(249,115,22,.12); }
+    .obra-card .name { font-weight: 700; font-size: 1rem; color: #1E293B; }
+    .obra-card .sub  { font-size: .8rem; color: #64748B; margin-top: .15rem; }
+    .obra-card .rdo-tag { flex-shrink: 0; }
+    .empty { text-align: center; padding: 3rem 1rem; color: #94A3B8; }
+    .empty p { margin-top: .5rem; font-size: .875rem; }
+    .section-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94A3B8; margin-bottom: .6rem; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="logo">
+      <div class="logo-m">M</div>
+      <span class="logo-title">RDO Digital</span>
+    </div>
+    <div class="user-chip">
+      <span id="user-display"></span>
+      <button class="btn-out" onclick="Auth.logout()">Sair</button>
+    </div>
+  </div>
+
+  <main>
+    <p class="greeting" id="greeting"></p>
+    <p class="date-str" id="date-str"></p>
+    <p class="section-title">Selecione a obra do dia</p>
+    <div id="obras-list"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    let me = null;
+    DB.init().then(() => {
+      me = Auth.requireAuth('USUARIO');
+      if (me) render();
+    });
+
+    function render() {
+      const hora = new Date().getHours();
+      const greet = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+      document.getElementById('greeting').textContent = `${greet}, ${me.nome_completo.split(' ')[0]}!`;
+
+      const hoje = Utils.today();
+      document.getElementById('date-str').textContent = Utils.getDayOfWeek(hoje) + ', ' + Utils.formatDate(hoje);
+      document.getElementById('user-display').textContent = me.nome_completo.split(' ')[0];
+
+      // Only show obras assigned to this user by the admin
+      const obras = DB.getObrasByUsuario(me.id);
+      const container = document.getElementById('obras-list');
+
+      if (obras.length === 0) {
+        container.innerHTML = `<div class="empty">
+          <div style="font-size:2.5rem">🏗️</div>
+          <p>Nenhuma obra atribuída a você ainda.<br>Aguarde o administrador vincular você a uma obra.</p>
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = obras.map(o => {
+        const rdo = DB.getRDOByObraDataUsuario(o.id_obra, hoje, me.id);
+        let tag = '';
+        let tagColor = '';
+        if (!rdo) {
+          tag = 'Iniciar RDO'; tagColor = '#F97316';
+        } else if (rdo.status_documento === 'Finalizado') {
+          tag = '✓ Finalizado'; tagColor = '#16A34A';
+        } else if (rdo.status_documento === 'Pendente_Assinatura') {
+          tag = '✍ Assinar'; tagColor = '#2563EB';
+        } else {
+          tag = '◑ Rascunho'; tagColor = '#D97706';
+        }
+
+        return `<div class="obra-card" onclick="selectObra('${o.id_obra}')">
+          <div>
+            <p class="name">${o.nome_obra}</p>
+            <p class="sub">${o.cliente_nome} · ${o.endereco_local || 'Local não informado'}</p>
+            <p class="sub" style="margin-top:.1rem">OF: ${o.codigo_of}</p>
+          </div>
+          <div class="rdo-tag">
+            <span style="background:${tagColor}20;color:${tagColor};padding:.3rem .75rem;border-radius:9999px;font-size:.78rem;font-weight:700;white-space:nowrap">${tag}</span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function selectObra(obraId) {
+      // RN03: check date (only today)
+      location.href = `rdo.html?obra=${obraId}`;
+    }
+  </script>
+</body>
+</html>

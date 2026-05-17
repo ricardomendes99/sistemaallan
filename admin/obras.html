@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obras — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .header { background: #0F172A; color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: .75rem; }
+    .logo-m { width: 36px; height: 36px; background: #F97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .logo-text h1 { font-size: 1rem; font-weight: 700; }
+    .logo-text p  { font-size: .75rem; color: #64748B; }
+    nav { background: #1E293B; padding: 0 1.5rem; }
+    nav a { color: #94A3B8; padding: .625rem 1rem; font-size: .875rem; font-weight: 500; text-decoration: none; display: inline-block; }
+    nav a:hover { color: #fff; }
+    nav a.active { color: #fff; background: #334155; border-radius: 0 0 .5rem .5rem; }
+    main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .user-info { color: #94A3B8; font-size: .875rem; display: flex; align-items: center; gap: 1rem; }
+    .btn-logout { background: none; border: none; color: #64748B; cursor: pointer; font-size: .875rem; padding: .25rem .5rem; border-radius: .375rem; }
+    .btn-logout:hover { color: #fff; background: #334155; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem; }
+
+    /* User assignment checkboxes */
+    .user-check-list { max-height: 280px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: .5rem; }
+    .user-check-item { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
+    .user-check-item:last-child { border-bottom: none; }
+    .user-check-item:hover { background: #F8FAFC; }
+    .user-check-item input[type="checkbox"] { accent-color: #F97316; width: 16px; height: 16px; cursor: pointer; }
+    .user-name-label { font-size: .9rem; font-weight: 600; color: #1E293B; }
+    .user-role-label  { font-size: .75rem; color: #64748B; }
+    .team-avatars { display: flex; gap: .2rem; flex-wrap: wrap; }
+    .team-chip { background: #F1F5F9; color: #475569; font-size: .7rem; font-weight: 600; padding: .15rem .5rem; border-radius: 9999px; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-m">M</div>
+      <div class="logo-text"><h1>Modular Service</h1><p>RDO Digital</p></div>
+    </div>
+    <div class="user-info">
+      <span id="user-name"></span>
+      <button class="btn-logout" onclick="Auth.logout()">Sair</button>
+    </div>
+  </header>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="obras.html" class="active">Obras</a>
+    <a href="usuarios.html">Usuários</a>
+    <a href="historico.html">Histórico RDOs</a>
+    <a href="relatorio-executivo.html">Relatório Executivo</a>
+    <a href="backup.html">Backup</a>
+  </nav>
+
+  <main>
+    <div class="toolbar">
+      <div>
+        <p style="font-size:1.15rem;font-weight:700;color:#1E293B">Gestão de Obras</p>
+        <p style="font-size:.85rem;color:#64748B" id="obras-count"></p>
+      </div>
+      <button class="btn btn-primary" onclick="openObraModal()">+ Nova Obra</button>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Nome da Obra</th>
+            <th>OF</th>
+            <th>Cliente</th>
+            <th>Local</th>
+            <th>Equipe Vinculada</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modal: Obra -->
+  <div class="modal-overlay" id="modal-obra" style="display:none" onclick="if(event.target===this)closeObraModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span id="modal-obra-title">Nova Obra</span>
+        <button onclick="closeObraModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-id">
+        <div class="field">
+          <label>Nome da Obra *</label>
+          <input type="text" id="f-nome" placeholder="Ex: Expansão Galpão Net Container" required>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="field">
+            <label>Código OF *</label>
+            <input type="text" id="f-of" placeholder="Ex: OF-2024-001">
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="f-status">
+              <option value="Ativa">Ativa</option>
+              <option value="Pausada">Pausada</option>
+              <option value="Concluída">Concluída</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Nome do Cliente *</label>
+          <input type="text" id="f-cliente" placeholder="Nome da empresa/cliente">
+        </div>
+        <div class="field">
+          <label>Contato do Cliente</label>
+          <input type="text" id="f-contato" placeholder="(11) 99999-9999 ou e-mail">
+        </div>
+        <div class="field">
+          <label>Endereço / Local da Obra</label>
+          <input type="text" id="f-endereco" placeholder="Rua, número, cidade">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeObraModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveObra()">Salvar Obra</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Equipe (user assignment) -->
+  <div class="modal-overlay" id="modal-equipe" style="display:none" onclick="if(event.target===this)closeEquipeModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <p style="font-weight:700;font-size:1rem" id="equipe-obra-nome">Equipe da Obra</p>
+          <p style="font-size:.75rem;color:#64748B">Selecione os colaboradores vinculados a esta obra</p>
+        </div>
+        <button onclick="closeEquipeModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+      </div>
+      <div class="modal-body" style="padding-top:.75rem">
+        <input type="hidden" id="equipe-obra-id">
+        <div id="user-check-list" class="user-check-list"></div>
+        <p style="font-size:.75rem;color:#94A3B8;margin-top:.75rem">Apenas usuários com perfil "Usuário (Campo)" são listados.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeEquipeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveEquipe()">Salvar Equipe</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    DB.init().then(() => {
+      const user = Auth.requireAuth('ADMIN');
+      if (user) {
+        document.getElementById('user-name').textContent = user.nome_completo;
+        render();
+      }
+    });
+
+    function render() {
+      const obras = DB.getObras();
+      document.getElementById('obras-count').textContent = `${obras.length} obra(s) cadastrada(s)`;
+      const tbody = document.getElementById('tbody');
+      if (obras.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#94A3B8">Nenhuma obra cadastrada.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = obras.map(o => {
+        const userIds = DB.getUserIdsByObra(o.id_obra);
+        const equipe  = userIds.map(id => DB.getUserById(id)).filter(Boolean);
+        const teamHtml = equipe.length === 0
+          ? '<span style="color:#CBD5E1;font-size:.8rem">Nenhum</span>'
+          : equipe.map(u => `<span class="team-chip">${u.nome_completo.split(' ')[0]}</span>`).join('');
+
+        return `<tr>
+          <td style="font-weight:600">${o.nome_obra}</td>
+          <td style="color:#64748B">${o.codigo_of}</td>
+          <td>${o.cliente_nome}</td>
+          <td style="font-size:.85rem;color:#64748B">${o.endereco_local || '—'}</td>
+          <td><div class="team-avatars">${teamHtml}</div></td>
+          <td>${Utils.statusBadge(o.status_obra)}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-ghost btn-sm" onclick="openEquipeModal('${o.id_obra}')">👥 Equipe</button>
+            <button class="btn btn-ghost btn-sm" onclick="editObra('${o.id_obra}')" style="margin-left:.3rem">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="delObra('${o.id_obra}')" style="margin-left:.3rem">Excluir</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── OBRA MODAL ────────────────────────────────────
+    function openObraModal() {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('modal-obra-title').textContent = 'Nova Obra';
+      ['f-nome','f-of','f-cliente','f-contato','f-endereco'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-status').value = 'Ativa';
+      document.getElementById('modal-obra').style.display = 'flex';
+    }
+    function editObra(id) {
+      const o = DB.getObraById(id);
+      if (!o) return;
+      document.getElementById('edit-id').value   = id;
+      document.getElementById('modal-obra-title').textContent = 'Editar Obra';
+      document.getElementById('f-nome').value     = o.nome_obra || '';
+      document.getElementById('f-of').value       = o.codigo_of || '';
+      document.getElementById('f-cliente').value  = o.cliente_nome || '';
+      document.getElementById('f-contato').value  = o.cliente_contato || '';
+      document.getElementById('f-endereco').value = o.endereco_local || '';
+      document.getElementById('f-status').value   = o.status_obra || 'Ativa';
+      document.getElementById('modal-obra').style.display = 'flex';
+    }
+    function closeObraModal() { document.getElementById('modal-obra').style.display = 'none'; }
+    function saveObra() {
+      const nome = document.getElementById('f-nome').value.trim();
+      const of_  = document.getElementById('f-of').value.trim();
+      const cli  = document.getElementById('f-cliente').value.trim();
+      if (!nome || !of_ || !cli) { Utils.toast('Preencha os campos obrigatórios.', 'error'); return; }
+      const data = {
+        nome_obra: nome, codigo_of: of_, cliente_nome: cli,
+        cliente_contato: document.getElementById('f-contato').value.trim(),
+        endereco_local:  document.getElementById('f-endereco').value.trim(),
+        status_obra:     document.getElementById('f-status').value
+      };
+      const id = document.getElementById('edit-id').value;
+      if (id) DB.updateObra(id, data); else DB.createObra(data);
+      closeObraModal(); render();
+      Utils.toast(id ? 'Obra atualizada!' : 'Obra criada!');
+    }
+    function delObra(id) {
+      if (!confirm('Excluir esta obra? Os RDOs associados não serão removidos.')) return;
+      DB.deleteObra(id); render(); Utils.toast('Obra excluída.', 'warning');
+    }
+
+    // ── EQUIPE MODAL ─────────────────────────────────
+    function openEquipeModal(obraId) {
+      const obra     = DB.getObraById(obraId);
+      const assigned = DB.getUserIdsByObra(obraId);
+      const users    = DB.getUsers().filter(u => u.perfil === 'USUARIO' && u.ativo);
+
+      document.getElementById('equipe-obra-id').value   = obraId;
+      document.getElementById('equipe-obra-nome').textContent = obra ? obra.nome_obra : 'Obra';
+
+      const list = document.getElementById('user-check-list');
+      if (users.length === 0) {
+        list.innerHTML = '<p style="padding:1.5rem;text-align:center;color:#94A3B8;font-size:.875rem">Nenhum usuário de campo cadastrado.</p>';
+      } else {
+        list.innerHTML = users.map(u => `
+          <label class="user-check-item">
+            <input type="checkbox" value="${u.id}" ${assigned.includes(u.id) ? 'checked' : ''}>
+            <div>
+              <p class="user-name-label">${u.nome_completo}</p>
+              <p class="user-role-label">${u.funcao_principal || 'Campo'} · ${u.email}</p>
+            </div>
+          </label>`).join('');
+      }
+      document.getElementById('modal-equipe').style.display = 'flex';
+    }
+    function closeEquipeModal() { document.getElementById('modal-equipe').style.display = 'none'; }
+    function saveEquipe() {
+      const obraId   = document.getElementById('equipe-obra-id').value;
+      const checked  = [...document.querySelectorAll('#user-check-list input[type="checkbox"]:checked')].map(c => c.value);
+      DB.setObraUsuarios(obraId, checked);
+      closeEquipeModal(); render();
+      Utils.toast(`Equipe atualizada — ${checked.length} colaborador(es) vinculado(s).`);
+    }
+  </script>
+</body>
+</html>

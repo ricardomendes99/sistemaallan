@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Assinatura do Cliente — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    body { background: #F1F5F9; min-height: 100vh; padding-bottom: 5rem; }
+    .top-bar { background: #0F172A; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .75rem; }
+    .back-btn { background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 1.2rem; }
+    .top-title h1 { color: #fff; font-size: .95rem; font-weight: 700; }
+    .top-title p  { color: #64748B; font-size: .75rem; }
+    main { max-width: 680px; margin: 0 auto; padding: 1rem; }
+    .summary-row { display: flex; justify-content: space-between; padding: .65rem 0; border-bottom: 1px solid #F1F5F9; font-size: .875rem; }
+    .summary-row:last-child { border-bottom: none; }
+    .s-label { color: #64748B; font-weight: 500; }
+    .s-value { color: #1E293B; font-weight: 600; text-align: right; max-width: 60%; }
+    .sig-area { background: #fff; border-radius: .875rem; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 1rem; }
+    .sig-head  { padding: .75rem 1rem; background: #1E293B; color: #fff; font-weight: 700; font-size: .85rem; }
+    .sig-body  { padding: 1rem; }
+    canvas#sig-canvas { display: block; width: 100%; height: 220px; touch-action: none; border: 2px dashed #CBD5E1; border-radius: .5rem; background: #fff; cursor: crosshair; }
+    canvas#sig-canvas.has-sig { border-color: #86EFAC; border-style: solid; }
+    .sig-actions { display: flex; gap: .5rem; margin-top: .5rem; }
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #E2E8F0; padding: .85rem 1rem; display: flex; gap: .75rem; justify-content: flex-end; }
+    .finalized-screen { text-align: center; padding: 3rem 1.5rem; }
+    .finalized-screen .icon { font-size: 4rem; margin-bottom: 1rem; }
+    .finalized-screen h2 { font-size: 1.3rem; font-weight: 700; color: #166534; }
+    .finalized-screen p  { color: #64748B; font-size: .9rem; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="history.back()">←</button>
+    <div class="top-title">
+      <h1>Termo de Aprovação</h1>
+      <p>Assinatura do Cliente</p>
+    </div>
+  </div>
+
+  <main id="main-content">
+    <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
+  </main>
+
+  <div class="bottom-bar" id="bottom-bar" style="display:none">
+    <button class="btn btn-ghost" onclick="history.back()">← Voltar</button>
+    <button class="btn btn-primary" id="btn-finalizar" onclick="finalizar()">✓ Finalizar RDO</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="../assets/js/pdf-gen.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const rdoId  = params.get('rdo');
+    let sigPad = null;
+    let isEmpty = true;
+    let me = null;
+
+    DB.init().then(() => {
+      me = Auth.requireAuth('USUARIO');
+      if (me && rdoId) load();
+    });
+
+    function load() {
+      const rdo  = DB.getRDOById(rdoId);
+      if (!rdo)  { document.getElementById('main-content').innerHTML = '<p style="padding:2rem;color:#EF4444">RDO não encontrado.</p>'; return; }
+
+      if (rdo.status_documento === 'Finalizado') {
+        showFinalized(rdo);
+        return;
+      }
+
+      const obra   = DB.getObraById(rdo.id_obra) || {};
+      const linhas = DB.getRDOLinhas(rdoId);
+      const ef     = rdo.efetivo || {};
+      const total  = Object.values(ef).reduce((s,v) => s+(+v||0), 0);
+
+      document.getElementById('main-content').innerHTML = `
+        <!-- Resumo -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-header">Resumo do RDO</div>
+          <div style="padding:.75rem 1.25rem">
+            <div class="summary-row"><span class="s-label">Obra</span><span class="s-value">${obra.nome_obra || '—'}</span></div>
+            <div class="summary-row"><span class="s-label">Cliente</span><span class="s-value">${obra.cliente_nome || '—'}</span></div>
+            <div class="summary-row"><span class="s-label">Data</span><span class="s-value">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</span></div>
+            <div class="summary-row"><span class="s-label">Período</span><span class="s-value">${rdo.horario_inicio || '—'} às ${rdo.horario_termino || '—'}</span></div>
+            <div class="summary-row"><span class="s-label">Efetivo total</span><span class="s-value">${total} profissional(is)</span></div>
+            <div class="summary-row"><span class="s-label">Atividade</span><span class="s-value">${rdo.atividade || '—'}</span></div>
+            <div class="summary-row"><span class="s-label">Horas preenchidas</span><span class="s-value">${linhas.length} registros</span></div>
+          </div>
+        </div>
+
+        <!-- Nome do cliente -->
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-header">Confirmação do Responsável</div>
+          <div style="padding:1rem">
+            <div class="field" style="margin-bottom:0">
+              <label>Nome do Responsável pela Assinatura *</label>
+              <input type="text" id="f-nome-cliente" placeholder="Nome completo do cliente/responsável" autocomplete="name">
+            </div>
+          </div>
+        </div>
+
+        <!-- Assinatura -->
+        <div class="sig-area">
+          <div class="sig-head">Assinatura do Cliente</div>
+          <div class="sig-body">
+            <p style="font-size:.8rem;color:#64748B;margin-bottom:.75rem">Assine no espaço abaixo usando o dedo ou caneta touch:</p>
+            <canvas id="sig-canvas"></canvas>
+            <div class="sig-actions">
+              <button class="btn btn-ghost btn-sm" onclick="clearSig()">✕ Limpar</button>
+              <span id="sig-status" style="font-size:.8rem;color:#94A3B8;align-self:center;margin-left:.5rem">Aguardando assinatura…</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('bottom-bar').style.display = 'flex';
+      initSigPad();
+    }
+
+    function initSigPad() {
+      const canvas = document.getElementById('sig-canvas');
+      const ctx    = canvas.getContext('2d');
+      const dpr    = window.devicePixelRatio || 1;
+
+      // Set canvas resolution
+      const rect = canvas.getBoundingClientRect();
+      canvas.width  = rect.width  * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      ctx.strokeStyle = '#1E293B';
+      ctx.lineWidth   = 2.2;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+
+      let drawing = false;
+      let lastX = 0, lastY = 0;
+
+      function getPos(e) {
+        const r = canvas.getBoundingClientRect();
+        const src = e.touches ? e.touches[0] : e;
+        return { x: src.clientX - r.left, y: src.clientY - r.top };
+      }
+
+      function start(e) {
+        e.preventDefault();
+        drawing = true;
+        const p = getPos(e);
+        lastX = p.x; lastY = p.y;
+        ctx.beginPath(); ctx.moveTo(lastX, lastY);
+      }
+      function move(e) {
+        e.preventDefault();
+        if (!drawing) return;
+        const p = getPos(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        lastX = p.x; lastY = p.y;
+        if (!isEmpty) return;
+        isEmpty = false;
+        canvas.classList.add('has-sig');
+        document.getElementById('sig-status').textContent = 'Assinatura capturada ✓';
+        document.getElementById('sig-status').style.color = '#16A34A';
+      }
+      function stop(e) { e.preventDefault(); drawing = false; ctx.beginPath(); }
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      canvas.addEventListener('mouseup', stop);
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove',  move,  { passive: false });
+      canvas.addEventListener('touchend',   stop,  { passive: false });
+    }
+
+    function clearSig() {
+      const canvas = document.getElementById('sig-canvas');
+      const ctx    = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.classList.remove('has-sig');
+      isEmpty = true;
+      document.getElementById('sig-status').textContent = 'Aguardando assinatura…';
+      document.getElementById('sig-status').style.color = '#94A3B8';
+    }
+
+    function finalizar() {
+      const nome = (document.getElementById('f-nome-cliente')?.value || '').trim();
+      if (!nome) { Utils.toast('Informe o nome do responsável.', 'error'); return; }
+      if (isEmpty) { Utils.toast('Colete a assinatura do cliente antes de finalizar.', 'error'); return; }
+
+      const canvas = document.getElementById('sig-canvas');
+      const sigB64 = canvas.toDataURL('image/png');
+
+      DB.updateRDO(rdoId, {
+        status_documento:          'Finalizado',
+        assinatura_cliente_base64: sigB64,
+        assinatura_nome_confirmacao: nome,
+        data_fechamento:           new Date().toISOString()
+      });
+
+      Utils.toast('RDO finalizado com sucesso!', 'success');
+      setTimeout(() => {
+        // Auto-generate PDF
+        try {
+          const rdo    = DB.getRDOById(rdoId);
+          const obra   = DB.getObraById(rdo.id_obra) || {};
+          const cri    = DB.getUserById(rdo.id_usuario_criador) || {};
+          const linhas = DB.getRDOLinhas(rdoId);
+          PDFGen.generate(rdo, obra, cri, linhas);
+        } catch(e) { console.warn('PDF gen error:', e); }
+        showFinalized(DB.getRDOById(rdoId));
+      }, 500);
+    }
+
+    function showFinalized(rdo) {
+      document.getElementById('main-content').innerHTML = `
+        <div class="finalized-screen">
+          <div class="icon">✅</div>
+          <h2>RDO Finalizado!</h2>
+          <p>O relatório foi assinado e gerado com sucesso.<br>O PDF foi baixado automaticamente.</p>
+          <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.75rem;align-items:center">
+            <button class="btn btn-primary" onclick="downloadPDF('${rdo.id_rdo}')">⬇ Baixar PDF novamente</button>
+            <button class="btn btn-ghost" onclick="location.href='home.html'">← Voltar para obras</button>
+          </div>
+        </div>`;
+      document.getElementById('bottom-bar').style.display = 'none';
+    }
+
+    function downloadPDF(id) {
+      const rdo    = DB.getRDOById(id || rdoId);
+      const obra   = DB.getObraById(rdo.id_obra) || {};
+      const cri    = DB.getUserById(rdo.id_usuario_criador) || {};
+      const linhas = DB.getRDOLinhas(id || rdoId);
+      PDFGen.generate(rdo, obra, cri, linhas);
+    }
+  </script>
+</body>
+</html>

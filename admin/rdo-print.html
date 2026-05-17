@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RDO — Impressão</title>
+  <style>
+    @page { size: A4; margin: 10mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; background: #fff; }
+
+    /* Screen-only controls */
+    .screen-bar { background: #1E293B; color: #fff; padding: .75rem 1.25rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 100; }
+    .screen-bar h1 { font-size: .95rem; font-weight: 700; flex: 1; }
+    .btn-print { background: #F97316; color: #fff; border: none; padding: .5rem 1.1rem; border-radius: .375rem; font-size: .875rem; font-weight: 700; cursor: pointer; }
+    .btn-back  { background: transparent; color: #94A3B8; border: 1px solid #334155; padding: .5rem .85rem; border-radius: .375rem; font-size: .875rem; cursor: pointer; text-decoration: none; }
+    @media print { .screen-bar { display: none !important; } }
+
+    /* A4 page wrapper */
+    .page { width: 190mm; margin: 1.5rem auto; padding: 0; background: #fff; }
+    @media print { .page { margin: 0; width: 100%; } }
+
+    /* ── HEADER ── */
+    .rdo-header { display: flex; align-items: stretch; border: 1px solid #000; }
+    .logo-cell  { width: 42mm; background: #1E293B; display: flex; align-items: center; padding: 3mm 4mm; gap: 2mm; }
+    .logo-m     { width: 10mm; height: 10mm; background: #F97316; display: flex; align-items: center; justify-content: center; font-size: 10pt; font-weight: 900; color: #fff; border-radius: 2mm; flex-shrink: 0; }
+    .logo-text  { color: #fff; }
+    .logo-text .brand  { font-size: 7pt; font-weight: 700; line-height: 1.2; }
+    .logo-text .sub    { font-size: 5.5pt; color: #94A3B8; }
+    .title-cell { flex: 1; display: flex; align-items: center; justify-content: center; border-left: 1px solid #555; border-right: 1px solid #555; }
+    .title-cell h1 { font-size: 13pt; font-weight: 900; color: #1E293B; letter-spacing: -.02em; }
+    .rev-cell   { width: 38mm; background: #1E293B; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2mm; }
+    .rev-cell .rev  { font-size: 6.5pt; color: #94A3B8; }
+    .rev-cell .date { font-size: 7.5pt; font-weight: 700; color: #fff; }
+
+    /* ── INFO ROWS ── */
+    .info-table { width: 100%; border-collapse: collapse; border: 1px solid #000; border-top: none; }
+    .info-table td { border: 1px solid #ccc; padding: 1.5mm 2mm; vertical-align: top; }
+    .lbl { font-size: 6.5pt; font-weight: 700; color: #555; display: block; }
+    .val { font-size: 8.5pt; font-weight: 600; color: #000; }
+
+    /* ── META TABLE (efetivo/horarios/tempo) ── */
+    .meta-table { width: 100%; border-collapse: collapse; border: 1px solid #000; border-top: none; }
+    .meta-table th { background: #1E293B; color: #fff; font-size: 7pt; font-weight: 700; padding: 1.5mm 2mm; border: 1px solid #444; text-align: center; }
+    .meta-table td { font-size: 7.5pt; padding: 1.2mm 2mm; border: 1px solid #ddd; vertical-align: middle; }
+    .meta-table .row-alt { background: #F8FAFC; }
+    .meta-table .total-row { background: #FFF7ED; font-weight: 700; color: #92400E; }
+    .check-yes { color: #F97316; font-weight: 900; }
+    .check-no  { color: #ccc; }
+
+    /* ── HOUR TABLE ── */
+    .hour-table { width: 100%; border-collapse: collapse; border: 1px solid #000; border-top: none; }
+    .hour-table thead th { background: #1E293B; color: #fff; font-size: 7.5pt; font-weight: 700; padding: 1.5mm 2mm; text-align: left; border: 1px solid #444; }
+    .hour-table tbody tr td { font-size: 7.5pt; padding: 1.5mm 2mm; border: 1px solid #e5e7eb; vertical-align: top; }
+    .hour-table tbody tr:nth-child(even) td { background: #F8FAFC; }
+    .hour-table .time-col { font-weight: 800; font-size: 8pt; color: #1E293B; width: 14mm; }
+    .hour-table .status-tag { font-size: 6pt; font-weight: 700; padding: .5mm 1.5mm; border-radius: 2mm; display: inline-block; }
+    .st-ini { background: #DBEAFE; color: #1E40AF; }
+    .st-and { background: #FEF3C7; color: #92400E; }
+    .st-con { background: #DCFCE7; color: #166534; }
+    .lunch-row td { background: #FFFBEB !important; color: #92400E; font-style: italic; }
+
+    /* ── SECTIONS ── */
+    .section-header { background: #1E293B; color: #fff; text-align: center; font-size: 7.5pt; font-weight: 700; padding: 1.5mm; border: 1px solid #000; border-top: none; letter-spacing: .05em; }
+    .section-body   { min-height: 16mm; border: 1px solid #000; border-top: none; padding: 2mm 3mm; font-size: 8pt; white-space: pre-wrap; }
+    .obs-note { text-align: center; font-size: 7pt; color: #555; font-style: italic; border: 1px solid #ccc; border-top: none; padding: 1mm; }
+
+    /* ── SIGNATURES ── */
+    .sig-row { display: flex; border: 1px solid #000; border-top: none; min-height: 20mm; }
+    .sig-cell { flex: 1; padding: 3mm; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+    .sig-cell:first-child { border-right: 1px solid #ccc; }
+    .sig-line  { border-top: 1px solid #000; width: 80%; margin-top: 1mm; }
+    .sig-label { font-size: 7pt; font-weight: 700; color: #555; margin-top: 1mm; text-align: center; }
+    .sig-name  { font-size: 8pt; font-weight: 700; margin-top: .5mm; }
+    .sig-img   { max-height: 14mm; max-width: 90%; object-fit: contain; }
+
+    /* Client approval stamp */
+    .aprov-stamp { text-align: center; padding: 2mm; font-size: 7pt; }
+    .stamp-ok  { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; border-radius: 2mm; padding: 1mm 3mm; display: inline-block; font-weight: 700; }
+    .stamp-res { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 2mm; padding: 1mm 3mm; display: inline-block; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="screen-bar">
+    <h1 id="screen-title">RDO — Carregando…</h1>
+    <a class="btn-back" onclick="history.back()">← Voltar</a>
+    <button class="btn-print" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
+  </div>
+
+  <div class="page" id="page-content">
+    <div style="text-align:center;padding:2rem;color:#94A3B8">Carregando relatório…</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const rdoId  = params.get('id');
+
+    DB.init().then(() => render());
+
+    function render() {
+      const rdo    = DB.getRDOById(rdoId);
+      if (!rdo)   { document.getElementById('page-content').innerHTML = '<p style="padding:2rem;color:red">RDO não encontrado.</p>'; return; }
+      const obra   = DB.getObraById(rdo.id_obra) || {};
+      const cri    = DB.getUserById(rdo.id_usuario_criador) || {};
+      const linhas = DB.getRDOLinhas(rdoId);
+      const ef     = rdo.efetivo || {};
+
+      document.title = `RDO — ${obra.nome_obra||''} — ${Utils.formatDate(rdo.data_apontamento)}`;
+      document.getElementById('screen-title').textContent = document.title;
+
+      const DIAS = ['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
+      const ROLES = [
+        ['Montador', ef.montador||0],
+        ['Auxiliar Montagem', ef.auxiliar||0],
+        ['Eletricista', ef.eletricista||0],
+        ['Soldador', ef.soldador||0],
+        ['Encarregado', ef.encarregado||0],
+        ['Técnico Segurança', ef.tecnico_seguranca||0],
+      ];
+      const total = ROLES.reduce((s,[,v]) => s+(+v||0), 0);
+      const diaSemana = Utils.getDayOfWeek(rdo.data_apontamento);
+      const TEMPO_OPTS = ['Bom (sem chuva)','Chuva Leve','Chuva Extrema'];
+      const STATUS_GERAL = ['Iniciada','Em Andamento','Concluída'];
+
+      function chk(val, ref) { return val === ref ? '<span class="check-yes">■</span>' : '<span class="check-no">□</span>'; }
+
+      const metaRows = DIAS.map((dia, i) => {
+        const isDia    = dia === diaSemana;
+        const role     = ROLES[i] || ['—', ''];
+        const horRow   = i === 0 ? `<span class="lbl">Início</span> ${rdo.horario_inicio||''}`
+                       : i === 1 ? `<span class="lbl">Almoço</span> ${rdo.horario_almoco||''}`
+                       : i === 2 ? `<span class="lbl">Término</span> ${rdo.horario_termino||''}`
+                       : '';
+        const tempoOpt  = TEMPO_OPTS[i] || '';
+        const statusOpt = i >= 4 ? STATUS_GERAL[i - 4] || '' : '';
+
+        // Col 3 — Tempo (rows 0-2), label Status (row 3), opções Status (rows 4-6)
+        let col3 = '';
+        if (i < 3 && tempoOpt) {
+          const active = tempoOpt === rdo.condicao_tempo_manha || tempoOpt === rdo.condicao_tempo_tarde;
+          col3 = `${active ? '<span class="check-yes">●</span>' : '<span class="check-no">○</span>'} ${tempoOpt}`;
+        } else if (i === 3) {
+          col3 = '<strong style="font-size:7pt;color:#1E293B">Status da Atividade</strong>';
+        } else if (statusOpt) {
+          col3 = `${chk(statusOpt, rdo.status_atividade)} ${statusOpt}`;
+        }
+
+        // Col 4 — Manhã checkbox (somente rows 0-2)
+        const col4 = (i < 3 && tempoOpt) ? chk(tempoOpt, rdo.condicao_tempo_manha) : '';
+        // Col 5 — Tarde checkbox (somente rows 0-2)
+        const col5 = (i < 3 && tempoOpt) ? chk(tempoOpt, rdo.condicao_tempo_tarde) : '';
+
+        return `<tr class="${i % 2 === 0 ? '' : 'row-alt'} ${i === 6 ? 'total-row' : ''}">
+          <td>${isDia ? '<b>' : ''}${chk(dia, diaSemana)} ${dia}${isDia ? '</b>' : ''}</td>
+          <td>${i === 6 ? '<b>Total</b>' : role[0]} &nbsp;<b>${i === 6 ? total : (role[1] || '')}</b></td>
+          <td>${horRow}</td>
+          <td>${col3}</td>
+          <td style="text-align:center">${col4}</td>
+          <td style="text-align:center">${col5}</td>
+        </tr>`;
+      }).join('');
+
+      const hourRows = Utils.getSlots().map((slot, idx) => {
+        const isLunch = slot === rdo.horario_almoco;
+        if (isLunch) return `<tr class="lunch-row"><td class="time-col">${slot}</td><td colspan="2"><em>Intervalo de almoço</em></td></tr>`;
+        const l = linhas.find(x => x.horario_ponto === slot);
+        if (!l || !l.descricao_detalhada) return `<tr><td class="time-col">${slot}</td><td style="color:#ccc">—</td><td></td></tr>`;
+        const sc = { 'Iniciada':'st-ini', 'Em Andamento':'st-and', 'Concluída':'st-con' };
+        return `<tr>
+          <td class="time-col">${slot}</td>
+          <td>${l.referencia_modulo ? `<b>[${l.referencia_modulo}]</b> ` : ''}${l.descricao_detalhada}</td>
+          <td style="text-align:center">${l.status_atividade ? `<span class="status-tag ${sc[l.status_atividade]||''}">${l.status_atividade}</span>` : ''}</td>
+        </tr>`;
+      }).join('');
+
+      // Approval section
+      const aprovHTML = rdo.aprovacao_cliente ? `
+        <div class="aprov-stamp">
+          <span class="${rdo.aprovacao_cliente === 'Aprovado' ? 'stamp-ok' : 'stamp-res'}">
+            ${rdo.aprovacao_cliente} — ${rdo.nome_aprovador_cliente || ''}
+          </span>
+          ${rdo.comentario_cliente ? `<br><span style="font-size:6.5pt;color:#64748B">"${rdo.comentario_cliente}"</span>` : ''}
+        </div>` : '';
+
+      document.getElementById('page-content').innerHTML = `
+        <!-- HEADER -->
+        <div class="rdo-header">
+          <div class="logo-cell">
+            <div class="logo-m">M</div>
+            <div class="logo-text">
+              <div class="brand">MODULAR<br>SERVICE</div>
+            </div>
+          </div>
+          <div class="title-cell"><h1>RDO — RELATÓRIO DIÁRIO DE OBRA</h1></div>
+          <div class="rev-cell">
+            <div class="rev">RDO-001 - Revisão: 03</div>
+            <div class="date">Data: ${Utils.formatDate(rdo.data_apontamento)}</div>
+          </div>
+        </div>
+
+        <!-- INFO ROWS -->
+        <table class="info-table">
+          <tr>
+            <td style="width:33%"><span class="lbl">Cliente:</span><span class="val">${obra.cliente_nome||''}</span></td>
+            <td style="width:34%"><span class="lbl">Local da Obra:</span><span class="val">${obra.endereco_local||''}</span></td>
+            <td style="width:33%"><span class="lbl">Contato Cliente:</span><span class="val">${obra.cliente_contato||''}</span></td>
+          </tr>
+          <tr>
+            <td colspan="2"><span class="lbl">Executantes:</span><span class="val">${rdo.executantes || cri.nome_completo || ''}</span></td>
+            <td style="display:flex;gap:4mm">
+              <div style="flex:1"><span class="lbl">Data:</span><span class="val">${Utils.formatDate(rdo.data_apontamento)}</span></div>
+              <div><span class="lbl">OF:</span><span class="val">${obra.codigo_of||''}</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3"><span class="lbl">Atividade:</span><span class="val">${rdo.atividade||''}</span></td>
+          </tr>
+        </table>
+
+        <!-- META TABLE -->
+        <table class="meta-table">
+          <thead>
+            <tr>
+              <th style="width:30%">Dia da Atividade</th>
+              <th style="width:22%">Efetivo Modular</th>
+              <th style="width:18%">Horários</th>
+              <th style="width:18%">Tempo</th>
+              <th style="width:6%">Manhã</th>
+              <th style="width:6%">Tarde</th>
+            </tr>
+          </thead>
+          <tbody>${metaRows}</tbody>
+        </table>
+
+        <!-- HOUR TABLE -->
+        <table class="hour-table">
+          <thead><tr><th style="width:14mm">Hora</th><th>Discriminação das atividades</th><th style="width:22mm">Status</th></tr></thead>
+          <tbody>${hourRows}</tbody>
+        </table>
+
+        <div class="obs-note">Observação: O RDO deve ser preenchido de hora em hora</div>
+
+        <div class="section-header">CAMPO OBSERVAÇÕES E DESVIOS</div>
+        <div class="section-body" style="min-height:18mm">${rdo.observacoes_desvios||''}</div>
+
+        <div class="section-header">CAMPO DESTINADO A COMENTÁRIOS FISCALIZAÇÃO</div>
+        <div class="section-body" style="min-height:16mm">${rdo.comentarios_fiscalizacao||''}</div>
+
+        ${aprovHTML}
+
+        ${rdo.fotos && rdo.fotos.length > 0 ? `
+        <div class="section-header">REGISTRO FOTOGRÁFICO (${rdo.fotos.length} foto${rdo.fotos.length > 1 ? 's' : ''})</div>
+        <div style="border:1px solid #000;border-top:none;padding:3mm;display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;page-break-inside:avoid">
+          ${rdo.fotos.map((src, i) => `
+            <div style="aspect-ratio:1;overflow:hidden;border:1px solid #ddd;border-radius:1.5mm">
+              <img src="${src}" alt="Foto ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block">
+            </div>`).join('')}
+        </div>` : ''}
+
+        <!-- SIGNATURES -->
+        <div class="sig-row">
+          <div class="sig-cell">
+            <div class="sig-line"></div>
+            <div class="sig-label">Modular</div>
+          </div>
+          <div class="sig-cell">
+            ${rdo.assinatura_cliente_base64 ? `<img src="${rdo.assinatura_cliente_base64}" class="sig-img">` : ''}
+            <div class="sig-line"></div>
+            <div class="sig-label">Nome e Assinatura do Cliente:</div>
+            <div class="sig-name">${rdo.assinatura_nome_confirmacao||''}</div>
+          </div>
+        </div>
+      `;
+    }
+
+  </script>
+</body>
+</html>

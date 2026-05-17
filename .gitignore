@@ -1,0 +1,17 @@
+# Credenciais — nunca subir
+.env
+
+# PDFs de referência
+*.pdf
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*.swo
+
+# Docker build cache
+docker-compose.override.yml

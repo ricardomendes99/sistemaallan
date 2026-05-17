@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .header { background: #0F172A; color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: .75rem; }
+    .logo-m { width: 36px; height: 36px; background: #F97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #fff; }
+    .logo-text h1 { font-size: 1rem; font-weight: 700; }
+    .logo-text p  { font-size: .75rem; color: #64748B; }
+    nav { background: #1E293B; padding: 0 1.5rem; }
+    nav a { color: #94A3B8; padding: .625rem 1rem; font-size: .875rem; font-weight: 500; text-decoration: none; display: inline-block; }
+    nav a:hover { color: #fff; }
+    nav a.active { color: #fff; background: #334155; border-radius: 0 0 .5rem .5rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    @media(min-width:768px){ .metrics { grid-template-columns: repeat(4,1fr); } }
+    .two-col { display: grid; gap: 1.25rem; margin-bottom: 1.25rem; }
+    @media(min-width:900px){ .two-col { grid-template-columns: 1fr 1fr; } }
+    .list-item { padding: .75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #F1F5F9; }
+    .list-item:last-child { border-bottom: none; }
+    .list-empty { padding: 2.5rem; text-align: center; color: #94A3B8; font-size: .875rem; }
+    .user-info { color: #94A3B8; font-size: .875rem; display: flex; align-items: center; gap: 1rem; }
+    .btn-logout { background: none; border: none; color: #64748B; cursor: pointer; font-size: .875rem; padding: .25rem .5rem; border-radius: .375rem; }
+    .btn-logout:hover { color: #fff; background: #334155; }
+    .section-header { padding: .9rem 1.25rem; border-bottom: 1px solid #E2E8F0; font-weight: 600; color: #1E293B; display: flex; align-items: center; gap: .5rem; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .page-title { font-size: 1.15rem; font-weight: 700; color: #1E293B; }
+    .page-sub   { font-size: .85rem; color: #64748B; }
+    .refresh-btn { background: none; border: none; color: #F97316; cursor: pointer; font-size: .875rem; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-m">M</div>
+      <div class="logo-text"><h1>Modular Service</h1><p>RDO Digital</p></div>
+    </div>
+    <div class="user-info">
+      <span id="user-name"></span>
+      <button class="btn-logout" onclick="Auth.logout()">Sair</button>
+    </div>
+  </header>
+
+  <nav>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="obras.html">Obras</a>
+    <a href="usuarios.html">Usuários</a>
+    <a href="historico.html">Histórico RDOs</a>
+    <a href="relatorio-executivo.html">Relatório Executivo</a>
+    <a href="backup.html">Backup</a>
+  </nav>
+
+  <main>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem;">
+      <div>
+        <p class="page-title">Painel do Dia</p>
+        <p class="page-sub" id="date-label"></p>
+      </div>
+      <button class="refresh-btn" onclick="render()">↻ Atualizar</button>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics">
+      <div class="metric-card card">
+        <p class="metric-label">Obras Ativas</p>
+        <p class="metric-value" id="m-ativas" style="color:#1E293B">0</p>
+      </div>
+      <div class="metric-card card">
+        <p class="metric-label">RDOs Finalizados</p>
+        <p class="metric-value" id="m-fin" style="color:#16A34A">0</p>
+      </div>
+      <div class="metric-card card">
+        <p class="metric-label">Em Rascunho</p>
+        <p class="metric-value" id="m-rasc" style="color:#D97706">0</p>
+      </div>
+      <div class="metric-card card">
+        <p class="metric-label">Sem Apontamento</p>
+        <p class="metric-value" id="m-sem" style="color:#DC2626">0</p>
+      </div>
+    </div>
+
+    <!-- Two columns -->
+    <div class="two-col">
+      <!-- Quem já fez -->
+      <div class="card">
+        <div class="section-header">
+          <span class="dot" style="background:#4ADE80"></span> Quem Já Fez
+        </div>
+        <div id="list-fez"><div class="list-empty">Nenhum RDO entregue hoje.</div></div>
+      </div>
+
+      <!-- O que está faltando -->
+      <div class="card">
+        <div class="section-header">
+          <span class="dot" style="background:#F87171"></span> O Que Está Faltando
+        </div>
+        <div id="list-falta"><div class="list-empty">Tudo em dia!</div></div>
+      </div>
+    </div>
+
+    <!-- Recent RDOs -->
+    <div class="card">
+      <div class="section-header">Todos os RDOs Recentes</div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Obra</th>
+              <th>Data</th>
+              <th>Criador</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="rdos-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    DB.init().then(() => {
+      const user = Auth.requireAuth('ADMIN');
+      if (user) {
+        document.getElementById('user-name').textContent = user.nome_completo;
+        const hoje = Utils.today();
+        document.getElementById('date-label').textContent =
+          Utils.getDayOfWeek(hoje) + ', ' + Utils.formatDate(hoje);
+        render();
+      }
+    });
+
+    function render() {
+      const hoje = Utils.today();
+      const obras = DB.getObrasAtivas();
+      const rdosHoje = DB.getRDOsByData(hoje);
+      const allRDOs = DB.getRDOs();
+
+      // Metrics
+      document.getElementById('m-ativas').textContent = obras.length;
+      const fin  = rdosHoje.filter(r => r.status_documento === 'Finalizado' || r.status_documento === 'Pendente_Assinatura').length;
+      const rasc = rdosHoje.filter(r => r.status_documento === 'Rascunho').length;
+      const obrasComRDO = new Set(rdosHoje.map(r => r.id_obra));
+      const obrasSem = obras.filter(o => !obrasComRDO.has(o.id_obra));
+      document.getElementById('m-fin').textContent  = fin;
+      document.getElementById('m-rasc').textContent = rasc;
+      document.getElementById('m-sem').textContent  = obrasSem.length;
+
+      // RN04: after noon, mark red
+      const isAfternoon = new Date().getHours() >= 12;
+
+      // "Quem já fez"
+      const listFez = document.getElementById('list-fez');
+      if (rdosHoje.length === 0) {
+        listFez.innerHTML = '<div class="list-empty">Nenhum RDO iniciado hoje.</div>';
+      } else {
+        listFez.innerHTML = rdosHoje.map(r => {
+          const obra = DB.getObraById(r.id_obra);
+          const cri  = DB.getUserById(r.id_usuario_criador);
+          return `<div class="list-item">
+            <div>
+              <p style="font-weight:600;font-size:.9rem">${obra ? obra.nome_obra : '—'}</p>
+              <p style="font-size:.78rem;color:#64748B">${cri ? cri.nome_completo : ''}</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:.75rem">
+              ${Utils.statusBadge(r.status_documento)}
+              <a href="rdo-view.html?id=${r.id_rdo}" style="color:#F97316;font-size:.8rem;font-weight:600;text-decoration:none">Ver</a>
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      // "O que está faltando"
+      const listFalta = document.getElementById('list-falta');
+      if (obrasSem.length === 0) {
+        listFalta.innerHTML = '<div class="list-empty">Todas as obras têm apontamento!</div>';
+      } else {
+        listFalta.innerHTML = obrasSem.map(o => {
+          const tag = isAfternoon
+            ? '<span class="tag-alerta">⚠ Sem Atividade</span>'
+            : '<span class="tag-pending">Pendente</span>';
+          return `<div class="list-item">
+            <div>
+              <p style="font-weight:600;font-size:.9rem">${o.nome_obra}</p>
+              <p style="font-size:.78rem;color:#64748B">${o.cliente_nome} · OF: ${o.codigo_of}</p>
+            </div>
+            ${tag}
+          </div>`;
+        }).join('');
+      }
+
+      // Recent RDOs table
+      const recent = [...allRDOs].reverse().slice(0, 30);
+      const tbody = document.getElementById('rdos-tbody');
+      if (recent.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:#94A3B8">Nenhum RDO ainda.</td></tr>';
+      } else {
+        tbody.innerHTML = recent.map(r => {
+          const obra = DB.getObraById(r.id_obra);
+          const cri  = DB.getUserById(r.id_usuario_criador);
+          return `<tr>
+            <td style="font-weight:600">${obra ? obra.nome_obra : '—'}</td>
+            <td>${Utils.formatDate(r.data_apontamento)}</td>
+            <td>${cri ? cri.nome_completo : '—'}</td>
+            <td>${Utils.statusBadge(r.status_documento)}</td>
+            <td><a href="rdo-view.html?id=${r.id_rdo}" style="color:#F97316;font-weight:600;font-size:.85rem;text-decoration:none">Ver →</a></td>
+          </tr>`;
+        }).join('');
+      }
+    }
+  </script>
+</body>
+</html>

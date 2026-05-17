@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Aprovação de RDO — Modular Service</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F1F5F9; min-height: 100vh; }
+    .top { background: #0F172A; padding: 1rem 1.25rem; display: flex; align-items: center; gap: .65rem; }
+    .logo-m { width: 32px; height: 32px; background: #F97316; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: .9rem; flex-shrink: 0; }
+    .top-title { color: #fff; font-weight: 700; font-size: .95rem; }
+    .top-sub   { color: #64748B; font-size: .75rem; }
+    main { max-width: 700px; margin: 0 auto; padding: 1.25rem; }
+    .card { background: #fff; border-radius: .875rem; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 1rem; }
+    .card-header { padding: .75rem 1.25rem; background: #1E293B; color: #fff; font-weight: 700; font-size: .85rem; }
+    .card-body { padding: 1.25rem; }
+    .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: .55rem 0; border-bottom: 1px solid #F1F5F9; font-size: .875rem; }
+    .info-row:last-child { border-bottom: none; }
+    .il { color: #64748B; }
+    .iv { color: #1E293B; font-weight: 600; text-align: right; max-width: 60%; }
+    .hora-row { display: flex; gap: .75rem; padding: .65rem 0; border-bottom: 1px solid #F8FAFC; align-items: flex-start; }
+    .hora-row:last-child { border-bottom: none; }
+    .ht { font-size: .9rem; font-weight: 800; color: #1E293B; min-width: 50px; flex-shrink: 0; }
+    .hd { flex: 1; font-size: .85rem; color: #334155; line-height: 1.5; }
+    .hm { font-size: .72rem; color: #94A3B8; font-weight: 600; }
+    .status-pill { font-size: .68rem; font-weight: 700; padding: .18rem .5rem; border-radius: 9999px; flex-shrink: 0; }
+    .sp-ini { background:#DBEAFE;color:#1E40AF; }
+    .sp-and { background:#FEF3C7;color:#92400E; }
+    .sp-con { background:#DCFCE7;color:#166534; }
+
+    /* Approval section */
+    .aprov-opts { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+    .aprov-opt { display: flex; align-items: center; gap: .75rem; border: 1.5px solid #E2E8F0; border-radius: .625rem; padding: .75rem 1rem; cursor: pointer; transition: border-color .15s; }
+    .aprov-opt:hover { border-color: #F97316; }
+    .aprov-opt input { accent-color: #F97316; width: 18px; height: 18px; cursor: pointer; }
+    .aprov-opt.selected { border-color: #F97316; background: #FFF7ED; }
+    .aprov-label { font-size: .9rem; font-weight: 600; color: #1E293B; }
+    .aprov-sub   { font-size: .75rem; color: #64748B; }
+    textarea { width: 100%; border: 1.5px solid #CBD5E1; border-radius: .5rem; padding: .65rem .85rem; font-size: .9rem; font-family: inherit; resize: vertical; min-height: 90px; }
+    textarea:focus { outline: none; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,.1); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .65rem 1.25rem; border-radius: .5rem; font-size: .9rem; font-weight: 700; cursor: pointer; border: none; }
+    .btn-primary { background: #F97316; color: #fff; }
+    .btn-primary:hover { background: #EA6C0A; }
+    .btn-full { width: 100%; padding: .85rem; font-size: 1rem; }
+    .badge-ok { background: #DCFCE7; color: #166534; padding: .35rem .9rem; border-radius: 9999px; font-size: .85rem; font-weight: 700; display: inline-block; }
+    .badge-res { background: #FEF3C7; color: #92400E; padding: .35rem .9rem; border-radius: 9999px; font-size: .85rem; font-weight: 700; display: inline-block; }
+    .obs-box { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: .5rem; padding: .85rem 1rem; font-size: .875rem; color: #78350F; white-space: pre-wrap; }
+    .error-box { background: #FEE2E2; border: 1px solid #FECACA; color: #991B1B; border-radius: .625rem; padding: 1.5rem; text-align: center; }
+    .success-screen { text-align: center; padding: 3rem 1.5rem; }
+    .success-screen .icon { font-size: 3.5rem; margin-bottom: .75rem; }
+    .success-screen h2 { font-size: 1.2rem; font-weight: 700; color: #166534; }
+    .success-screen p  { color: #64748B; margin-top: .4rem; font-size: .875rem; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="logo-m">M</div>
+    <div>
+      <p class="top-title">Modular Service</p>
+      <p class="top-sub">Portal de Aprovação de RDO</p>
+    </div>
+  </div>
+
+  <main id="main-content">
+    <div style="text-align:center;padding:3rem;color:#94A3B8">Verificando acesso…</div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/db.js"></script>
+  <script src="../assets/js/utils.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const rdoId  = params.get('rdo');
+    const token  = params.get('t');
+
+    DB.init().then(() => load());
+
+    function load() {
+      const rdo = DB.getRDOById(rdoId);
+      if (!rdo || !token) { showError('Link inválido ou expirado.'); return; }
+      if (rdo.cliente_token !== token) { showError('Código de acesso inválido.'); return; }
+
+      // Already approved
+      if (rdo.aprovacao_cliente) { showAlreadyApproved(rdo); return; }
+
+      const obra   = DB.getObraById(rdo.id_obra) || {};
+      const cri    = DB.getUserById(rdo.id_usuario_criador) || {};
+      const linhas = DB.getRDOLinhas(rdoId);
+      const ef     = rdo.efetivo || {};
+      const total  = Object.values(ef).reduce((s,v) => s+(+v||0), 0);
+
+      document.getElementById('main-content').innerHTML = `
+        <div style="margin-bottom:1rem">
+          <p style="font-size:1.1rem;font-weight:700;color:#1E293B">${obra.nome_obra || '—'}</p>
+          <p style="font-size:.85rem;color:#64748B">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</p>
+        </div>
+
+        <!-- Dados gerais -->
+        <div class="card">
+          <div class="card-header">Dados do Relatório</div>
+          <div class="card-body">
+            <div class="info-row"><span class="il">Cliente</span><span class="iv">${obra.cliente_nome||'—'}</span></div>
+            <div class="info-row"><span class="il">Local</span><span class="iv">${obra.endereco_local||'—'}</span></div>
+            <div class="info-row"><span class="il">Atividade</span><span class="iv">${rdo.atividade||'—'}</span></div>
+            <div class="info-row"><span class="il">Período</span><span class="iv">${rdo.horario_inicio||'—'} — ${rdo.horario_termino||'—'}</span></div>
+            <div class="info-row"><span class="il">Tempo Manhã</span><span class="iv">${rdo.condicao_tempo_manha||'—'}</span></div>
+            <div class="info-row"><span class="il">Tempo Tarde</span><span class="iv">${rdo.condicao_tempo_tarde||'—'}</span></div>
+            <div class="info-row"><span class="il">Equipe total</span><span class="iv">${total} profissional(is)</span></div>
+            <div class="info-row"><span class="il">Executante</span><span class="iv">${cri.nome_completo||'—'}</span></div>
+            <div class="info-row"><span class="il">OF</span><span class="iv">${obra.codigo_of||'—'}</span></div>
+          </div>
+        </div>
+
+        <!-- Atividades hora a hora -->
+        <div class="card">
+          <div class="card-header">Atividades Realizadas</div>
+          <div class="card-body" style="padding:.75rem 1.25rem">
+            ${Utils.getSlots().map(slot => {
+              const l = linhas.find(x => x.horario_ponto === slot);
+              if (slot === rdo.horario_almoco)
+                return `<div class="hora-row"><span class="ht" style="color:#D97706">${slot}</span><em class="hd" style="color:#92400E">Intervalo de almoço</em></div>`;
+              if (!l || !l.descricao_detalhada)
+                return `<div class="hora-row" style="opacity:.35"><span class="ht">${slot}</span><span class="hd">—</span></div>`;
+              const sc = { 'Iniciada':'sp-ini','Em Andamento':'sp-and','Concluída':'sp-con' };
+              return `<div class="hora-row">
+                <span class="ht">${slot}</span>
+                <div class="hd">
+                  ${l.referencia_modulo ? `<span class="hm">${l.referencia_modulo}</span><br>` : ''}
+                  ${l.descricao_detalhada}
+                </div>
+                ${l.status_atividade ? `<span class="status-pill ${sc[l.status_atividade]||''}">${l.status_atividade}</span>` : ''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        ${rdo.observacoes_desvios ? `
+        <div class="card">
+          <div class="card-header">Observações e Desvios</div>
+          <div class="card-body"><div class="obs-box">${rdo.observacoes_desvios}</div></div>
+        </div>` : ''}
+
+        ${rdo.fotos && rdo.fotos.length > 0 ? `
+        <div class="card">
+          <div class="card-header">Fotos da Obra (${rdo.fotos.length})</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.65rem;padding:1rem">
+            ${rdo.fotos.map((src, i) => `
+              <div style="aspect-ratio:1;border-radius:.5rem;overflow:hidden;border:1px solid #E2E8F0;cursor:zoom-in" onclick="verFoto('${i}')">
+                <img src="${src}" alt="Foto ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block">
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+
+        <!-- Aprovação do cliente -->
+        <div class="card">
+          <div class="card-header">Sua Aprovação</div>
+          <div class="card-body">
+            <p style="font-size:.875rem;color:#475569;margin-bottom:1rem">Revise o relatório acima e registre sua aprovação:</p>
+            <div class="aprov-opts" id="aprov-opts">
+              <label class="aprov-opt" onclick="selectAprov(this)">
+                <input type="radio" name="aprov" value="Aprovado">
+                <div>
+                  <p class="aprov-label">✅ Aprovado</p>
+                  <p class="aprov-sub">Confirmo as atividades realizadas conforme descrito.</p>
+                </div>
+              </label>
+              <label class="aprov-opt" onclick="selectAprov(this)">
+                <input type="radio" name="aprov" value="Aprovado com ressalvas">
+                <div>
+                  <p class="aprov-label">⚠️ Aprovado com ressalvas</p>
+                  <p class="aprov-sub">Aprovo com comentários adicionais abaixo.</p>
+                </div>
+              </label>
+            </div>
+            <div class="field" style="margin-bottom:1.25rem">
+              <label style="display:block;font-size:.78rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.4rem">Comentário (opcional)</label>
+              <textarea id="f-coment" placeholder="Escreva aqui qualquer observação ou ressalva…"></textarea>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label style="display:block;font-size:.78rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.4rem">Seu nome *</label>
+              <input type="text" id="f-nome-cli" placeholder="Nome completo do responsável"
+                style="width:100%;padding:.6rem .85rem;border:1.5px solid #CBD5E1;border-radius:.5rem;font-size:.9rem;margin-bottom:1.25rem">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="confirmarAprovacao()">Confirmar Aprovação</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function verFoto(idx) {
+      const rdo = DB.getRDOById(rdoId);
+      if (!rdo || !rdo.fotos) return;
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;cursor:zoom-out';
+      overlay.innerHTML = `<img src="${rdo.fotos[idx]}" style="max-width:100%;max-height:100%;border-radius:.5rem;object-fit:contain">`;
+      overlay.onclick = () => overlay.remove();
+      document.body.appendChild(overlay);
+    }
+
+    function selectAprov(el) {
+      document.querySelectorAll('.aprov-opt').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function confirmarAprovacao() {
+      const aprov = document.querySelector('input[name="aprov"]:checked');
+      const nome  = document.getElementById('f-nome-cli').value.trim();
+      const comt  = document.getElementById('f-coment').value.trim();
+      if (!aprov) { alert('Selecione uma opção de aprovação.'); return; }
+      if (!nome)  { alert('Informe seu nome.'); return; }
+
+      DB.updateRDO(rdoId, {
+        aprovacao_cliente:            aprov.value,
+        comentario_cliente:           comt,
+        nome_aprovador_cliente:       nome,
+        data_aprovacao_cliente:       new Date().toISOString()
+      });
+
+      document.getElementById('main-content').innerHTML = `
+        <div class="success-screen">
+          <div class="icon">✅</div>
+          <h2>Aprovação registrada!</h2>
+          <p><strong>${nome}</strong></p>
+          <p style="margin-top:.25rem">${aprov.value}</p>
+          ${comt ? `<p style="margin-top:1rem;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.5rem;padding:.75rem;font-size:.875rem;color:#334155;text-align:left">"${comt}"</p>` : ''}
+          <p style="margin-top:1.5rem;color:#94A3B8;font-size:.8rem">Obrigado! Este registro foi enviado para a equipe Modular Service.</p>
+        </div>`;
+    }
+
+    function showAlreadyApproved(rdo) {
+      document.getElementById('main-content').innerHTML = `
+        <div class="success-screen">
+          <div class="icon">✅</div>
+          <h2>RDO já aprovado</h2>
+          <p><strong>${rdo.nome_aprovador_cliente}</strong></p>
+          <p><span class="${rdo.aprovacao_cliente === 'Aprovado' ? 'badge-ok' : 'badge-res'}">${rdo.aprovacao_cliente}</span></p>
+          ${rdo.comentario_cliente ? `<p style="margin-top:1rem;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.5rem;padding:.75rem;font-size:.875rem;color:#334155;">"${rdo.comentario_cliente}"</p>` : ''}
+          <p style="margin-top:1rem;font-size:.8rem;color:#94A3B8">Aprovado em ${Utils.formatDate(rdo.data_aprovacao_cliente ? rdo.data_aprovacao_cliente.split('T')[0] : '')}</p>
+        </div>`;
+    }
+
+    function showError(msg) {
+      document.getElementById('main-content').innerHTML = `
+        <div class="error-box">
+          <p style="font-size:1.5rem;margin-bottom:.5rem">🔒</p>
+          <p style="font-weight:700;margin-bottom:.25rem">Acesso negado</p>
+          <p style="font-size:.875rem">${msg}</p>
+        </div>`;
+    }
+
+  </script>
+</body>
+</html>

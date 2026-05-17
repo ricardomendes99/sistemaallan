@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:vault/*)",
+      "Bash(ls:vault/)",
+      "Read(vault/*)",
+      "Read(vault/**/*)",
+      "Read(CLAUDE.md)"
+    ]
+  }
+}
