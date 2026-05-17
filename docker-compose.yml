@@ -2,10 +2,7 @@ version: '3.8'
 
 services:
   modular-rdo:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: modular-rdo:latest
+    image: ghcr.io/ricardomendes99/sistemaallan:latest
     container_name: modular-rdo
     restart: unless-stopped
 
