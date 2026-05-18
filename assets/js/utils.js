@@ -26,20 +26,18 @@ const Utils = (() => {
     return null;
   }
 
-  // RN05: all slots between start/end (excluding lunch) must be filled
+  // RN05: minimum 12 slots must be filled to generate the RDO
   function validateRDOCompleto(rdo, linhas) {
     if (!rdo.horario_inicio || !rdo.horario_termino) return 'Preencha os horários de início e término.';
     const idx_start = SLOTS.indexOf(rdo.horario_inicio);
     const idx_end   = SLOTS.indexOf(rdo.horario_termino);
     if (idx_start < 0 || idx_end < 0 || idx_end <= idx_start) return 'Horários inválidos.';
 
-    for (let i = idx_start; i <= idx_end; i++) {
-      const slot = SLOTS[i];
-      if (slot === rdo.horario_almoco) continue;
-      const l = linhas.find(x => x.horario_ponto === slot);
-      if (!l || !l.descricao_detalhada || l.descricao_detalhada.trim().length < 20)
-        return `Hora ${slot} está incompleta. Preencha todas as horas (RN05).`;
-    }
+    const filled = linhas.filter(l =>
+      l.descricao_detalhada && l.descricao_detalhada.trim().length >= 20
+    ).length;
+
+    if (filled < 12) return `Preencha pelo menos 12 horas (${filled}/12 preenchidas) para gerar o RDO.`;
     return null;
   }
 
