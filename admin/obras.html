@@ -21,7 +21,6 @@
     .btn-logout:hover { color: #fff; background: #334155; }
     .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem; }
 
-    /* User assignment checkboxes */
     .user-check-list { max-height: 280px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: .5rem; }
     .user-check-item { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
     .user-check-item:last-child { border-bottom: none; }
@@ -31,6 +30,12 @@
     .user-role-label  { font-size: .75rem; color: #64748B; }
     .team-avatars { display: flex; gap: .2rem; flex-wrap: wrap; }
     .team-chip { background: #F1F5F9; color: #475569; font-size: .7rem; font-weight: 600; padding: .15rem .5rem; border-radius: 9999px; }
+
+    .anexo-row { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-bottom: 1px solid #F1F5F9; }
+    .anexo-row:last-child { border-bottom: none; }
+    .anexo-nome { font-size: .9rem; font-weight: 600; color: #1E293B; flex: 1; }
+    .anexo-file { font-size: .75rem; color: #64748B; }
+    .anexo-add { border-top: 1px solid #E2E8F0; padding: 1rem; display: flex; flex-direction: column; gap: .65rem; }
   </style>
 </head>
 <body>
@@ -127,7 +132,7 @@
     </div>
   </div>
 
-  <!-- Modal: Equipe (user assignment) -->
+  <!-- Modal: Equipe -->
   <div class="modal-overlay" id="modal-equipe" style="display:none" onclick="if(event.target===this)closeEquipeModal()">
     <div class="modal-box">
       <div class="modal-header">
@@ -145,6 +150,29 @@
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeEquipeModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="saveEquipe()">Salvar Equipe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Plantas / Anexos -->
+  <div class="modal-overlay" id="modal-anexos" style="display:none" onclick="if(event.target===this)closeAnexosModal()">
+    <div class="modal-box" style="max-width:560px">
+      <div class="modal-header">
+        <div>
+          <p style="font-weight:700;font-size:1rem" id="anexos-obra-nome">Plantas e Anexos</p>
+          <p style="font-size:.75rem;color:#64748B">Arquivos vinculados a esta obra</p>
+        </div>
+        <button onclick="closeAnexosModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+      </div>
+      <div class="modal-body" style="padding:0">
+        <input type="hidden" id="anexos-obra-id">
+        <div id="anexos-list" style="min-height:60px"></div>
+        <div class="anexo-add">
+          <p style="font-size:.8rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.04em">Adicionar Anexo</p>
+          <input type="text" id="anexo-nome" placeholder="Nome do anexo (ex: Planta Elétrica)" style="border:1px solid #E2E8F0;border-radius:.5rem;padding:.5rem .75rem;font-size:.875rem;width:100%;box-sizing:border-box">
+          <input type="file" id="anexo-file" style="font-size:.85rem">
+          <button class="btn btn-primary btn-sm" id="btn-upload" onclick="uploadAnexo()">Enviar Arquivo</button>
+        </div>
       </div>
     </div>
   </div>
@@ -177,6 +205,7 @@
         const teamHtml = equipe.length === 0
           ? '<span style="color:#CBD5E1;font-size:.8rem">Nenhum</span>'
           : equipe.map(u => `<span class="team-chip">${u.nome_completo.split(' ')[0]}</span>`).join('');
+        const nAnexos = DB.getAnexosByObra(o.id_obra).length;
 
         return `<tr>
           <td style="font-weight:600">${o.nome_obra}</td>
@@ -187,6 +216,7 @@
           <td>${Utils.statusBadge(o.status_obra)}</td>
           <td style="white-space:nowrap">
             <button class="btn btn-ghost btn-sm" onclick="openEquipeModal('${o.id_obra}')">👥 Equipe</button>
+            <button class="btn btn-ghost btn-sm" onclick="openAnexosModal('${o.id_obra}')" style="margin-left:.3rem">📎 Plantas${nAnexos > 0 ? ` <span style="background:#F97316;color:#fff;border-radius:9999px;padding:0 .4rem;font-size:.7rem">${nAnexos}</span>` : ''}</button>
             <button class="btn btn-ghost btn-sm" onclick="editObra('${o.id_obra}')" style="margin-left:.3rem">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="delObra('${o.id_obra}')" style="margin-left:.3rem">Excluir</button>
           </td>
@@ -242,10 +272,8 @@
       const obra     = DB.getObraById(obraId);
       const assigned = DB.getUserIdsByObra(obraId);
       const users    = DB.getUsers().filter(u => u.perfil === 'USUARIO' && u.ativo);
-
       document.getElementById('equipe-obra-id').value   = obraId;
       document.getElementById('equipe-obra-nome').textContent = obra ? obra.nome_obra : 'Obra';
-
       const list = document.getElementById('user-check-list');
       if (users.length === 0) {
         list.innerHTML = '<p style="padding:1.5rem;text-align:center;color:#94A3B8;font-size:.875rem">Nenhum usuário de campo cadastrado.</p>';
@@ -268,6 +296,73 @@
       DB.setObraUsuarios(obraId, checked);
       closeEquipeModal(); render();
       Utils.toast(`Equipe atualizada — ${checked.length} colaborador(es) vinculado(s).`);
+    }
+
+    // ── ANEXOS MODAL ──────────────────────────────────
+    function openAnexosModal(obraId) {
+      const obra = DB.getObraById(obraId);
+      document.getElementById('anexos-obra-id').value = obraId;
+      document.getElementById('anexos-obra-nome').textContent = obra ? obra.nome_obra : 'Obra';
+      document.getElementById('anexo-nome').value = '';
+      document.getElementById('anexo-file').value = '';
+      renderAnexosList(obraId);
+      document.getElementById('modal-anexos').style.display = 'flex';
+    }
+    function closeAnexosModal() { document.getElementById('modal-anexos').style.display = 'none'; }
+
+    function renderAnexosList(obraId) {
+      const anexos = DB.getAnexosByObra(obraId);
+      const el = document.getElementById('anexos-list');
+      if (anexos.length === 0) {
+        el.innerHTML = '<p style="padding:1.25rem 1rem;color:#94A3B8;font-size:.875rem">Nenhum anexo cadastrado.</p>';
+        return;
+      }
+      el.innerHTML = anexos.map(a => `
+        <div class="anexo-row">
+          <div style="flex:1">
+            <p class="anexo-nome">${a.nome}</p>
+            <p class="anexo-file">${a.arquivo_nome}</p>
+          </div>
+          <a href="${a.arquivo_url}" target="_blank" download="${a.arquivo_nome}"
+             style="font-size:.8rem;color:#2563EB;font-weight:600;text-decoration:none;margin-right:.5rem">Baixar</a>
+          <button onclick="removerAnexo('${a.id}','${a.arquivo_path}','${obraId}')"
+                  style="background:none;border:none;cursor:pointer;color:#EF4444;font-size:1.1rem;line-height:1">×</button>
+        </div>`).join('');
+    }
+
+    async function uploadAnexo() {
+      const obraId = document.getElementById('anexos-obra-id').value;
+      const nome   = document.getElementById('anexo-nome').value.trim();
+      const file   = document.getElementById('anexo-file').files[0];
+      if (!nome) { Utils.toast('Informe o nome do anexo.', 'error'); return; }
+      if (!file)  { Utils.toast('Selecione um arquivo.', 'error'); return; }
+      const btn = document.getElementById('btn-upload');
+      btn.disabled = true; btn.textContent = 'Enviando…';
+      try {
+        await DB.addAnexo(obraId, nome, file);
+        document.getElementById('anexo-nome').value = '';
+        document.getElementById('anexo-file').value = '';
+        renderAnexosList(obraId);
+        render();
+        Utils.toast('Anexo adicionado!');
+      } catch(e) {
+        console.error(e);
+        Utils.toast('Erro ao enviar arquivo. Verifique o bucket no Supabase.', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Enviar Arquivo';
+      }
+    }
+
+    async function removerAnexo(id, path, obraId) {
+      if (!confirm('Remover este anexo?')) return;
+      try {
+        await DB.deleteAnexo(id, path);
+        renderAnexosList(obraId);
+        render();
+        Utils.toast('Anexo removido.', 'warning');
+      } catch(e) {
+        Utils.toast('Erro ao remover anexo.', 'error');
+      }
     }
   </script>
 </body>

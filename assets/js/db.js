@@ -7,7 +7,7 @@ const DB = (() => {
   const SUPABASE_KEY = window.SUPABASE_ANON_KEY || '';
   const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let _cache = { users: [], obras: [], rdos: [], rdo_linhas: [], obra_usuarios: [] };
+  let _cache = { users: [], obras: [], rdos: [], rdo_linhas: [], obra_usuarios: [], obra_anexos: [] };
 
   function uuid() {
     if (crypto.randomUUID) return crypto.randomUUID();
@@ -23,18 +23,20 @@ const DB = (() => {
   }
 
   async function init() {
-    const [u, o, r, rl, ou] = await Promise.all([
+    const [u, o, r, rl, ou, oa] = await Promise.all([
       _sb.from('usuarios').select('*'),
       _sb.from('obras').select('*'),
       _sb.from('rdos').select('*'),
       _sb.from('rdo_linhas').select('*'),
-      _sb.from('obra_usuarios').select('*')
+      _sb.from('obra_usuarios').select('*'),
+      _sb.from('obra_anexos').select('*')
     ]);
     _cache.users         = u.data  || [];
     _cache.obras         = o.data  || [];
     _cache.rdos          = r.data  || [];
     _cache.rdo_linhas    = rl.data || [];
     _cache.obra_usuarios = ou.data || [];
+    _cache.obra_anexos   = oa.data || [];
 
     // Seed admin user if database is empty
     if (_cache.users.length === 0) {
@@ -150,6 +152,34 @@ const DB = (() => {
   }
   function isUserInObra(id_obra, id_usuario) { return getUserIdsByObra(id_obra).includes(id_usuario); }
 
+  // ── OBRA ANEXOS ───────────────────────────────────
+  function getAnexosByObra(obra_id) {
+    return _cache.obra_anexos.filter(a => a.obra_id === obra_id);
+  }
+  async function addAnexo(obra_id, nome, file) {
+    const ext  = file.name.split('.').pop();
+    const path = `${obra_id}/${uuid()}.${ext}`;
+    const { error: upErr } = await _sb.storage.from('obra-anexos').upload(path, file);
+    if (upErr) throw upErr;
+    const { data: urlData } = _sb.storage.from('obra-anexos').getPublicUrl(path);
+    const anexo = {
+      id: uuid(), obra_id, nome,
+      arquivo_url: urlData.publicUrl,
+      arquivo_path: path,
+      arquivo_nome: file.name,
+      criado_em: new Date().toISOString()
+    };
+    const { error: insErr } = await _sb.from('obra_anexos').insert(anexo);
+    if (insErr) throw insErr;
+    _cache.obra_anexos.push(anexo);
+    return anexo;
+  }
+  async function deleteAnexo(id, arquivo_path) {
+    await _sb.storage.from('obra-anexos').remove([arquivo_path]);
+    await _sb.from('obra_anexos').delete().eq('id', id);
+    _cache.obra_anexos = _cache.obra_anexos.filter(a => a.id !== id);
+  }
+
   // ── CLIENT TOKEN ──────────────────────────────────
   function generateClienteToken() { return Math.random().toString(36).slice(2, 10).toUpperCase(); }
 
@@ -181,7 +211,7 @@ const DB = (() => {
     await _sb.from('rdos').delete().not('id_rdo',            'is', null);
     await _sb.from('obras').delete().not('id_obra',          'is', null);
     await _sb.from('usuarios').delete().not('id',            'is', null);
-    _cache = { users: [], obras: [], rdos: [], rdo_linhas: [], obra_usuarios: [] };
+    _cache = { users: [], obras: [], rdos: [], rdo_linhas: [], obra_usuarios: [], obra_anexos: [] };
   }
 
   return {
@@ -192,6 +222,7 @@ const DB = (() => {
     getRDOLinhas, getLinha, upsertLinha,
     getObraUsuarios, getUserIdsByObra, getObrasByUsuario, setObraUsuarios, isUserInObra,
     generateClienteToken,
-    getAllRDOLinhas, getAllObraUsuarios, getDataSize, importAll, deleteAll
+    getAllRDOLinhas, getAllObraUsuarios, getDataSize, importAll, deleteAll,
+    getAnexosByObra, addAnexo, deleteAnexo
   };
 })();
