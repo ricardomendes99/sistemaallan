@@ -1,5 +1,6 @@
 # Credenciais — nunca subir
 .env
+assets/js/config.js
 
 # PDFs de referência
 *.pdf
