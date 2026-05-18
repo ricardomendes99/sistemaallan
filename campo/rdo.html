@@ -146,7 +146,7 @@
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem">
           <div class="field" style="margin-bottom:0">
             <label>Início</label>
-            <select id="f-inicio">
+            <select id="f-inicio" onchange="buildSlots()">
               <option value="">--</option>
             </select>
           </div>
@@ -158,7 +158,7 @@
           </div>
           <div class="field" style="margin-bottom:0">
             <label>Término</label>
-            <select id="f-termino">
+            <select id="f-termino" onchange="buildSlots()">
               <option value="">--</option>
             </select>
           </div>
@@ -360,7 +360,24 @@
       const rdo = DB.getRDOById(rdoId);
       container.innerHTML = '';
 
-      SLOTS.forEach(slot => {
+      const inicio  = document.getElementById('f-inicio').value;
+      const termino = document.getElementById('f-termino').value;
+
+      if (!inicio || !termino) {
+        container.innerHTML = '<p style="color:#94A3B8;font-size:.875rem;text-align:center;padding:1.5rem 0">Selecione o horário de início e término para ver os apontamentos.</p>';
+        return;
+      }
+
+      const iStart = SLOTS.indexOf(inicio);
+      const iEnd   = SLOTS.indexOf(termino);
+      if (iStart < 0 || iEnd < 0 || iEnd <= iStart) {
+        container.innerHTML = '<p style="color:#DC2626;font-size:.875rem;text-align:center;padding:1.5rem 0">Horário de término deve ser após o início.</p>';
+        return;
+      }
+
+      const slotsToRender = SLOTS.slice(iStart, iEnd + 1);
+
+      slotsToRender.forEach(slot => {
         const linha  = DB.getLinha(rdoId, slot);
         const isLunch = slot === (rdo ? rdo.horario_almoco : null);
         const filled  = linha && linha.descricao_detalhada && linha.descricao_detalhada.trim().length >= 20;
