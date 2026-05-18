@@ -75,7 +75,48 @@
     const rdoId  = params.get('rdo');
     const token  = params.get('t');
 
-    DB.init().then(() => load());
+    DB.init().then(() => {
+      const rdo = DB.getRDOById(rdoId);
+      if (!rdo || !token) { showError('Link inválido ou expirado.'); return; }
+      if (rdo.cliente_token !== token) { showError('Código de acesso inválido.'); return; }
+      const obra = DB.getObraById(rdo.id_obra);
+      if (obra && obra.codigo_cliente) {
+        showCodigoGate(obra);
+      } else {
+        load();
+      }
+    });
+
+    function showCodigoGate(obra) {
+      document.getElementById('main-content').innerHTML = `
+        <div style="max-width:380px;margin:2rem auto">
+          <div style="background:#fff;border-radius:1rem;border:1px solid #E2E8F0;overflow:hidden">
+            <div style="background:#1E293B;padding:.75rem 1.25rem">
+              <p style="color:#fff;font-weight:700;font-size:.95rem">Verificação de Identidade</p>
+            </div>
+            <div style="padding:1.5rem">
+              <p style="font-size:.875rem;color:#475569;margin-bottom:1.25rem">Para acessar o RDO da obra <strong>${obra.nome_obra}</strong>, informe o código de verificação que você recebeu.</p>
+              <input type="text" id="f-codigo-cli" placeholder="Ex: A3F7K2"
+                style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.65rem .85rem;font-size:1.1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:.75rem"
+                maxlength="6" oninput="this.value=this.value.toUpperCase()">
+              <p id="codigo-err" style="color:#DC2626;font-size:.8rem;margin-bottom:.75rem;display:none">Código incorreto. Verifique com a Modular Service.</p>
+              <button onclick="verificarCodigo('${obra.codigo_cliente}')"
+                style="width:100%;background:#F97316;color:#fff;border:none;border-radius:.5rem;padding:.75rem;font-size:1rem;font-weight:700;cursor:pointer">
+                Verificar
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function verificarCodigo(codigoCorreto) {
+      const digitado = (document.getElementById('f-codigo-cli').value || '').trim().toUpperCase();
+      if (digitado === codigoCorreto.toUpperCase()) {
+        load();
+      } else {
+        document.getElementById('codigo-err').style.display = 'block';
+      }
+    }
 
     function load() {
       const rdo = DB.getRDOById(rdoId);

@@ -154,6 +154,32 @@
     </div>
   </div>
 
+  <!-- Modal: Código do Cliente -->
+  <div class="modal-overlay" id="modal-codigo" style="display:none" onclick="if(event.target===this)closeCodigoModal()">
+    <div class="modal-box" style="max-width:420px">
+      <div class="modal-header">
+        <div>
+          <p style="font-weight:700;font-size:1rem" id="codigo-obra-nome">Código do Cliente</p>
+          <p style="font-size:.75rem;color:#64748B">Código de verificação para aprovação de RDO</p>
+        </div>
+        <button onclick="closeCodigoModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="codigo-obra-id">
+        <p style="font-size:.8rem;color:#64748B;margin-bottom:.75rem">Envie este código ao cliente. Ele será solicitado ao acessar o link de aprovação do RDO.</p>
+        <div style="display:flex;align-items:center;gap:.75rem;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:.75rem;padding:1rem 1.25rem;margin-bottom:1rem">
+          <span id="codigo-valor" style="font-size:1.8rem;font-weight:900;letter-spacing:.2em;color:#1E293B;flex:1"></span>
+          <button onclick="copiarCodigo()" style="background:#F1F5F9;border:none;cursor:pointer;border-radius:.5rem;padding:.4rem .75rem;font-size:.8rem;font-weight:700;color:#475569">Copiar</button>
+        </div>
+        <button onclick="enviarWhatsApp()" class="btn btn-primary" style="width:100%;margin-bottom:.75rem;background:#25D366;display:flex;align-items:center;justify-content:center;gap:.5rem">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.998l6.304-1.654A11.938 11.938 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.374l-.36-.214-3.732.979.996-3.636-.235-.374A9.818 9.818 0 1112 21.818z"/></svg>
+          Enviar via WhatsApp
+        </button>
+        <button onclick="regenerarCodigo()" style="width:100%;background:none;border:1px solid #E2E8F0;border-radius:.5rem;padding:.5rem;font-size:.8rem;color:#94A3B8;cursor:pointer">Gerar novo código</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Plantas / Anexos -->
   <div class="modal-overlay" id="modal-anexos" style="display:none" onclick="if(event.target===this)closeAnexosModal()">
     <div class="modal-box" style="max-width:560px">
@@ -217,6 +243,7 @@
           <td style="white-space:nowrap">
             <button class="btn btn-ghost btn-sm" onclick="openEquipeModal('${o.id_obra}')">👥 Equipe</button>
             <button class="btn btn-ghost btn-sm" onclick="openAnexosModal('${o.id_obra}')" style="margin-left:.3rem">📎 Plantas${nAnexos > 0 ? ` <span style="background:#F97316;color:#fff;border-radius:9999px;padding:0 .4rem;font-size:.7rem">${nAnexos}</span>` : ''}</button>
+            <button class="btn btn-ghost btn-sm" onclick="openCodigoModal('${o.id_obra}')" style="margin-left:.3rem">🔑 Código</button>
             <button class="btn btn-ghost btn-sm" onclick="editObra('${o.id_obra}')" style="margin-left:.3rem">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="delObra('${o.id_obra}')" style="margin-left:.3rem">Excluir</button>
           </td>
@@ -351,6 +378,46 @@
       } finally {
         btn.disabled = false; btn.textContent = 'Enviar Arquivo';
       }
+    }
+
+    // ── CÓDIGO MODAL ──────────────────────────────────
+    function openCodigoModal(obraId) {
+      const obra = DB.getObraById(obraId);
+      if (!obra) return;
+      if (!obra.codigo_cliente) {
+        const novo = DB.regenerateCodigoCliente(obraId);
+        obra.codigo_cliente = novo;
+      }
+      document.getElementById('codigo-obra-id').value = obraId;
+      document.getElementById('codigo-obra-nome').textContent = obra.nome_obra;
+      document.getElementById('codigo-valor').textContent = obra.codigo_cliente;
+      document.getElementById('modal-codigo').style.display = 'flex';
+    }
+    function closeCodigoModal() { document.getElementById('modal-codigo').style.display = 'none'; }
+
+    function copiarCodigo() {
+      const codigo = document.getElementById('codigo-valor').textContent;
+      navigator.clipboard.writeText(codigo).then(() => Utils.toast('Código copiado!'));
+    }
+
+    function enviarWhatsApp() {
+      const obraId = document.getElementById('codigo-obra-id').value;
+      const obra   = DB.getObraById(obraId);
+      if (!obra) return;
+      const phone = (obra.cliente_contato || '').replace(/\D/g, '');
+      const msg   = encodeURIComponent(
+        `Olá! Seu código de verificação para aprovação do RDO da obra *${obra.nome_obra}* é:\n\n*${obra.codigo_cliente}*\n\nDigite este código ao acessar o link de aprovação enviado pela Modular Service.`
+      );
+      const url = phone ? `https://wa.me/55${phone}?text=${msg}` : `https://wa.me/?text=${msg}`;
+      window.open(url, '_blank');
+    }
+
+    function regenerarCodigo() {
+      if (!confirm('Gerar um novo código? O código anterior não funcionará mais.')) return;
+      const obraId = document.getElementById('codigo-obra-id').value;
+      const novo   = DB.regenerateCodigoCliente(obraId);
+      document.getElementById('codigo-valor').textContent = novo;
+      Utils.toast('Novo código gerado!');
     }
 
     async function removerAnexo(id, path, obraId) {

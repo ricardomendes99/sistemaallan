@@ -75,7 +75,7 @@ const DB = (() => {
   function getObraById(id)  { return _cache.obras.find(o => o.id_obra === id); }
 
   function createObra(data) {
-    const obra = { id_obra: uuid(), data_cadastro: new Date().toISOString(), ...data };
+    const obra = { id_obra: uuid(), data_cadastro: new Date().toISOString(), codigo_cliente: generateCodigoCliente(), ...data };
     _cache.obras.push(obra);
     _bg(_sb.from('obras').insert(obra));
     return obra;
@@ -180,8 +180,17 @@ const DB = (() => {
     _cache.obra_anexos = _cache.obra_anexos.filter(a => a.id !== id);
   }
 
-  // ── CLIENT TOKEN ──────────────────────────────────
+  // ── CLIENT TOKEN / CODIGO ─────────────────────────
   function generateClienteToken() { return Math.random().toString(36).slice(2, 10).toUpperCase(); }
+  function generateCodigoCliente() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  }
+  function regenerateCodigoCliente(id) {
+    const codigo = generateCodigoCliente();
+    updateObra(id, { codigo_cliente: codigo });
+    return codigo;
+  }
 
   // ── BACKUP HELPERS ────────────────────────────────
   function getAllRDOLinhas()    { return _cache.rdo_linhas; }
@@ -223,6 +232,7 @@ const DB = (() => {
     getObraUsuarios, getUserIdsByObra, getObrasByUsuario, setObraUsuarios, isUserInObra,
     generateClienteToken,
     getAllRDOLinhas, getAllObraUsuarios, getDataSize, importAll, deleteAll,
-    getAnexosByObra, addAnexo, deleteAnexo
+    getAnexosByObra, addAnexo, deleteAnexo,
+    generateCodigoCliente, regenerateCodigoCliente
   };
 })();
