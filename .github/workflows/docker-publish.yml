@@ -53,3 +53,19 @@ jobs:
           # Usar cache para agilizar builds futuros
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy na VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ricardomendes99 --password-stdin
+            docker pull ghcr.io/ricardomendes99/sistemaallan:latest
+            docker stack deploy -c /root/sistemaallan/docker-compose.yml modular-rdo --with-registry-auth
