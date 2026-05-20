@@ -74,6 +74,7 @@
     const params = new URLSearchParams(location.search);
     const rdoId  = params.get('rdo');
     const token  = params.get('t');
+    let _codigoEsperado = '';
 
     DB.init().then(() => {
       const rdo = DB.getRDOById(rdoId);
@@ -88,6 +89,7 @@
     });
 
     function showCodigoGate(obra) {
+      _codigoEsperado = obra.codigo_cliente;
       document.getElementById('main-content').innerHTML = `
         <div style="max-width:380px;margin:2rem auto">
           <div style="background:#fff;border-radius:1rem;border:1px solid #E2E8F0;overflow:hidden">
@@ -98,9 +100,9 @@
               <p style="font-size:.875rem;color:#475569;margin-bottom:1.25rem">Para acessar o RDO da obra <strong>${obra.nome_obra}</strong>, informe o código de verificação que você recebeu.</p>
               <input type="text" id="f-codigo-cli" placeholder="Ex: A3F7K2"
                 style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.65rem .85rem;font-size:1.1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:.75rem"
-                maxlength="6" oninput="this.value=this.value.toUpperCase()">
+                maxlength="6" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')verificarCodigo()">
               <p id="codigo-err" style="color:#DC2626;font-size:.8rem;margin-bottom:.75rem;display:none">Código incorreto. Verifique com a Modular Service.</p>
-              <button onclick="verificarCodigo('${obra.codigo_cliente}')"
+              <button onclick="verificarCodigo()"
                 style="width:100%;background:#F97316;color:#fff;border:none;border-radius:.5rem;padding:.75rem;font-size:1rem;font-weight:700;cursor:pointer">
                 Verificar
               </button>
@@ -109,9 +111,9 @@
         </div>`;
     }
 
-    function verificarCodigo(codigoCorreto) {
+    function verificarCodigo() {
       const digitado = (document.getElementById('f-codigo-cli').value || '').trim().toUpperCase();
-      if (digitado === codigoCorreto.toUpperCase()) {
+      if (digitado === _codigoEsperado.toUpperCase()) {
         load();
       } else {
         document.getElementById('codigo-err').style.display = 'block';

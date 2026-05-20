@@ -18,6 +18,23 @@ const Utils = (() => {
 
   function getSlots() { return [...SLOTS]; }
 
+  // Retorna "HH:00" a partir de qualquer string "HH:MM"
+  function floorHour(timeStr) {
+    if (!timeStr) return '';
+    return timeStr.substring(0, 2) + ':00';
+  }
+
+  // Gera slots horários entre dois horários livres (ex: "06:15" → "17:30" = ["06:00"…"17:00"])
+  function getSlotsInRange(start, end) {
+    if (!start || !end) return [];
+    const sh = parseInt(start.split(':')[0], 10);
+    const eh = parseInt(end.split(':')[0], 10);
+    if (isNaN(sh) || isNaN(eh) || eh < sh) return [];
+    const result = [];
+    for (let h = sh; h <= eh; h++) result.push(String(h).padStart(2, '0') + ':00');
+    return result;
+  }
+
   // ── Business Rules ────────────────────────────────
   function validateLinha(linha) {
     if (!linha.status_atividade) return 'Selecione o status da atividade.';
@@ -29,9 +46,7 @@ const Utils = (() => {
   // RN05: minimum 12 slots must be filled to generate the RDO
   function validateRDOCompleto(rdo, linhas) {
     if (!rdo.horario_inicio || !rdo.horario_termino) return 'Preencha os horários de início e término.';
-    const idx_start = SLOTS.indexOf(rdo.horario_inicio);
-    const idx_end   = SLOTS.indexOf(rdo.horario_termino);
-    if (idx_start < 0 || idx_end < 0 || idx_end <= idx_start) return 'Horários inválidos.';
+    if (rdo.horario_termino <= rdo.horario_inicio) return 'Horário de término deve ser após o início.';
 
     const filled = linhas.filter(l =>
       l.descricao_detalhada && l.descricao_detalhada.trim().length >= 20
@@ -67,5 +82,5 @@ const Utils = (() => {
     return `<span style="${style};padding:.2rem .6rem;border-radius:9999px;font-size:.75rem;font-weight:700">${s}</span>`;
   }
 
-  return { today, formatDate, getDayOfWeek, getSlots, validateLinha, validateRDOCompleto, toast, statusBadge, DIAS };
+  return { today, formatDate, getDayOfWeek, getSlots, floorHour, getSlotsInRange, validateLinha, validateRDOCompleto, toast, statusBadge, DIAS };
 })();

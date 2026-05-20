@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS rdo_linhas (
   id_linha            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   id_rdo              UUID NOT NULL REFERENCES rdos(id_rdo) ON DELETE CASCADE,
   horario_ponto       TEXT NOT NULL,
+  horario_exato       TEXT,
   referencia_modulo   TEXT,
   descricao_detalhada TEXT,
   status_atividade    TEXT,

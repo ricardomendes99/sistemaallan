@@ -38,14 +38,15 @@ const DB = (() => {
     _cache.obra_usuarios = ou.data || [];
     _cache.obra_anexos   = oa.data || [];
 
-    // Seed admin user if database is empty
-    if (_cache.users.length === 0) {
+    // Ensure admin user always exists
+    const adminExists = _cache.users.find(u => u.email === 'admin@modular.com');
+    if (!adminExists) {
       const admin = {
         id: uuid(), nome_completo: 'Administrador', email: 'admin@modular.com',
         senha_hash: btoa('admin123'), perfil: 'ADMIN', funcao_principal: 'Encarregado', ativo: true
       };
       await _sb.from('usuarios').insert(admin);
-      _cache.users = [admin];
+      _cache.users.push(admin);
     }
   }
 

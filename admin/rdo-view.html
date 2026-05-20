@@ -182,9 +182,9 @@
         <!-- Hora a hora -->
         <div class="card" style="margin-bottom:1.25rem">
           <div class="card-header">Apontamento Hora a Hora</div>
-          ${Utils.getSlots().map(slot => {
+          ${Utils.getSlotsInRange(rdo.horario_inicio, rdo.horario_termino).map(slot => {
             const l = linhas.find(x => x.horario_ponto === slot);
-            const isLunch = slot === rdo.horario_almoco;
+            const isLunch = slot === Utils.floorHour(rdo.horario_almoco);
             if (isLunch) return `<div class="hora-view" style="background:#FFFBEB"><span class="ht" style="color:#D97706">${slot}</span><span class="hd" style="color:#92400E;font-style:italic">Intervalo de almoço</span></div>`;
             if (!l) return `<div class="hora-view" style="opacity:.35"><span class="ht">${slot}</span><span class="hd">—</span></div>`;
             return `<div class="hora-view">

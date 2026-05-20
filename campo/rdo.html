@@ -146,21 +146,15 @@
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem">
           <div class="field" style="margin-bottom:0">
             <label>Início</label>
-            <select id="f-inicio" onchange="buildSlots()">
-              <option value="">--</option>
-            </select>
+            <input type="time" id="f-inicio" onchange="buildSlots()" style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.45rem .6rem;font-size:.95rem;color:#1E293B;accent-color:#F97316">
           </div>
           <div class="field" style="margin-bottom:0">
             <label>Almoço</label>
-            <select id="f-almoco">
-              <option value="">--</option>
-            </select>
+            <input type="time" id="f-almoco" style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.45rem .6rem;font-size:.95rem;color:#1E293B;accent-color:#F97316">
           </div>
           <div class="field" style="margin-bottom:0">
             <label>Término</label>
-            <select id="f-termino" onchange="buildSlots()">
-              <option value="">--</option>
-            </select>
+            <input type="time" id="f-termino" onchange="buildSlots()" style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.45rem .6rem;font-size:.95rem;color:#1E293B;accent-color:#F97316">
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
@@ -218,7 +212,7 @@
       <div class="section-body-p">
         <div class="fotos-grid" id="fotos-grid"></div>
         <label class="btn-add-foto" id="btn-add-foto">
-          <input type="file" id="foto-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addFotos(this)">
+          <input type="file" id="foto-input" accept="image/*" multiple style="display:none" onchange="addFotos(this)">
           📷 Adicionar Foto(s)
         </label>
         <p style="font-size:.72rem;color:#94A3B8;margin-top:.5rem">Câmera ou galeria · Máx. 8 fotos · Compressão automática</p>
@@ -246,8 +240,6 @@
     let autoSaveTimer = null;
     let fotosArr = [];
     const MAX_FOTOS = 8;
-    const SLOTS = Utils.getSlots();
-    const SLOT_SELECTS = ['--', ...SLOTS];
     let me = null;
 
     DB.init().then(() => {
@@ -266,12 +258,6 @@
       document.getElementById('i-contato').textContent = obra.cliente_contato || '—';
       document.getElementById('obra-title').textContent = obra.nome_obra;
       document.getElementById('obra-sub').textContent   = Utils.getDayOfWeek(hoje) + ', ' + Utils.formatDate(hoje);
-
-      // Populate time selects
-      ['f-inicio','f-almoco','f-termino'].forEach(id => {
-        const sel = document.getElementById(id);
-        SLOTS.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
-      });
 
       // Regra das Duplas: each user has their own RDO per obra per day
       let rdo = DB.getRDOByObraDataUsuario(obraId, hoje, me.id);
@@ -360,14 +346,27 @@
       const rdo = DB.getRDOById(rdoId);
       container.innerHTML = '';
 
-      SLOTS.forEach(slot => {
+      const inicio  = document.getElementById('f-inicio').value  || (rdo && rdo.horario_inicio)  || '';
+      const termino = document.getElementById('f-termino').value || (rdo && rdo.horario_termino) || '';
+      const slots   = Utils.getSlotsInRange(inicio, termino);
+
+      if (!slots.length) {
+        container.innerHTML = '<p style="color:#94A3B8;font-size:.85rem;text-align:center;padding:1rem">Selecione os horários de Início e Término para ver os slots.</p>';
+        return;
+      }
+
+      const almocoHour = Utils.floorHour((rdo && rdo.horario_almoco) || document.getElementById('f-almoco').value || '');
+
+      slots.forEach(slot => {
         const linha  = DB.getLinha(rdoId, slot);
-        const isLunch = slot === (rdo ? rdo.horario_almoco : null);
+        const isLunch = slot === almocoHour;
         const filled  = linha && linha.descricao_detalhada && linha.descricao_detalhada.trim().length >= 20;
 
         const div = document.createElement('div');
         div.className = 'hora-slot' + (isLunch ? ' lunch' : filled ? ' filled' : '');
         div.id = 'slot-' + slot.replace(':', '');
+
+        const displayTime = (linha && linha.horario_exato) ? linha.horario_exato : slot;
 
         const statusPill = linha && linha.status_atividade
           ? `<span class="hora-status-pill ${linha.status_atividade === 'Iniciada' ? 'hs-ini' : linha.status_atividade === 'Em Andamento' ? 'hs-and' : 'hs-con'}">${linha.status_atividade}</span>`
@@ -381,13 +380,17 @@
 
         div.innerHTML = `
           <div class="hora-slot-hd" onclick="toggleSlot('${slot}')">
-            <span class="hora-time">${slot}</span>
+            <span class="hora-time">${displayTime}</span>
             ${preview}
             ${statusPill}
             <span class="hora-chevron" id="chev-${slot.replace(':','')}">▾</span>
           </div>
           <div class="hora-body" id="body-${slot.replace(':','')}">
             ${isLunch ? '<p style="color:#92400E;font-size:.85rem;text-align:center">Horário de almoço configurado acima.</p>' : `
+            <div class="field">
+              <label>Horário Exato</label>
+              <input type="time" id="htime-${slot.replace(':','')}" value="${linha && linha.horario_exato ? linha.horario_exato : slot}" onchange="saveLinhaField('${slot}')">
+            </div>
             <div class="field">
               <label>Status da Atividade</label>
               <select id="status-${slot.replace(':','')}" onchange="saveLinhaField('${slot}')">
@@ -448,8 +451,13 @@
       const status = document.getElementById('status-' + id)?.value || '';
       const mod    = document.getElementById('mod-' + id)?.value    || '';
       const desc   = document.getElementById('desc-' + id)?.value   || '';
+      const htime  = document.getElementById('htime-' + id)?.value  || slot;
 
-      DB.upsertLinha({ id_rdo: rdoId, horario_ponto: slot, status_atividade: status, referencia_modulo: mod, descricao_detalhada: desc });
+      DB.upsertLinha({ id_rdo: rdoId, horario_ponto: slot, horario_exato: htime, status_atividade: status, referencia_modulo: mod, descricao_detalhada: desc });
+
+      // Atualiza o label do cabeçalho com o horário exato digitado
+      const timeLabel = document.querySelector('#slot-' + id + ' .hora-time');
+      if (timeLabel) timeLabel.textContent = htime || slot;
 
       const rdo = DB.getRDOById(rdoId);
       const filled = desc.trim().length >= 20;
@@ -512,18 +520,16 @@
     function updateProgress() {
       const rdo = DB.getRDOById(rdoId);
       const linhas = DB.getRDOLinhas(rdoId);
-      const iStart = SLOTS.indexOf(rdo.horario_inicio  || '');
-      const iEnd   = SLOTS.indexOf(rdo.horario_termino || '');
-      if (iStart < 0 || iEnd <= iStart) { document.getElementById('progress-fill').style.width = '0%'; return; }
-      const total = iEnd - iStart; // excluding start itself? Count from iStart to iEnd inclusive minus lunch
+      const slots = Utils.getSlotsInRange(rdo.horario_inicio || '', rdo.horario_termino || '');
+      if (!slots.length) { document.getElementById('progress-fill').style.width = '0%'; return; }
+      const almocoHour = Utils.floorHour(rdo.horario_almoco || '');
       let filled = 0;
-      for (let i = iStart; i <= iEnd; i++) {
-        const s = SLOTS[i];
-        if (s === rdo.horario_almoco) { filled++; continue; }
+      for (const s of slots) {
+        if (s === almocoHour) { filled++; continue; }
         const l = linhas.find(x => x.horario_ponto === s);
         if (l && l.descricao_detalhada && l.descricao_detalhada.trim().length >= 20) filled++;
       }
-      const pct = total > 0 ? Math.round((filled / (total + 1)) * 100) : 0;
+      const pct = slots.length > 0 ? Math.round((filled / slots.length) * 100) : 0;
       document.getElementById('progress-fill').style.width = pct + '%';
     }
 

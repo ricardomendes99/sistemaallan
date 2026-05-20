@@ -165,8 +165,8 @@
         </tr>`;
       }).join('');
 
-      const hourRows = Utils.getSlots().map((slot, idx) => {
-        const isLunch = slot === rdo.horario_almoco;
+      const hourRows = Utils.getSlotsInRange(rdo.horario_inicio, rdo.horario_termino).map((slot, idx) => {
+        const isLunch = slot === Utils.floorHour(rdo.horario_almoco);
         if (isLunch) return `<tr class="lunch-row"><td class="time-col">${slot}</td><td colspan="2"><em>Intervalo de almoço</em></td></tr>`;
         const l = linhas.find(x => x.horario_ponto === slot);
         if (!l || !l.descricao_detalhada) return `<tr><td class="time-col">${slot}</td><td style="color:#ccc">—</td><td></td></tr>`;
