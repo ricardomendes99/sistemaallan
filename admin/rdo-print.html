@@ -58,7 +58,13 @@
     .st-ini { background: #DBEAFE; color: #1E40AF; }
     .st-and { background: #FEF3C7; color: #92400E; }
     .st-con { background: #DCFCE7; color: #166534; }
-    .lunch-row td { background: #FFFBEB !important; color: #92400E; font-style: italic; }
+    .lunch-row td { background: #FEF3C7 !important; color: #92400E; font-weight: 700; font-style: normal; border-top: 2px solid #F59E0B !important; border-bottom: 2px solid #F59E0B !important; }
+    .empty-row { display: none !important; }
+    @media screen { .empty-row { display: table-row !important; } }
+    .chk-box { display: inline-block; width: 7pt; height: 7pt; border: 1.5px solid #999; vertical-align: middle; margin-right: 1.5mm; flex-shrink: 0; }
+    .chk-box.on { background: #F97316; border-color: #F97316; }
+    .dot-mark { display: inline-block; width: 7pt; height: 7pt; border-radius: 50%; border: 1.5px solid #999; vertical-align: middle; margin-right: 1.5mm; flex-shrink: 0; }
+    .dot-mark.on { background: #F97316; border-color: #F97316; }
 
     /* ── SECTIONS ── */
     .section-header { background: #1E293B; color: #fff; text-align: center; font-size: 7.5pt; font-weight: 700; padding: 1.5mm; border: 1px solid #000; border-top: none; letter-spacing: .05em; }
@@ -127,7 +133,10 @@
       const TEMPO_OPTS = ['Bom (sem chuva)','Chuva Leve','Chuva Extrema'];
       const STATUS_GERAL = ['Iniciada','Em Andamento','Concluída'];
 
-      function chk(val, ref) { return val === ref ? '<span class="check-yes">■</span>' : '<span class="check-no">□</span>'; }
+      function chk(val, ref) {
+        const on = val === ref;
+        return `<span class="chk-box${on ? ' on' : ''}"></span>`;
+      }
 
       const metaRows = DIAS.map((dia, i) => {
         const isDia    = dia === diaSemana;
@@ -143,7 +152,7 @@
         let col3 = '';
         if (i < 3 && tempoOpt) {
           const active = tempoOpt === rdo.condicao_tempo_manha || tempoOpt === rdo.condicao_tempo_tarde;
-          col3 = `${active ? '<span class="check-yes">●</span>' : '<span class="check-no">○</span>'} ${tempoOpt}`;
+          col3 = `<span class="dot-mark${active ? ' on' : ''}"></span> ${tempoOpt}`;
         } else if (i === 3) {
           col3 = '<strong style="font-size:7pt;color:#1E293B">Status da Atividade</strong>';
         } else if (statusOpt) {
@@ -167,9 +176,9 @@
 
       const hourRows = Utils.getSlotsInRange(rdo.horario_inicio, rdo.horario_termino).map((slot, idx) => {
         const isLunch = slot === Utils.floorHour(rdo.horario_almoco);
-        if (isLunch) return `<tr class="lunch-row"><td class="time-col">${slot}</td><td colspan="2"><em>Intervalo de almoço</em></td></tr>`;
+        if (isLunch) return `<tr class="lunch-row"><td class="time-col">${slot}</td><td colspan="2" style="text-align:center;letter-spacing:.08em;font-size:8pt">&#9632; INTERVALO DE ALMO&Ccedil;O &#9632;</td></tr>`;
         const l = linhas.find(x => x.horario_ponto === slot);
-        if (!l || !l.descricao_detalhada) return `<tr><td class="time-col">${slot}</td><td style="color:#ccc">—</td><td></td></tr>`;
+        if (!l || !l.descricao_detalhada) return `<tr class="empty-row"><td class="time-col">${slot}</td><td style="color:#ccc;font-style:italic">—</td><td></td></tr>`;
         const sc = { 'Iniciada':'st-ini', 'Em Andamento':'st-and', 'Concluída':'st-con' };
         return `<tr>
           <td class="time-col">${slot}</td>
