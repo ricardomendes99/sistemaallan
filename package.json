@@ -1,0 +1,25 @@
+{
+  "name": "sistemaallan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "node node_modules/tailwindcss/lib/cli.js -i assets/css/tailwind.css -o assets/css/output.css --config tailwind.config.js",
+    "watch:css": "node node_modules/tailwindcss/lib/cli.js -i assets/css/tailwind.css -o assets/css/output.css --config tailwind.config.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricardomendes99/sistemaallan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ricardomendes99/sistemaallan/issues"
+  },
+  "homepage": "https://github.com/ricardomendes99/sistemaallan#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

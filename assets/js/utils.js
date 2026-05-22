@@ -43,16 +43,9 @@ const Utils = (() => {
     return null;
   }
 
-  // RN05: minimum 12 slots must be filled to generate the RDO
   function validateRDOCompleto(rdo, linhas) {
     if (!rdo.horario_inicio || !rdo.horario_termino) return 'Preencha os horários de início e término.';
     if (rdo.horario_termino <= rdo.horario_inicio) return 'Horário de término deve ser após o início.';
-
-    const filled = linhas.filter(l =>
-      l.descricao_detalhada && l.descricao_detalhada.trim().length >= 20
-    ).length;
-
-    if (filled < 12) return `Preencha pelo menos 12 horas (${filled}/12 preenchidas) para gerar o RDO.`;
     return null;
   }
 

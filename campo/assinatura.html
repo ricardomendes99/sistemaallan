@@ -8,56 +8,33 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/faviconemodular/apple-icon-180x180.png">
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Assinatura do Cliente — RDO Digital</title>
-  <link rel="stylesheet" href="../assets/css/main.css">
-  <style>
-    body { background: #F1F5F9; min-height: 100vh; padding-bottom: 5rem; }
-    .top-bar { background: #0F172A; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .75rem; }
-    .back-btn { background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 1.2rem; }
-    .top-title h1 { color: #fff; font-size: .95rem; font-weight: 700; }
-    .top-title p  { color: #64748B; font-size: .75rem; }
-    main { max-width: 680px; margin: 0 auto; padding: 1rem; }
-    .summary-row { display: flex; justify-content: space-between; padding: .65rem 0; border-bottom: 1px solid #F1F5F9; font-size: .875rem; }
-    .summary-row:last-child { border-bottom: none; }
-    .s-label { color: #64748B; font-weight: 500; }
-    .s-value { color: #1E293B; font-weight: 600; text-align: right; max-width: 60%; }
-    .sig-area { background: #fff; border-radius: .875rem; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 1rem; }
-    .sig-head  { padding: .75rem 1rem; background: #1E293B; color: #fff; font-weight: 700; font-size: .85rem; }
-    .sig-body  { padding: 1rem; }
-    canvas#sig-canvas { display: block; width: 100%; height: 220px; touch-action: none; border: 2px dashed #CBD5E1; border-radius: .5rem; background: #fff; cursor: crosshair; }
-    canvas#sig-canvas.has-sig { border-color: #86EFAC; border-style: solid; }
-    .sig-actions { display: flex; gap: .5rem; margin-top: .5rem; }
-    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #E2E8F0; padding: .85rem 1rem; display: flex; gap: .75rem; justify-content: flex-end; }
-    .finalized-screen { text-align: center; padding: 3rem 1.5rem; }
-    .finalized-screen .icon { font-size: 4rem; margin-bottom: 1rem; }
-    .finalized-screen h2 { font-size: 1.3rem; font-weight: 700; color: #166534; }
-    .finalized-screen p  { color: #64748B; font-size: .9rem; margin-top: .5rem; }
-  </style>
+  <link rel="stylesheet" href="../assets/css/output.css">
 </head>
-<body>
-  <div class="top-bar">
-    <button class="back-btn" onclick="history.back()">←</button>
-    <div class="top-title">
-      <h1>Termo de Aprovação</h1>
-      <p>Assinatura do Cliente</p>
-    </div>
-  </div>
+<body class="bg-slate-50 min-h-screen pb-8">
 
-  <main id="main-content">
-    <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
+  <!-- ── Top bar ── -->
+  <header class="bg-white border-b border-slate-200 px-4 h-16 flex items-center justify-between sticky top-0 z-10">
+    <button onclick="history.back()" class="btn btn-ghost btn-sm" style="cursor:pointer;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Voltar
+    </button>
+    <span class="text-slate-900 text-sm font-semibold">Finalizar RDO</span>
+    <div class="w-16"></div>
+  </header>
+
+  <!-- ── Main content ── -->
+  <main class="max-w-lg mx-auto p-4 pb-8" id="main-content">
+    <div class="text-center py-12 text-slate-400">Carregando…</div>
   </main>
-
-  <div class="bottom-bar" id="bottom-bar" style="display:none">
-    <button class="btn btn-ghost" onclick="history.back()">← Voltar</button>
-    <button class="btn btn-primary" id="btn-finalizar" onclick="finalizar()">✓ Finalizar RDO</button>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/db.js?v=3"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
+  <script src="../assets/js/ui.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="../assets/js/pdf-gen.js"></script>
   <script>
@@ -74,7 +51,10 @@
 
     function load() {
       const rdo  = DB.getRDOById(rdoId);
-      if (!rdo)  { document.getElementById('main-content').innerHTML = '<p style="padding:2rem;color:#EF4444">RDO não encontrado.</p>'; return; }
+      if (!rdo)  {
+        document.getElementById('main-content').innerHTML = '<p class="p-8 text-red-500">RDO não encontrado.</p>';
+        return;
+      }
 
       if (rdo.status_documento === 'Finalizado') {
         showFinalized(rdo);
@@ -87,46 +67,64 @@
       const total  = Object.values(ef).reduce((s,v) => s+(+v||0), 0);
 
       document.getElementById('main-content').innerHTML = `
-        <!-- Resumo -->
-        <div class="card" style="margin-bottom:1rem">
-          <div class="card-header">Resumo do RDO</div>
-          <div style="padding:.75rem 1.25rem">
-            <div class="summary-row"><span class="s-label">Obra</span><span class="s-value">${obra.nome_obra || '—'}</span></div>
-            <div class="summary-row"><span class="s-label">Cliente</span><span class="s-value">${obra.cliente_nome || '—'}</span></div>
-            <div class="summary-row"><span class="s-label">Data</span><span class="s-value">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</span></div>
-            <div class="summary-row"><span class="s-label">Período</span><span class="s-value">${rdo.horario_inicio || '—'} às ${rdo.horario_termino || '—'}</span></div>
-            <div class="summary-row"><span class="s-label">Efetivo total</span><span class="s-value">${total} profissional(is)</span></div>
-            <div class="summary-row"><span class="s-label">Atividade</span><span class="s-value">${rdo.atividade || '—'}</span></div>
-            <div class="summary-row"><span class="s-label">Horas preenchidas</span><span class="s-value">${linhas.length} registros</span></div>
+        <!-- Resumo do RDO -->
+        <div class="card p-4 mb-5">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Resumo do RDO</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wide">Obra</p>
+              <p class="text-sm font-semibold text-slate-800">${obra.nome_obra || '—'}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wide">Cliente</p>
+              <p class="text-sm font-semibold text-slate-800">${obra.cliente_nome || '—'}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wide">Data</p>
+              <p class="text-sm font-semibold text-slate-800">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wide">Período</p>
+              <p class="text-sm font-semibold text-slate-800">${rdo.horario_inicio || '—'} às ${rdo.horario_termino || '—'}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wide">Profissionais</p>
+              <p class="text-sm font-semibold text-slate-800">${total}</p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wide">Horas preenchidas</p>
+              <p class="text-sm font-semibold text-slate-800">${linhas.length} registros</p>
+            </div>
           </div>
         </div>
 
-        <!-- Nome do cliente -->
-        <div class="card" style="margin-bottom:1rem">
-          <div class="card-header">Confirmação do Responsável</div>
-          <div style="padding:1rem">
-            <div class="field" style="margin-bottom:0">
-              <label>Nome do Responsável pela Assinatura *</label>
-              <input type="text" id="f-nome-cliente" placeholder="Nome completo do cliente/responsável" autocomplete="name">
-            </div>
-          </div>
+        <!-- Nome do responsável -->
+        <div class="field mb-5">
+          <label>Nome do Responsável pela Assinatura *</label>
+          <input type="text" id="f-nome-cliente" placeholder="Nome completo do cliente/responsável" autocomplete="name">
         </div>
 
         <!-- Assinatura -->
-        <div class="sig-area">
-          <div class="sig-head">Assinatura do Cliente</div>
-          <div class="sig-body">
-            <p style="font-size:.8rem;color:#64748B;margin-bottom:.75rem">Assine no espaço abaixo usando o dedo ou caneta touch:</p>
-            <canvas id="sig-canvas"></canvas>
-            <div class="sig-actions">
-              <button class="btn btn-ghost btn-sm" onclick="clearSig()">✕ Limpar</button>
-              <span id="sig-status" style="font-size:.8rem;color:#94A3B8;align-self:center;margin-left:.5rem">Aguardando assinatura…</span>
-            </div>
+        <div class="mb-5">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Assinatura do Cliente</p>
+          <p class="text-xs text-slate-400 mb-2">Assine no espaço abaixo usando o dedo ou caneta touch:</p>
+          <div class="sig-wrap">
+            <canvas id="sig-canvas" style="display:block;width:100%;height:220px;touch-action:none;cursor:crosshair;border-radius:.5rem;border:2px dashed #CBD5E1;background:#fff;"></canvas>
           </div>
+          <p id="sig-status" class="text-xs text-center mt-2 transition-colors text-slate-400">Aguardando assinatura…</p>
+          <button class="btn btn-ghost btn-sm w-full mt-2" onclick="clearSig()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Limpar assinatura
+          </button>
         </div>
+
+        <!-- Botão finalizar -->
+        <button class="btn btn-primary btn-full mt-4" id="btn-finalizar" onclick="finalizar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Finalizar RDO
+        </button>
       `;
 
-      document.getElementById('bottom-bar').style.display = 'flex';
       initSigPad();
     }
 
@@ -191,8 +189,9 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       canvas.classList.remove('has-sig');
       isEmpty = true;
-      document.getElementById('sig-status').textContent = 'Aguardando assinatura…';
-      document.getElementById('sig-status').style.color = '#94A3B8';
+      const status = document.getElementById('sig-status');
+      status.textContent = 'Aguardando assinatura…';
+      status.style.color = '';
     }
 
     function finalizar() {
@@ -226,16 +225,23 @@
 
     function showFinalized(rdo) {
       document.getElementById('main-content').innerHTML = `
-        <div class="finalized-screen">
-          <div class="icon">✅</div>
-          <h2>RDO Finalizado!</h2>
-          <p>O relatório foi assinado e gerado com sucesso.<br>O PDF foi baixado automaticamente.</p>
-          <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.75rem;align-items:center">
-            <button class="btn btn-primary" onclick="downloadPDF('${rdo.id_rdo}')">⬇ Baixar PDF novamente</button>
-            <button class="btn btn-ghost" onclick="location.href='home.html'">← Voltar para obras</button>
+        <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-white -mx-4 -mt-4">
+          <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">RDO Finalizado!</h2>
+          <p class="text-slate-500 mb-8">O relatório foi assinado e gerado com sucesso.<br>O PDF foi baixado automaticamente.</p>
+          <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
+            <button class="btn btn-primary" onclick="downloadPDF('${rdo.id_rdo}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar PDF
+            </button>
+            <button class="btn btn-ghost" onclick="location.href='home.html'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              Voltar
+            </button>
           </div>
         </div>`;
-      document.getElementById('bottom-bar').style.display = 'none';
     }
 
     function downloadPDF(id) {

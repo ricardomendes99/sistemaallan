@@ -8,235 +8,321 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/faviconemodular/apple-icon-180x180.png">
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preenchimento RDO — RDO Digital</title>
-  <link rel="stylesheet" href="../assets/css/main.css">
-  <style>
-    body { background: #F1F5F9; min-height: 100vh; padding-bottom: 6rem; }
-    .top-bar { background: #0F172A; padding: .85rem 1.1rem; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 50; }
-    .back-btn { background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 1.2rem; line-height: 1; padding: .2rem; }
-    .top-title { flex: 1; }
-    .top-title h1 { color: #fff; font-size: .95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .top-title p  { color: #64748B; font-size: .75rem; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-rasc { background: #D97706; }
-    .dot-pend { background: #2563EB; }
-    .dot-fin  { background: #16A34A; }
-
-    main { max-width: 680px; margin: 0 auto; padding: 1rem 1rem; }
-    .section-card { background: #fff; border-radius: .875rem; border: 1px solid #E2E8F0; margin-bottom: 1rem; overflow: hidden; }
-    .section-head { padding: .75rem 1rem; background: #1E293B; color: #fff; font-weight: 700; font-size: .85rem; letter-spacing: .02em; }
-    .section-body-p { padding: 1rem; }
-
-    /* Info chips (read-only) */
-    .info-row  { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: .75rem; }
-    .info-chip { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: .5rem; padding: .5rem .85rem; }
-    .ic-label  { font-size: .68rem; font-weight: 700; text-transform: uppercase; color: #94A3B8; }
-    .ic-value  { font-size: .9rem; font-weight: 600; color: #1E293B; margin-top: .1rem; }
-
-    /* Efetivo table */
-    .efetivo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; }
-    @media(min-width:420px){ .efetivo-grid { grid-template-columns: repeat(3,1fr); } }
-    .ef-box { display: flex; flex-direction: column; align-items: center; gap: .2rem; }
-    .ef-box label { font-size: .7rem; font-weight: 600; color: #64748B; text-align: center; }
-    .ef-box input { width: 60px; text-align: center; border: 1.5px solid #CBD5E1; border-radius: .5rem; padding: .4rem; font-size: 1rem; font-weight: 700; color: #1E293B; }
-    .ef-box input:focus { outline: none; border-color: #F97316; }
-    .ef-total { text-align: center; padding: .75rem; background: #FFF7ED; border-top: 1px solid #FED7AA; font-weight: 700; color: #92400E; font-size: .9rem; }
-
-    /* Weather radio group */
-    .radio-group { display: flex; gap: .5rem; flex-wrap: wrap; }
-    .radio-opt { display: flex; align-items: center; gap: .4rem; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: .5rem; padding: .45rem .75rem; cursor: pointer; transition: border-color .15s; }
-    .radio-opt:hover { border-color: #F97316; }
-    .radio-opt input { accent-color: #F97316; }
-    .radio-opt.selected { border-color: #F97316; background: #FFF7ED; }
-    .radio-opt span { font-size: .82rem; font-weight: 500; color: #334155; }
-
-    /* Hora slots */
-    .hora-slot { background: #fff; border: 1.5px solid #E2E8F0; border-radius: .625rem; margin-bottom: .45rem; transition: border-color .2s; }
-    .hora-slot.filled  { border-color: #86EFAC; }
-    .hora-slot.lunch   { border-color: #FCD34D; background: #FFFBEB; }
-    .hora-slot-hd { display: flex; align-items: center; padding: .7rem .9rem; cursor: pointer; gap: .65rem; }
-    .hora-slot-hd:hover { background: #FAFAFA; border-radius: .625rem; }
-    .hora-time   { font-size: 1rem; font-weight: 800; color: #1E293B; min-width: 48px; }
-    .hora-status-pill { font-size: .7rem; font-weight: 700; padding: .18rem .55rem; border-radius: 9999px; }
-    .hs-ini { background: #DBEAFE; color: #1E40AF; }
-    .hs-and { background: #FEF3C7; color: #92400E; }
-    .hs-con { background: #DCFCE7; color: #166534; }
-    .hora-desc-preview { flex: 1; font-size: .8rem; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .hora-chevron { font-size: .85rem; color: #94A3B8; transition: transform .2s; }
-    .hora-chevron.open { transform: rotate(180deg); }
-    .hora-body { padding: .75rem .9rem 1rem; border-top: 1px solid #F1F5F9; display: none; }
-    .hora-body.open { display: block; }
-    .char-count { font-size: .72rem; text-align: right; margin-top: .25rem; }
-    .char-ok  { color: #16A34A; }
-    .char-bad { color: #EF4444; }
-
-    /* Fixed footer */
-    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #E2E8F0; padding: .85rem 1rem; display: flex; gap: .75rem; justify-content: flex-end; z-index: 50; max-width: 100%; }
-    .progress-bar { height: 4px; background: #E2E8F0; border-radius: 2px; margin: 0 1rem 1rem; }
-    .progress-bar-fill { height: 100%; background: #F97316; border-radius: 2px; transition: width .3s; }
-    .locked-msg { background: #FEF3C7; border: 1px solid #FCD34D; color: #92400E; font-size: .8rem; border-radius: .5rem; padding: .5rem .85rem; margin-bottom: .5rem; }
-
-    /* Fotos */
-    .fotos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-bottom: .75rem; }
-    .foto-thumb { position: relative; aspect-ratio: 1; border-radius: .5rem; overflow: hidden; border: 1px solid #E2E8F0; background: #F1F5F9; }
-    .foto-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .foto-remove { position: absolute; top: 4px; right: 4px; background: rgba(15,23,42,.7); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: .75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .btn-add-foto { display: flex; align-items: center; justify-content: center; gap: .5rem; background: #F8FAFC; border: 2px dashed #CBD5E1; border-radius: .625rem; padding: .85rem; cursor: pointer; color: #475569; font-size: .875rem; font-weight: 600; width: 100%; transition: border-color .15s, color .15s; }
-    .btn-add-foto:hover { border-color: #F97316; color: #F97316; }
-  </style>
+  <link rel="stylesheet" href="../assets/css/output.css">
 </head>
-<body>
+<body class="bg-slate-50 min-h-screen flex flex-col">
 
-  <div class="top-bar">
-    <button class="back-btn" onclick="goBack()">←</button>
-    <div class="top-title">
-      <h1 id="obra-title">Carregando…</h1>
-      <p id="obra-sub"></p>
+  <!-- ── Top bar ── -->
+  <header class="bg-white border-b border-slate-200 px-4 h-16 flex items-center justify-between sticky top-0 z-20">
+    <a href="home.html" onclick="salvar(true)" class="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm font-medium">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Obras
+    </a>
+    <div class="text-center">
+      <p id="obra-nome" class="text-slate-900 text-sm font-semibold truncate max-w-[180px]">Carregando…</p>
+      <p id="data-label" class="text-slate-400 text-xs"></p>
     </div>
-    <div id="status-indicator" class="status-dot dot-rasc" title="Rascunho"></div>
+    <div id="save-indicator" class="text-xs text-slate-400 flex items-center gap-1 min-w-[52px] justify-end"></div>
+  </header>
+
+  <!-- ── Progress bar (fina, sticky abaixo do top bar) ── -->
+  <div class="h-1 bg-slate-100 sticky top-14 z-10">
+    <div id="progress-fill" class="h-full bg-brand-500 transition-all duration-500" style="width:0%"></div>
   </div>
 
-  <main>
-    <!-- Readonly lock notice (RN03) -->
-    <div class="locked-msg" id="locked-notice" style="display:none">
-      ⚠ Este RDO é de uma data anterior. Somente leitura — edições exigem liberação do Administrador.
-    </div>
+  <!-- ── Tab contents ── -->
+  <div class="flex-1 pb-16 overflow-y-auto">
 
-    <!-- Barra de progresso -->
-    <div class="progress-bar"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+    <!-- TAB: Info -->
+    <div id="tab-info" class="tab-content p-4 max-w-2xl mx-auto">
 
-    <!-- Info obra (somente leitura, RN01) -->
-    <div class="section-card">
-      <div class="section-head">Dados da Obra</div>
-      <div class="section-body-p">
-        <div class="info-row">
-          <div class="info-chip"><p class="ic-label">Cliente</p><p class="ic-value" id="i-cliente">—</p></div>
-          <div class="info-chip"><p class="ic-label">OF</p><p class="ic-value" id="i-of">—</p></div>
+      <!-- Lock notice -->
+      <div id="locked-notice" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex items-start gap-3">
+        <svg class="shrink-0 mt-0.5 text-amber-500" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <p class="text-sm text-amber-800 font-medium">Este RDO é de uma data anterior. Somente leitura — edições exigem liberação do Administrador.</p>
+      </div>
+
+      <!-- Dados da obra (read-only) -->
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Dados da Obra</p>
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="bg-white rounded-xl p-3 border border-slate-200">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Cliente</p>
+          <p id="i-cliente" class="text-sm font-semibold text-slate-800 mt-0.5">—</p>
         </div>
-        <div class="info-row">
-          <div class="info-chip"><p class="ic-label">Local</p><p class="ic-value" id="i-local">—</p></div>
-          <div class="info-chip"><p class="ic-label">Contato</p><p class="ic-value" id="i-contato">—</p></div>
+        <div class="bg-white rounded-xl p-3 border border-slate-200">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">OF</p>
+          <p id="i-of" class="text-sm font-semibold text-slate-800 mt-0.5">—</p>
         </div>
+        <div class="bg-white rounded-xl p-3 border border-slate-200">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Local</p>
+          <p id="i-local" class="text-sm font-semibold text-slate-800 mt-0.5">—</p>
+        </div>
+        <div class="bg-white rounded-xl p-3 border border-slate-200">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Contato</p>
+          <p id="i-contato" class="text-sm font-semibold text-slate-800 mt-0.5">—</p>
+        </div>
+      </div>
+
+      <!-- Campos editáveis -->
+      <div class="card p-4 mb-4">
         <div class="field">
           <label>Executantes (nomes da equipe)</label>
           <input type="text" id="f-executantes" placeholder="Ex: Warleson Silva, Kelton Souza" maxlength="200">
         </div>
-        <div class="field" style="margin-bottom:0">
+        <div class="field mb-0">
           <label>Atividade Principal do Dia</label>
           <input type="text" id="f-atividade" placeholder="Ex: Montagem estrutura módulo 148" maxlength="120">
         </div>
       </div>
-    </div>
 
-    <!-- Efetivo -->
-    <div class="section-card">
-      <div class="section-head">Efetivo da Equipe</div>
-      <div class="section-body-p">
-        <div class="efetivo-grid">
-          <div class="ef-box"><label>Montador</label><input type="number" min="0" max="99" id="ef-montador" value="0"></div>
-          <div class="ef-box"><label>Aux. Montagem</label><input type="number" min="0" max="99" id="ef-auxiliar" value="0"></div>
-          <div class="ef-box"><label>Eletricista</label><input type="number" min="0" max="99" id="ef-eletricista" value="0"></div>
-          <div class="ef-box"><label>Soldador</label><input type="number" min="0" max="99" id="ef-soldador" value="0"></div>
-          <div class="ef-box"><label>Encarregado</label><input type="number" min="0" max="99" id="ef-encarregado" value="0"></div>
-          <div class="ef-box"><label>Tec. Segurança</label><input type="number" min="0" max="99" id="ef-tecnico" value="0"></div>
-        </div>
-        <div class="ef-total">Total: <span id="ef-total">0</span> profissional(is)</div>
-      </div>
-    </div>
-
-    <!-- Horários e Condições -->
-    <div class="section-card">
-      <div class="section-head">Horários e Condições Climáticas</div>
-      <div class="section-body-p">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1rem">
-          <div class="field" style="margin-bottom:0">
-            <label>Início</label>
-            <input type="time" id="f-inicio" onchange="buildSlots()" style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.45rem .6rem;font-size:.95rem;color:#1E293B;accent-color:#F97316">
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Almoço</label>
-            <input type="time" id="f-almoco" style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.45rem .6rem;font-size:.95rem;color:#1E293B;accent-color:#F97316">
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Término</label>
-            <input type="time" id="f-termino" onchange="buildSlots()" style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.45rem .6rem;font-size:.95rem;color:#1E293B;accent-color:#F97316">
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
-          <div>
-            <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.45rem">Tempo — Manhã</p>
-            <div style="display:flex;flex-direction:column;gap:.35rem" id="tempo-manha">
-              <label class="radio-opt"><input type="radio" name="tm" value="Bom (sem chuva)"><span>☀ Bom (sem chuva)</span></label>
-              <label class="radio-opt"><input type="radio" name="tm" value="Chuva Leve"><span>🌦 Chuva Leve</span></label>
-              <label class="radio-opt"><input type="radio" name="tm" value="Chuva Extrema"><span>⛈ Chuva Extrema</span></label>
-            </div>
-          </div>
-          <div>
-            <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.45rem">Tempo — Tarde</p>
-            <div style="display:flex;flex-direction:column;gap:.35rem" id="tempo-tarde">
-              <label class="radio-opt"><input type="radio" name="tt" value="Bom (sem chuva)"><span>☀ Bom (sem chuva)</span></label>
-              <label class="radio-opt"><input type="radio" name="tt" value="Chuva Leve"><span>🌦 Chuva Leve</span></label>
-              <label class="radio-opt"><input type="radio" name="tt" value="Chuva Extrema"><span>⛈ Chuva Extrema</span></label>
-            </div>
-          </div>
+      <!-- Status da Atividade -->
+      <div class="card p-4 mb-4">
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Status da Atividade</p>
+        <div class="grid grid-cols-3 gap-2" id="status-atividade-group">
+          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <input type="radio" name="sa" value="Iniciada" class="sr-only">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span class="text-xs font-semibold text-slate-600 text-center">Iniciada</span>
+          </label>
+          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <input type="radio" name="sa" value="Em Andamento" class="sr-only">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="text-xs font-semibold text-slate-600 text-center">Em Andamento</span>
+          </label>
+          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <input type="radio" name="sa" value="Concluída" class="sr-only">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-xs font-semibold text-slate-600 text-center">Concluída</span>
+          </label>
         </div>
       </div>
-    </div>
 
-    <!-- Status da Atividade -->
-    <div class="section-card">
-      <div class="section-head">Status da Atividade</div>
-      <div class="section-body-p">
-        <div class="radio-group" id="status-atividade-group">
-          <label class="radio-opt"><input type="radio" name="sa" value="Iniciada"><span>▶ Iniciada</span></label>
-          <label class="radio-opt"><input type="radio" name="sa" value="Em Andamento"><span>◑ Em Andamento</span></label>
-          <label class="radio-opt"><input type="radio" name="sa" value="Concluída"><span>✓ Concluída</span></label>
+      <!-- Condições Climáticas -->
+      <div class="card p-4 mb-4">
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Condições Climáticas</p>
+        <div class="mb-4">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Tempo — Manhã</p>
+          <div class="grid grid-cols-3 gap-2" id="tempo-manha">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+              <input type="radio" name="tm" value="Bom (sem chuva)" class="sr-only">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <span class="text-[11px] font-semibold text-slate-600 text-center">Bom</span>
+            </label>
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+              <input type="radio" name="tm" value="Chuva Leve" class="sr-only">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
+              <span class="text-[11px] font-semibold text-slate-600 text-center">Chuva Leve</span>
+            </label>
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+              <input type="radio" name="tm" value="Chuva Extrema" class="sr-only">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>
+              <span class="text-[11px] font-semibold text-slate-600 text-center">Extrema</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Tempo — Tarde</p>
+          <div class="grid grid-cols-3 gap-2" id="tempo-tarde">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+              <input type="radio" name="tt" value="Bom (sem chuva)" class="sr-only">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+              <span class="text-[11px] font-semibold text-slate-600 text-center">Bom</span>
+            </label>
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+              <input type="radio" name="tt" value="Chuva Leve" class="sr-only">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
+              <span class="text-[11px] font-semibold text-slate-600 text-center">Chuva Leve</span>
+            </label>
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+              <input type="radio" name="tt" value="Chuva Extrema" class="sr-only">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>
+              <span class="text-[11px] font-semibold text-slate-600 text-center">Extrema</span>
+            </label>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Apontamento hora a hora -->
-    <div class="section-card">
-      <div class="section-head">Apontamento Hora a Hora</div>
-      <div class="section-body-p" id="slots-container"></div>
-    </div>
-
-    <!-- Observações -->
-    <div class="section-card">
-      <div class="section-head">Observações e Desvios</div>
-      <div class="section-body-p">
-        <div class="field" style="margin-bottom:0">
+      <!-- Observações e Desvios -->
+      <div class="card p-4 mb-4">
+        <div class="field mb-0">
+          <label>Observações e Desvios</label>
           <textarea id="f-obs" rows="4" placeholder="Registre paradas, ocorrências, desvios de planejamento…"></textarea>
         </div>
       </div>
-    </div>
 
-    <!-- Fotos -->
-    <div class="section-card">
-      <div class="section-head">Fotos da Obra</div>
-      <div class="section-body-p">
-        <div class="fotos-grid" id="fotos-grid"></div>
-        <label class="btn-add-foto" id="btn-add-foto">
-          <input type="file" id="foto-input" accept="image/*" multiple style="display:none" onchange="addFotos(this)">
-          📷 Adicionar Foto(s)
-        </label>
-        <p style="font-size:.72rem;color:#94A3B8;margin-top:.5rem">Câmera ou galeria · Máx. 8 fotos · Compressão automática</p>
+      <!-- Botões de ação -->
+      <div id="action-buttons" class="flex gap-3 mb-2">
+        <button class="btn btn-ghost flex-1 justify-center" id="btn-salvar" onclick="salvar()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Salvar Rascunho
+        </button>
+        <button class="btn btn-primary flex-1 justify-center" id="btn-enviar" onclick="enviarAssinatura()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Gerar Aprovação
+        </button>
       </div>
     </div>
-  </main>
 
-  <!-- Bottom bar -->
-  <div class="bottom-bar">
-    <button class="btn btn-ghost" id="btn-salvar" onclick="salvar()">💾 Salvar Rascunho</button>
-    <button class="btn btn-primary" id="btn-enviar" onclick="enviarAssinatura()">✍ Gerar Termo de Aprovação</button>
-  </div>
+    <!-- TAB: Efetivo -->
+    <div id="tab-efetivo" class="tab-content p-4 max-w-2xl mx-auto hidden">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Efetivo da Equipe</p>
+      <div class="card p-4 mb-4">
+        <div class="grid grid-cols-3 gap-3 mb-4" id="efetivo-grid">
+          <div class="flex flex-col items-center gap-1.5">
+            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Montador</label>
+            <input type="number" min="0" max="99" id="ef-montador" value="0"
+              class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+          </div>
+          <div class="flex flex-col items-center gap-1.5">
+            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Aux. Montagem</label>
+            <input type="number" min="0" max="99" id="ef-auxiliar" value="0"
+              class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+          </div>
+          <div class="flex flex-col items-center gap-1.5">
+            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Eletricista</label>
+            <input type="number" min="0" max="99" id="ef-eletricista" value="0"
+              class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+          </div>
+          <div class="flex flex-col items-center gap-1.5">
+            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Soldador</label>
+            <input type="number" min="0" max="99" id="ef-soldador" value="0"
+              class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+          </div>
+          <div class="flex flex-col items-center gap-1.5">
+            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Encarregado</label>
+            <input type="number" min="0" max="99" id="ef-encarregado" value="0"
+              class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+          </div>
+          <div class="flex flex-col items-center gap-1.5">
+            <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Tec. Segurança</label>
+            <input type="number" min="0" max="99" id="ef-tecnico" value="0"
+              class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+          </div>
+        </div>
+        <!-- Total -->
+        <div class="flex items-center justify-between bg-brand-50 rounded-xl px-4 py-3 border border-brand-100">
+          <div class="flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="text-sm font-semibold text-slate-700">Total de Profissionais</span>
+          </div>
+          <span id="ef-total" class="text-2xl font-extrabold text-brand-500">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Horas -->
+    <div id="tab-horas" class="tab-content p-4 max-w-2xl mx-auto hidden">
+      <!-- Horários de entrada/almoço/saída -->
+      <div class="card p-4 mb-4">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Horários do Dia</p>
+        <div class="grid grid-cols-3 gap-3 mb-0">
+          <div class="field mb-0">
+            <label>Início</label>
+            <input type="time" id="f-inicio" onchange="buildSlots()"
+              class="w-full border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all accent-brand-500">
+          </div>
+          <div class="field mb-0">
+            <label>Almoço</label>
+            <input type="time" id="f-almoco"
+              class="w-full border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all accent-brand-500">
+          </div>
+          <div class="field mb-0">
+            <label>Término</label>
+            <input type="time" id="f-termino" onchange="buildSlots()"
+              class="w-full border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all accent-brand-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles dos slots -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="text-xs font-semibold text-slate-500" id="slots-progress-label">0/0 horas preenchidas</span>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="expandAllSlots()" class="btn btn-sm btn-ghost">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            Expandir
+          </button>
+          <button onclick="collapseAllSlots()" class="btn btn-sm btn-ghost">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="10" y1="14" x2="21" y2="3"/><line x1="3" y1="21" x2="14" y2="10"/></svg>
+            Recolher
+          </button>
+        </div>
+      </div>
+
+      <!-- Slots container -->
+      <div id="slots-container"></div>
+    </div>
+
+    <!-- TAB: Fotos -->
+    <div id="tab-fotos" class="tab-content p-4 max-w-2xl mx-auto hidden">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Fotos da Obra</p>
+        <span class="text-xs text-slate-400 font-medium" id="fotos-count">0 / 8</span>
+      </div>
+
+      <!-- Grid de fotos -->
+      <div class="grid grid-cols-3 gap-2 mb-3" id="fotos-grid"></div>
+
+      <!-- Botão adicionar -->
+      <label id="btn-add-foto" class="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-brand-400 hover:bg-brand-50 transition-all">
+        <input type="file" id="foto-input" accept="image/*" multiple class="hidden" onchange="addFotos(this)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span class="text-xs font-semibold text-slate-400">Adicionar Foto</span>
+      </label>
+
+      <p class="text-xs text-slate-400 mt-3 text-center">Câmera ou galeria · Máx. 8 fotos · Compressão automática</p>
+    </div>
+
+  </div><!-- fim tab contents -->
+
+  <!-- ── Bottom navigation ── -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-20 flex h-14">
+    <button class="tab-btn flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-colors text-brand-500" data-tab="info">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Info</span>
+    </button>
+    <button class="tab-btn flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-colors text-slate-400" data-tab="efetivo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Efetivo</span>
+    </button>
+    <button class="tab-btn flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-colors text-slate-400" data-tab="horas">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Horas</span>
+    </button>
+    <button class="tab-btn flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-colors text-slate-400" data-tab="fotos">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Fotos</span>
+    </button>
+  </nav>
+
+  <div class="toast-container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/db.js?v=3"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
+  <script src="../assets/js/ui.js"></script>
   <script>
     const params = new URLSearchParams(location.search);
     const obraId = params.get('obra');
@@ -248,6 +334,22 @@
     const MAX_FOTOS = 8;
     let me = null;
 
+    // ── Tab navigation ─────────────────────────────────────
+    function switchTab(name) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + name).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === name;
+        btn.classList.toggle('text-brand-500', active);
+        btn.classList.toggle('text-slate-400', !active);
+      });
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // ── Init ───────────────────────────────────────────────
     DB.init().then(() => {
       me = Auth.requireAuth('USUARIO');
       if (me && obraId) init();
@@ -255,15 +357,15 @@
 
     function init() {
       const obra = DB.getObraById(obraId);
-      if (!obra) { Utils.toast('Obra não encontrada.', 'error'); return; }
+      if (!obra) { Toast.error('Obra não encontrada.'); return; }
 
       // RN01 — pull obra data
-      document.getElementById('i-cliente').textContent = obra.cliente_nome || '—';
-      document.getElementById('i-of').textContent      = obra.codigo_of   || '—';
-      document.getElementById('i-local').textContent   = obra.endereco_local || '—';
-      document.getElementById('i-contato').textContent = obra.cliente_contato || '—';
-      document.getElementById('obra-title').textContent = obra.nome_obra;
-      document.getElementById('obra-sub').textContent   = Utils.getDayOfWeek(hoje) + ', ' + Utils.formatDate(hoje);
+      document.getElementById('i-cliente').textContent = obra.cliente_nome     || '—';
+      document.getElementById('i-of').textContent      = obra.codigo_of        || '—';
+      document.getElementById('i-local').textContent   = obra.endereco_local   || '—';
+      document.getElementById('i-contato').textContent = obra.cliente_contato  || '—';
+      document.getElementById('obra-nome').textContent  = obra.nome_obra;
+      document.getElementById('data-label').textContent = Utils.getDayOfWeek(hoje) + ', ' + Utils.formatDate(hoje);
 
       // Regra das Duplas: each user has their own RDO per obra per day
       let rdo = DB.getRDOByObraDataUsuario(obraId, hoje, me.id);
@@ -283,9 +385,8 @@
       const dataRDO = rdo.data_apontamento;
       if (dataRDO !== hoje) {
         isLocked = true;
-        document.getElementById('locked-notice').style.display = 'block';
-        document.getElementById('btn-salvar').style.display = 'none';
-        document.getElementById('btn-enviar').style.display = 'none';
+        document.getElementById('locked-notice').classList.remove('hidden');
+        document.getElementById('action-buttons').classList.add('hidden');
         setAllReadOnly();
       }
 
@@ -297,7 +398,10 @@
 
       // Redirect to signature if already pending
       if (rdo.status_documento === 'Pendente_Assinatura') {
-        document.getElementById('btn-enviar').textContent = '✍ Ir para Assinatura';
+        const btn = document.getElementById('btn-enviar');
+        if (btn) btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Ir para Assinatura`;
       }
 
       // Auto-save on any input change
@@ -309,15 +413,16 @@
 
     function populateFromRDO(rdo) {
       if (rdo.fotos && Array.isArray(rdo.fotos)) { fotosArr = [...rdo.fotos]; renderFotos(); }
-      if (rdo.executantes)        document.getElementById('f-executantes').value = rdo.executantes;
-      if (rdo.atividade)          document.getElementById('f-atividade').value = rdo.atividade;
-      if (rdo.horario_inicio)     document.getElementById('f-inicio').value    = rdo.horario_inicio;
-      if (rdo.horario_almoco)     document.getElementById('f-almoco').value    = rdo.horario_almoco;
-      if (rdo.horario_termino)    document.getElementById('f-termino').value   = rdo.horario_termino;
-      if (rdo.observacoes_desvios)document.getElementById('f-obs').value       = rdo.observacoes_desvios;
+      if (rdo.executantes)         document.getElementById('f-executantes').value = rdo.executantes;
+      if (rdo.atividade)           document.getElementById('f-atividade').value   = rdo.atividade;
+      if (rdo.horario_inicio)      document.getElementById('f-inicio').value      = rdo.horario_inicio;
+      if (rdo.horario_almoco)      document.getElementById('f-almoco').value      = rdo.horario_almoco;
+      if (rdo.horario_termino)     document.getElementById('f-termino').value     = rdo.horario_termino;
+      if (rdo.observacoes_desvios) document.getElementById('f-obs').value         = rdo.observacoes_desvios;
+
       if (rdo.status_atividade) {
         const r = document.querySelector(`input[name="sa"][value="${rdo.status_atividade}"]`);
-        if (r) { r.checked = true; r.closest('.radio-opt').classList.add('selected'); }
+        if (r) { r.checked = true; r.closest('.radio-card').classList.add('border-brand-500', 'bg-brand-50'); }
       }
 
       const ef = rdo.efetivo || {};
@@ -331,22 +436,25 @@
       // Weather radios
       if (rdo.condicao_tempo_manha) {
         const r = document.querySelector(`input[name="tm"][value="${rdo.condicao_tempo_manha}"]`);
-        if (r) { r.checked = true; r.closest('.radio-opt').classList.add('selected'); }
+        if (r) { r.checked = true; r.closest('.radio-card').classList.add('border-brand-500', 'bg-brand-50'); }
       }
       if (rdo.condicao_tempo_tarde) {
         const r = document.querySelector(`input[name="tt"][value="${rdo.condicao_tempo_tarde}"]`);
-        if (r) { r.checked = true; r.closest('.radio-opt').classList.add('selected'); }
+        if (r) { r.checked = true; r.closest('.radio-card').classList.add('border-brand-500', 'bg-brand-50'); }
       }
 
       // Radio visual feedback
-      document.querySelectorAll('.radio-opt input').forEach(inp => {
+      document.querySelectorAll('.radio-card input[type="radio"]').forEach(inp => {
         inp.addEventListener('change', function() {
-          document.querySelectorAll(`.radio-opt input[name="${this.name}"]`).forEach(x => x.closest('.radio-opt').classList.remove('selected'));
-          this.closest('.radio-opt').classList.add('selected');
+          document.querySelectorAll(`.radio-card input[name="${this.name}"]`).forEach(x => {
+            x.closest('.radio-card').classList.remove('border-brand-500', 'bg-brand-50');
+          });
+          this.closest('.radio-card').classList.add('border-brand-500', 'bg-brand-50');
         });
       });
     }
 
+    // ── Slots ──────────────────────────────────────────────
     function buildSlots() {
       const container = document.getElementById('slots-container');
       const rdo = DB.getRDOById(rdoId);
@@ -357,42 +465,63 @@
       const slots   = Utils.getSlotsInRange(inicio, termino);
 
       if (!slots.length) {
-        container.innerHTML = '<p style="color:#94A3B8;font-size:.85rem;text-align:center;padding:1rem">Selecione os horários de Início e Término para ver os slots.</p>';
+        container.innerHTML = `
+          <div class="flex flex-col items-center gap-2 py-12 text-center">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <p class="text-sm text-slate-400 font-medium">Defina os horários de Início e Término<br>para ver os slots de apontamento.</p>
+          </div>`;
+        updateSlotsProgressLabel(0, 0);
         return;
       }
 
       const almocoHour = Utils.floorHour((rdo && rdo.horario_almoco) || document.getElementById('f-almoco').value || '');
+      let filledCount = 0;
+      let nonLunchCount = 0;
 
       slots.forEach(slot => {
-        const linha  = DB.getLinha(rdoId, slot);
+        const linha   = DB.getLinha(rdoId, slot);
         const isLunch = slot === almocoHour;
         const filled  = linha && linha.descricao_detalhada && linha.descricao_detalhada.trim().length >= 20;
 
+        if (!isLunch) {
+          nonLunchCount++;
+          if (filled) filledCount++;
+        }
+
         const div = document.createElement('div');
-        div.className = 'hora-slot' + (isLunch ? ' lunch' : filled ? ' filled' : '');
+        div.className = 'hora-slot' + (isLunch ? ' in-lunch' : filled ? ' filled' : '');
         div.id = 'slot-' + slot.replace(':', '');
 
         const displayTime = (linha && linha.horario_exato) ? linha.horario_exato : slot;
 
         const statusPill = linha && linha.status_atividade
-          ? `<span class="hora-status-pill ${linha.status_atividade === 'Iniciada' ? 'hs-ini' : linha.status_atividade === 'Em Andamento' ? 'hs-and' : 'hs-con'}">${linha.status_atividade}</span>`
+          ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              linha.status_atividade === 'Iniciada'    ? 'bg-blue-100 text-blue-700' :
+              linha.status_atividade === 'Em Andamento'? 'bg-amber-100 text-amber-700' :
+                                                          'bg-emerald-100 text-emerald-700'
+            }">${linha.status_atividade}</span>`
           : '';
 
+        const dotClass = isLunch ? 'dot-lunch' : filled ? 'dot-filled' : 'dot-empty';
+
         const preview = isLunch
-          ? '<em style="color:#D97706;font-size:.8rem">Intervalo de almoço</em>'
+          ? `<span class="hora-preview italic text-amber-600">Intervalo de almoço</span>`
           : (linha && linha.descricao_detalhada
-              ? `<span class="hora-desc-preview">${linha.referencia_modulo ? '[' + linha.referencia_modulo + '] ' : ''}${linha.descricao_detalhada}</span>`
-              : '<span class="hora-desc-preview" style="color:#CBD5E1">Toque para preencher…</span>');
+              ? `<span class="hora-preview">${linha.referencia_modulo ? '[' + linha.referencia_modulo + '] ' : ''}${linha.descricao_detalhada}</span>`
+              : `<span class="hora-preview text-slate-300">Toque para preencher…</span>`);
 
         div.innerHTML = `
-          <div class="hora-slot-hd" onclick="toggleSlot('${slot}')">
-            <span class="hora-time">${displayTime}</span>
+          <div class="hora-slot-header" onclick="toggleSlot('${slot}')">
+            <span class="hora-label">${displayTime}</span>
             ${preview}
             ${statusPill}
-            <span class="hora-chevron" id="chev-${slot.replace(':','')}">▾</span>
+            <span class="hora-dot ${dotClass} mx-2"></span>
+            <svg id="chev-${slot.replace(':','')}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 transition-transform duration-200"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="hora-body" id="body-${slot.replace(':','')}">
-            ${isLunch ? '<p style="color:#92400E;font-size:.85rem;text-align:center">Horário de almoço configurado acima.</p>' : `
+            ${isLunch
+              ? `<p class="text-sm text-amber-700 font-medium text-center py-2">Horário de almoço configurado na aba Horas.</p>`
+              : `
             <div class="field">
               <label>Horário Exato</label>
               <input type="time" id="htime-${slot.replace(':','')}" value="${linha && linha.horario_exato ? linha.horario_exato : slot}" onchange="saveLinhaField('${slot}')">
@@ -410,16 +539,35 @@
               <label>Módulo / Referência</label>
               <input type="text" id="mod-${slot.replace(':','')}" placeholder="Ex: Módulo 148/26" value="${linha && linha.referencia_modulo ? linha.referencia_modulo : ''}" onchange="saveLinhaField('${slot}')">
             </div>
-            <div class="field" style="margin-bottom:0">
+            <div class="field mb-0">
               <label>Descrição da Atividade *</label>
-              <textarea id="desc-${slot.replace(':','')}" rows="3" placeholder="Mín. 20 caracteres — descreva o que foi feito e onde (ex: Montagem das vigas do módulo 148, setor norte)" oninput="onDescInput('${slot}')" onchange="saveLinhaField('${slot}')">${linha && linha.descricao_detalhada ? linha.descricao_detalhada : ''}</textarea>
-              <p class="char-count" id="cc-${slot.replace(':','')}"></p>
+              <textarea id="desc-${slot.replace(':','')}" rows="3"
+                placeholder="Mín. 20 caracteres — descreva o que foi feito e onde"
+                oninput="onDescInput('${slot}')" onchange="saveLinhaField('${slot}')">${linha && linha.descricao_detalhada ? linha.descricao_detalhada : ''}</textarea>
+              <p class="char-count text-right text-xs mt-1" id="cc-${slot.replace(':','')}"></p>
             </div>`}
           </div>`;
 
         container.appendChild(div);
         if (!isLunch) onDescInputRender(slot, linha);
       });
+
+      updateSlotsProgressLabel(filledCount, slots.length - (almocoHour && slots.includes(almocoHour) ? 1 : 0));
+    }
+
+    function updateSlotsProgressLabel(filled, total) {
+      const el = document.getElementById('slots-progress-label');
+      if (el) el.textContent = `${filled}/${total} horas preenchidas`;
+    }
+
+    function expandAllSlots() {
+      document.querySelectorAll('.hora-body').forEach(b => b.classList.add('open'));
+      document.querySelectorAll('[id^="chev-"]').forEach(c => c.style.transform = 'rotate(180deg)');
+    }
+
+    function collapseAllSlots() {
+      document.querySelectorAll('.hora-body').forEach(b => b.classList.remove('open'));
+      document.querySelectorAll('[id^="chev-"]').forEach(c => c.style.transform = '');
     }
 
     function onDescInputRender(slot, linha) {
@@ -438,7 +586,7 @@
       const el = document.getElementById('cc-' + id);
       if (!el) return;
       const ok = len >= 20;
-      el.className = 'char-count ' + (ok ? 'char-ok' : 'char-bad');
+      el.className = 'text-right text-xs mt-1 ' + (ok ? 'text-emerald-600' : 'text-red-500');
       el.textContent = ok ? `✓ ${len} caracteres` : `${len}/20 — mínimo não atingido`;
     }
 
@@ -448,7 +596,7 @@
       const body = document.getElementById('body-' + id);
       const chev = document.getElementById('chev-' + id);
       const open = body.classList.toggle('open');
-      chev.classList.toggle('open', open);
+      if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
     }
 
     function saveLinhaField(slot) {
@@ -462,20 +610,27 @@
       DB.upsertLinha({ id_rdo: rdoId, horario_ponto: slot, horario_exato: htime, status_atividade: status, referencia_modulo: mod, descricao_detalhada: desc });
 
       // Atualiza o label do cabeçalho com o horário exato digitado
-      const timeLabel = document.querySelector('#slot-' + id + ' .hora-time');
+      const timeLabel = document.querySelector('#slot-' + id + ' .hora-label');
       if (timeLabel) timeLabel.textContent = htime || slot;
 
       const rdo = DB.getRDOById(rdoId);
       const filled = desc.trim().length >= 20;
       const slotEl = document.getElementById('slot-' + id);
-      const isLunch = slot === (rdo ? rdo.horario_almoco : null);
+      const isLunch = slot === (rdo ? Utils.floorHour(rdo.horario_almoco || '') : null);
       if (slotEl && !isLunch) {
         slotEl.classList.toggle('filled', filled);
-        slotEl.classList.remove('lunch');
+        slotEl.classList.remove('in-lunch');
+
+        // Update dot
+        const dot = slotEl.querySelector('.hora-dot');
+        if (dot) {
+          dot.className = 'hora-dot ' + (filled ? 'dot-filled' : 'dot-empty') + ' mx-2';
+        }
       }
       updateProgress();
     }
 
+    // ── Efetivo ────────────────────────────────────────────
     function updateEfTotal() {
       const keys = ['montador','auxiliar','eletricista','soldador','encarregado','tecnico'];
       const total = keys.reduce((s, k) => s + (parseInt(document.getElementById('ef-' + k)?.value || 0, 10)), 0);
@@ -485,14 +640,15 @@
       if (e.target.id && e.target.id.startsWith('ef-')) updateEfTotal();
     });
 
+    // ── Form data ──────────────────────────────────────────
     function getFormData() {
       const ef = {
-        montador:         parseInt(document.getElementById('ef-montador').value    || 0),
-        auxiliar:         parseInt(document.getElementById('ef-auxiliar').value    || 0),
-        eletricista:      parseInt(document.getElementById('ef-eletricista').value || 0),
-        soldador:         parseInt(document.getElementById('ef-soldador').value    || 0),
-        encarregado:      parseInt(document.getElementById('ef-encarregado').value || 0),
-        tecnico_seguranca:parseInt(document.getElementById('ef-tecnico').value     || 0),
+        montador:          parseInt(document.getElementById('ef-montador').value    || 0),
+        auxiliar:          parseInt(document.getElementById('ef-auxiliar').value    || 0),
+        eletricista:       parseInt(document.getElementById('ef-eletricista').value || 0),
+        soldador:          parseInt(document.getElementById('ef-soldador').value    || 0),
+        encarregado:       parseInt(document.getElementById('ef-encarregado').value || 0),
+        tecnico_seguranca: parseInt(document.getElementById('ef-tecnico').value     || 0),
       };
       const tmEl = document.querySelector('input[name="tm"]:checked');
       const ttEl = document.querySelector('input[name="tt"]:checked');
@@ -511,18 +667,40 @@
       };
     }
 
+    // ── Save ───────────────────────────────────────────────
     function salvar(silent) {
       if (isLocked) return;
       DB.updateRDO(rdoId, { ...getFormData(), fotos: fotosArr, status_documento: 'Rascunho' });
-      if (!silent) Utils.toast('Rascunho salvo!', 'success');
+      if (!silent) Toast.success('Rascunho salvo!');
       updateStatus('Rascunho');
     }
 
     function scheduleAutoSave() {
+      if (isLocked) return;
       clearTimeout(autoSaveTimer);
-      autoSaveTimer = setTimeout(() => salvar(true), 1200);
+      showSaveIndicator('saving');
+      autoSaveTimer = setTimeout(() => {
+        salvar(true);
+        showSaveIndicator('saved');
+      }, 1200);
     }
 
+    function showSaveIndicator(state) {
+      const el = document.getElementById('save-indicator');
+      if (!el) return;
+      if (state === 'saving') {
+        el.innerHTML = `
+          <svg class="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          <span class="text-amber-500">Salvando…</span>`;
+      } else {
+        el.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="text-emerald-500">Salvo</span>`;
+        setTimeout(() => { el.innerHTML = ''; }, 2000);
+      }
+    }
+
+    // ── Progress ───────────────────────────────────────────
     function updateProgress() {
       const rdo = DB.getRDOById(rdoId);
       const linhas = DB.getRDOLinhas(rdoId);
@@ -537,14 +715,23 @@
       }
       const pct = slots.length > 0 ? Math.round((filled / slots.length) * 100) : 0;
       document.getElementById('progress-fill').style.width = pct + '%';
+
+      // Atualiza label da aba Horas
+      const nonLunch = slots.filter(s => s !== almocoHour).length;
+      const filledNonLunch = linhas.filter(l => {
+        return slots.includes(l.horario_ponto) && l.horario_ponto !== almocoHour &&
+               l.descricao_detalhada && l.descricao_detalhada.trim().length >= 20;
+      }).length;
+      updateSlotsProgressLabel(filledNonLunch, nonLunch);
     }
 
+    // ── Status indicator ───────────────────────────────────
     function updateStatus(status) {
-      const dot = document.getElementById('status-indicator');
-      dot.className = 'status-dot ' + (status === 'Finalizado' ? 'dot-fin' : status === 'Pendente_Assinatura' ? 'dot-pend' : 'dot-rasc');
-      dot.title = status;
+      // Status is shown in save-indicator; also store title
+      document.title = `RDO — ${status === 'Finalizado' ? 'Finalizado' : status === 'Pendente_Assinatura' ? 'Aguardando Assinatura' : 'Rascunho'} — RDO Digital`;
     }
 
+    // ── Enviar ─────────────────────────────────────────────
     function enviarAssinatura() {
       if (isLocked) return;
       salvar(true);
@@ -553,29 +740,25 @@
 
       // RN05
       const err = Utils.validateRDOCompleto(rdo, linhas);
-      if (err) { Utils.toast(err, 'error'); return; }
+      if (err) { Toast.error(err); return; }
 
       DB.updateRDO(rdoId, { status_documento: 'Pendente_Assinatura' });
       updateStatus('Pendente_Assinatura');
       location.href = `assinatura.html?rdo=${rdoId}`;
     }
 
+    // ── Read-only ──────────────────────────────────────────
     function setAllReadOnly() {
       document.querySelectorAll('input,select,textarea').forEach(el => el.disabled = true);
     }
 
-    function goBack() {
-      salvar(true);
-      location.href = 'home.html';
-    }
-
-    // ── FOTOS ─────────────────────────────────────────
+    // ── FOTOS ──────────────────────────────────────────────
     function addFotos(input) {
       if (isLocked) return;
       const files = Array.from(input.files);
       if (!files.length) return;
       const slots = MAX_FOTOS - fotosArr.length;
-      if (slots <= 0) { Utils.toast(`Máximo de ${MAX_FOTOS} fotos atingido.`, 'warning'); return; }
+      if (slots <= 0) { Toast.warning(`Máximo de ${MAX_FOTOS} fotos atingido.`); return; }
       const toProcess = files.slice(0, slots);
       let done = 0;
       toProcess.forEach(file => {
@@ -609,24 +792,34 @@
       const grid = document.getElementById('fotos-grid');
       if (!grid) return;
       grid.innerHTML = fotosArr.map((src, i) => `
-        <div class="foto-thumb">
-          <img src="${src}" alt="Foto ${i+1}" onclick="verFoto(${i})">
-          ${!isLocked ? `<button class="foto-remove" onclick="removeFoto(${i})" title="Remover">✕</button>` : ''}
+        <div class="relative aspect-square rounded-xl overflow-hidden bg-slate-100 cursor-pointer border border-slate-200">
+          <img src="${src}" alt="Foto ${i+1}" class="w-full h-full object-cover block" onclick="verFoto(${i})">
+          ${!isLocked ? `<button onclick="removerFoto(${i})" title="Remover"
+            class="absolute top-1.5 right-1.5 bg-slate-900/70 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors hover:bg-red-600" style="border:none;cursor:pointer">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>` : ''}
         </div>`).join('');
+
       const btn = document.getElementById('btn-add-foto');
-      if (btn) btn.style.display = (fotosArr.length >= MAX_FOTOS || isLocked) ? 'none' : 'flex';
+      if (btn) btn.style.display = (fotosArr.length >= MAX_FOTOS || isLocked) ? 'none' : '';
+
+      const countEl = document.getElementById('fotos-count');
+      if (countEl) countEl.textContent = `${fotosArr.length} / ${MAX_FOTOS}`;
     }
 
-    function removeFoto(idx) {
-      fotosArr.splice(idx, 1);
-      renderFotos();
-      salvar(true);
+    function removerFoto(idx) {
+      UIConfirm('Remover esta foto?', () => {
+        fotosArr.splice(idx, 1);
+        renderFotos();
+        salvar(true);
+      }, { danger: true, confirmText: 'Remover' });
     }
 
     function verFoto(idx) {
       const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;cursor:zoom-out';
-      overlay.innerHTML = `<img src="${fotosArr[idx]}" style="max-width:100%;max-height:100%;border-radius:.5rem;object-fit:contain">`;
+      overlay.className = 'modal-overlay';
+      overlay.style.cssText = 'z-index:9999;cursor:zoom-out';
+      overlay.innerHTML = `<img src="${fotosArr[idx]}" style="max-width:100%;max-height:90vh;border-radius:.75rem;object-fit:contain">`;
       overlay.onclick = () => overlay.remove();
       document.body.appendChild(overlay);
     }

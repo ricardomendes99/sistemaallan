@@ -10,23 +10,8 @@
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Obras — RDO Digital</title>
-  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/output.css">
   <style>
-    .header { background: #0F172A; color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-    .logo { display: flex; align-items: center; gap: .75rem; }
-    .logo-m { width: 36px; height: 36px; background: #F97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #fff; }
-    .logo-text h1 { font-size: 1rem; font-weight: 700; }
-    .logo-text p  { font-size: .75rem; color: #64748B; }
-    nav { background: #1E293B; padding: 0 1.5rem; }
-    nav a { color: #94A3B8; padding: .625rem 1rem; font-size: .875rem; font-weight: 500; text-decoration: none; display: inline-block; }
-    nav a:hover { color: #fff; }
-    nav a.active { color: #fff; background: #334155; border-radius: 0 0 .5rem .5rem; }
-    main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
-    .user-info { color: #94A3B8; font-size: .875rem; display: flex; align-items: center; gap: 1rem; }
-    .btn-logout { background: none; border: none; color: #64748B; cursor: pointer; font-size: .875rem; padding: .25rem .5rem; border-radius: .375rem; }
-    .btn-logout:hover { color: #fff; background: #334155; }
-    .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem; }
-
     .user-check-list { max-height: 280px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: .5rem; }
     .user-check-item { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-bottom: 1px solid #F1F5F9; cursor: pointer; }
     .user-check-item:last-child { border-bottom: none; }
@@ -36,7 +21,6 @@
     .user-role-label  { font-size: .75rem; color: #64748B; }
     .team-avatars { display: flex; gap: .2rem; flex-wrap: wrap; }
     .team-chip { background: #F1F5F9; color: #475569; font-size: .7rem; font-weight: 600; padding: .15rem .5rem; border-radius: 9999px; }
-
     .anexo-row { display: flex; align-items: center; gap: .75rem; padding: .65rem 1rem; border-bottom: 1px solid #F1F5F9; }
     .anexo-row:last-child { border-bottom: none; }
     .anexo-nome { font-size: .9rem; font-weight: 600; color: #1E293B; flex: 1; }
@@ -44,52 +28,99 @@
     .anexo-add { border-top: 1px solid #E2E8F0; padding: 1rem; display: flex; flex-direction: column; gap: .65rem; }
   </style>
 </head>
-<body>
-  <header class="header">
-    <div class="logo">
-      <img src="../assets/img/logo.png" style="height:38px;border-radius:6px;">
-      <div class="logo-text"><p>RDO Digital</p></div>
-    </div>
-    <div class="user-info">
-      <span id="user-name"></span>
-      <button class="btn-logout" onclick="Auth.logout()">Sair</button>
-    </div>
-  </header>
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="obras.html" class="active">Obras</a>
-    <a href="usuarios.html">Usuários</a>
-    <a href="historico.html">Histórico RDOs</a>
-    <a href="relatorio-executivo.html">Relatório Executivo</a>
-    <a href="backup.html">Backup</a>
-  </nav>
+<body class="bg-slate-50">
 
-  <main>
-    <div class="toolbar">
-      <div>
-        <p style="font-size:1.15rem;font-weight:700;color:#1E293B">Gestão de Obras</p>
-        <p style="font-size:.85rem;color:#64748B" id="obras-count"></p>
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar" class="sidebar">
+    <div class="flex justify-center py-4 border-b border-slate-800">
+      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" class="h-14 rounded-xl" style="width:auto">
+      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" class="h-14 w-14 rounded-xl object-contain" style="display:none">
+    </div>
+    <nav class="flex-1 py-3 overflow-y-auto">
+      <a href="dashboard.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="obras.html" class="sidebar-nav-item active">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Obras</span>
+      </a>
+      <a href="usuarios.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-label">Usuários</span>
+      </a>
+      <a href="historico.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span class="nav-label">Histórico RDOs</span>
+      </a>
+      <a href="relatorio-executivo.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-label">Relatório Executivo</span>
+      </a>
+      <a href="backup.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 7 20 21 4 21 4 7"/><rect x="1" y="3" width="22" height="4"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        <span class="nav-label">Backup</span>
+      </a>
+    </nav>
+    <div class="border-t border-slate-800 p-3">
+      <div class="flex items-center gap-2.5 px-2">
+        <div class="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="nav-label flex-1 min-w-0">
+          <p class="text-xs font-semibold text-white truncate" id="user-name">—</p>
+          <p class="text-xs text-slate-500">Administrador</p>
+        </div>
+        <button onclick="Auth.logout()" title="Sair"
+                class="nav-label text-slate-500 hover:text-red-400 transition-colors p-1"
+                style="background:none;border:none;cursor:pointer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main wrap ── -->
+  <div id="admin-wrap" class="admin-main">
+
+    <header class="admin-topbar">
+      <div class="flex items-center gap-3">
+        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Toggle sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
+        <div>
+          <h1 class="text-sm font-bold text-slate-900">Gestão de Obras</h1>
+          <p class="text-xs text-slate-500" id="obras-count"></p>
+        </div>
       </div>
       <button class="btn btn-primary" onclick="openObraModal()">+ Nova Obra</button>
-    </div>
+    </header>
 
-    <div class="card" style="overflow-x:auto">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>Nome da Obra</th>
-            <th>OF</th>
-            <th>Cliente</th>
-            <th>Local</th>
-            <th>Equipe Vinculada</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-  </main>
+    <main class="admin-content w-full">
+
+      <div class="card overflow-x-auto">
+        <div class="card-header flex items-center justify-between">
+          <span>Obras Cadastradas</span>
+          <span id="obras-badge" class="text-xs text-slate-400 font-normal"></span>
+        </div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Nome da Obra</th>
+              <th>OF</th>
+              <th>Cliente</th>
+              <th>Local</th>
+              <th>Equipe Vinculada</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
 
   <!-- Modal: Obra -->
   <div class="modal-overlay" id="modal-obra" style="display:none" onclick="if(event.target===this)closeObraModal()">
@@ -102,7 +133,7 @@
         <input type="hidden" id="edit-id">
         <div class="field">
           <label>Nome da Obra *</label>
-          <input type="text" id="f-nome" placeholder="Ex: Expansão Galpão Net Container" required>
+          <input type="text" id="f-nome" placeholder="Ex: Expansão Galpão Net Container">
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div class="field">
@@ -209,11 +240,14 @@
     </div>
   </div>
 
+  <div class="toast-container"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/db.js?v=3"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
+  <script src="../assets/js/ui.js"></script>
   <script>
     DB.init().then(() => {
       const user = Auth.requireAuth('ADMIN');
@@ -226,6 +260,7 @@
     function render() {
       const obras = DB.getObras();
       document.getElementById('obras-count').textContent = `${obras.length} obra(s) cadastrada(s)`;
+      document.getElementById('obras-badge').textContent = `${obras.length} obra(s)`;
       const tbody = document.getElementById('tbody');
       if (obras.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#94A3B8">Nenhuma obra cadastrada.</td></tr>';
@@ -247,9 +282,9 @@
           <td><div class="team-avatars">${teamHtml}</div></td>
           <td>${Utils.statusBadge(o.status_obra)}</td>
           <td style="white-space:nowrap">
-            <button class="btn btn-ghost btn-sm" onclick="openEquipeModal('${o.id_obra}')">👥 Equipe</button>
-            <button class="btn btn-ghost btn-sm" onclick="openAnexosModal('${o.id_obra}')" style="margin-left:.3rem">📎 Plantas${nAnexos > 0 ? ` <span style="background:#F97316;color:#fff;border-radius:9999px;padding:0 .4rem;font-size:.7rem">${nAnexos}</span>` : ''}</button>
-            <button class="btn btn-ghost btn-sm" onclick="openCodigoModal('${o.id_obra}')" style="margin-left:.3rem">🔑 Código</button>
+            <button class="btn btn-ghost btn-sm" onclick="openEquipeModal('${o.id_obra}')">Equipe</button>
+            <button class="btn btn-ghost btn-sm" onclick="openAnexosModal('${o.id_obra}')" style="margin-left:.3rem">Plantas${nAnexos > 0 ? ` <span style="background:#F97316;color:#fff;border-radius:9999px;padding:0 .4rem;font-size:.7rem">${nAnexos}</span>` : ''}</button>
+            <button class="btn btn-ghost btn-sm" onclick="openCodigoModal('${o.id_obra}')" style="margin-left:.3rem">Código</button>
             <button class="btn btn-ghost btn-sm" onclick="editObra('${o.id_obra}')" style="margin-left:.3rem">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="delObra('${o.id_obra}')" style="margin-left:.3rem">Excluir</button>
           </td>

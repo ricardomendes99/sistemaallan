@@ -8,73 +8,28 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/faviconemodular/apple-icon-180x180.png">
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aprovação de RDO — Modular Service</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F1F5F9; min-height: 100vh; }
-    .top { background: #0F172A; padding: 1rem 1.25rem; display: flex; align-items: center; gap: .65rem; }
-    .logo-m { width: 32px; height: 32px; background: #F97316; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: .9rem; flex-shrink: 0; }
-    .top-title { color: #fff; font-weight: 700; font-size: .95rem; }
-    .top-sub   { color: #64748B; font-size: .75rem; }
-    main { max-width: 700px; margin: 0 auto; padding: 1.25rem; }
-    .card { background: #fff; border-radius: .875rem; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 1rem; }
-    .card-header { padding: .75rem 1.25rem; background: #1E293B; color: #fff; font-weight: 700; font-size: .85rem; }
-    .card-body { padding: 1.25rem; }
-    .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: .55rem 0; border-bottom: 1px solid #F1F5F9; font-size: .875rem; }
-    .info-row:last-child { border-bottom: none; }
-    .il { color: #64748B; }
-    .iv { color: #1E293B; font-weight: 600; text-align: right; max-width: 60%; }
-    .hora-row { display: flex; gap: .75rem; padding: .65rem 0; border-bottom: 1px solid #F8FAFC; align-items: flex-start; }
-    .hora-row:last-child { border-bottom: none; }
-    .ht { font-size: .9rem; font-weight: 800; color: #1E293B; min-width: 50px; flex-shrink: 0; }
-    .hd { flex: 1; font-size: .85rem; color: #334155; line-height: 1.5; }
-    .hm { font-size: .72rem; color: #94A3B8; font-weight: 600; }
-    .status-pill { font-size: .68rem; font-weight: 700; padding: .18rem .5rem; border-radius: 9999px; flex-shrink: 0; }
-    .sp-ini { background:#DBEAFE;color:#1E40AF; }
-    .sp-and { background:#FEF3C7;color:#92400E; }
-    .sp-con { background:#DCFCE7;color:#166534; }
-
-    /* Approval section */
-    .aprov-opts { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
-    .aprov-opt { display: flex; align-items: center; gap: .75rem; border: 1.5px solid #E2E8F0; border-radius: .625rem; padding: .75rem 1rem; cursor: pointer; transition: border-color .15s; }
-    .aprov-opt:hover { border-color: #F97316; }
-    .aprov-opt input { accent-color: #F97316; width: 18px; height: 18px; cursor: pointer; }
-    .aprov-opt.selected { border-color: #F97316; background: #FFF7ED; }
-    .aprov-label { font-size: .9rem; font-weight: 600; color: #1E293B; }
-    .aprov-sub   { font-size: .75rem; color: #64748B; }
-    textarea { width: 100%; border: 1.5px solid #CBD5E1; border-radius: .5rem; padding: .65rem .85rem; font-size: .9rem; font-family: inherit; resize: vertical; min-height: 90px; }
-    textarea:focus { outline: none; border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,.1); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .65rem 1.25rem; border-radius: .5rem; font-size: .9rem; font-weight: 700; cursor: pointer; border: none; }
-    .btn-primary { background: #F97316; color: #fff; }
-    .btn-primary:hover { background: #EA6C0A; }
-    .btn-full { width: 100%; padding: .85rem; font-size: 1rem; }
-    .badge-ok { background: #DCFCE7; color: #166534; padding: .35rem .9rem; border-radius: 9999px; font-size: .85rem; font-weight: 700; display: inline-block; }
-    .badge-res { background: #FEF3C7; color: #92400E; padding: .35rem .9rem; border-radius: 9999px; font-size: .85rem; font-weight: 700; display: inline-block; }
-    .obs-box { background: #FFF7ED; border: 1px solid #FED7AA; border-radius: .5rem; padding: .85rem 1rem; font-size: .875rem; color: #78350F; white-space: pre-wrap; }
-    .error-box { background: #FEE2E2; border: 1px solid #FECACA; color: #991B1B; border-radius: .625rem; padding: 1.5rem; text-align: center; }
-    .success-screen { text-align: center; padding: 3rem 1.5rem; }
-    .success-screen .icon { font-size: 3.5rem; margin-bottom: .75rem; }
-    .success-screen h2 { font-size: 1.2rem; font-weight: 700; color: #166534; }
-    .success-screen p  { color: #64748B; margin-top: .4rem; font-size: .875rem; }
-  </style>
+  <link rel="stylesheet" href="../assets/css/output.css">
 </head>
-<body>
-  <div class="top">
-    <img src="../assets/img/logo.png" style="height:38px;border-radius:6px;">
-    <div>
-      <p class="top-sub">Portal de Aprovação de RDO</p>
-    </div>
-  </div>
+<body class="bg-slate-100 min-h-screen">
 
+  <!-- ── Header ── -->
+  <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+    <img src="../assets/img/logo.png" class="h-8 rounded-lg" alt="Modular Service">
+    <span class="text-xs text-slate-500 font-medium">Portal de Aprovação</span>
+  </header>
+
+  <!-- ── Main ── -->
   <main id="main-content">
-    <div style="text-align:center;padding:3rem;color:#94A3B8">Verificando acesso…</div>
+    <div class="text-center py-12 text-slate-400">Verificando acesso…</div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/db.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
+  <script src="../assets/js/ui.js"></script>
   <script>
     const params = new URLSearchParams(location.search);
     const rdoId  = params.get('rdo');
@@ -93,38 +48,43 @@
       }
     });
 
+    /* ── Tela 1: Gate de código ── */
     function showCodigoGate(obra) {
       _codigoEsperado = obra.codigo_cliente;
       document.getElementById('main-content').innerHTML = `
-        <div style="max-width:380px;margin:2rem auto">
-          <div style="background:#fff;border-radius:1rem;border:1px solid #E2E8F0;overflow:hidden">
-            <div style="background:#1E293B;padding:.75rem 1.25rem">
-              <p style="color:#fff;font-weight:700;font-size:.95rem">Verificação de Identidade</p>
-            </div>
-            <div style="padding:1.5rem">
-              <p style="font-size:.875rem;color:#475569;margin-bottom:1.25rem">Para acessar o RDO da obra <strong>${obra.nome_obra}</strong>, informe o código de verificação que você recebeu.</p>
+        <div class="max-w-sm mx-auto mt-12 p-4">
+          <div class="card p-6">
+            <h2 class="text-xl font-bold text-slate-900 mb-1">Verificação de Identidade</h2>
+            <p class="text-sm text-slate-500 mb-6">Para acessar o RDO da obra <strong>${obra.nome_obra}</strong>, informe o código de verificação que você recebeu.</p>
+            <div class="field mb-4">
+              <label>Código de acesso</label>
               <input type="text" id="f-codigo-cli" placeholder="Ex: A3F7K2"
-                style="width:100%;border:1.5px solid #CBD5E1;border-radius:.5rem;padding:.65rem .85rem;font-size:1.1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:.75rem"
-                maxlength="6" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')verificarCodigo()">
-              <p id="codigo-err" style="color:#DC2626;font-size:.8rem;margin-bottom:.75rem;display:none">Código incorreto. Verifique com a Modular Service.</p>
-              <button onclick="verificarCodigo()"
-                style="width:100%;background:#F97316;color:#fff;border:none;border-radius:.5rem;padding:.75rem;font-size:1rem;font-weight:700;cursor:pointer">
-                Verificar
-              </button>
+                class="text-center text-2xl font-bold tracking-[.5rem] uppercase"
+                maxlength="6"
+                oninput="this.value=this.value.toUpperCase()"
+                onkeydown="if(event.key==='Enter')verificarCodigo()">
             </div>
+            <div id="codigo-err" class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm flex items-center gap-2 mb-4" style="display:none!important">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Código incorreto. Verifique com a Modular Service.
+            </div>
+            <button onclick="verificarCodigo()" class="btn btn-primary btn-full">Verificar</button>
           </div>
         </div>`;
     }
 
     function verificarCodigo() {
       const digitado = (document.getElementById('f-codigo-cli').value || '').trim().toUpperCase();
+      const errEl = document.getElementById('codigo-err');
       if (digitado === _codigoEsperado.toUpperCase()) {
         load();
       } else {
-        document.getElementById('codigo-err').style.display = 'block';
+        errEl.style.removeProperty('display');
+        errEl.style.display = 'flex';
       }
     }
 
+    /* ── Tela 2: RDO + Aprovação ── */
     function load() {
       const rdo = DB.getRDOById(rdoId);
       if (!rdo || !token) { showError('Link inválido ou expirado.'); return; }
@@ -139,100 +99,129 @@
       const ef     = rdo.efetivo || {};
       const total  = Object.values(ef).reduce((s,v) => s+(+v||0), 0);
 
+      const statusPillClass = {
+        'Iniciada':      'bg-blue-100 text-blue-800',
+        'Em Andamento':  'bg-amber-100 text-amber-800',
+        'Concluída':     'bg-emerald-100 text-emerald-800'
+      };
+
       document.getElementById('main-content').innerHTML = `
-        <div style="margin-bottom:1rem">
-          <p style="font-size:1.1rem;font-weight:700;color:#1E293B">${obra.nome_obra || '—'}</p>
-          <p style="font-size:.85rem;color:#64748B">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</p>
-        </div>
+        <div class="max-w-2xl mx-auto p-4">
 
-        <!-- Dados gerais -->
-        <div class="card">
-          <div class="card-header">Dados do Relatório</div>
-          <div class="card-body">
-            <div class="info-row"><span class="il">Cliente</span><span class="iv">${obra.cliente_nome||'—'}</span></div>
-            <div class="info-row"><span class="il">Local</span><span class="iv">${obra.endereco_local||'—'}</span></div>
-            <div class="info-row"><span class="il">Atividade</span><span class="iv">${rdo.atividade||'—'}</span></div>
-            <div class="info-row"><span class="il">Período</span><span class="iv">${rdo.horario_inicio||'—'} — ${rdo.horario_termino||'—'}</span></div>
-            <div class="info-row"><span class="il">Tempo Manhã</span><span class="iv">${rdo.condicao_tempo_manha||'—'}</span></div>
-            <div class="info-row"><span class="il">Tempo Tarde</span><span class="iv">${rdo.condicao_tempo_tarde||'—'}</span></div>
-            <div class="info-row"><span class="il">Equipe total</span><span class="iv">${total} profissional(is)</span></div>
-            <div class="info-row"><span class="il">Executante</span><span class="iv">${cri.nome_completo||'—'}</span></div>
-            <div class="info-row"><span class="il">OF</span><span class="iv">${obra.codigo_of||'—'}</span></div>
+          <!-- Título -->
+          <div class="mb-4">
+            <p class="text-lg font-bold text-slate-900">${obra.nome_obra || '—'}</p>
+            <p class="text-sm text-slate-500">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</p>
           </div>
-        </div>
 
-        <!-- Atividades hora a hora -->
-        <div class="card">
-          <div class="card-header">Atividades Realizadas</div>
-          <div class="card-body" style="padding:.75rem 1.25rem">
-            ${Utils.getSlots().map(slot => {
-              const l = linhas.find(x => x.horario_ponto === slot);
-              if (slot === rdo.horario_almoco)
-                return `<div class="hora-row"><span class="ht" style="color:#D97706">${slot}</span><em class="hd" style="color:#92400E">Intervalo de almoço</em></div>`;
-              if (!l || !l.descricao_detalhada)
-                return `<div class="hora-row" style="opacity:.35"><span class="ht">${slot}</span><span class="hd">—</span></div>`;
-              const sc = { 'Iniciada':'sp-ini','Em Andamento':'sp-and','Concluída':'sp-con' };
-              return `<div class="hora-row">
-                <span class="ht">${slot}</span>
-                <div class="hd">
-                  ${l.referencia_modulo ? `<span class="hm">${l.referencia_modulo}</span><br>` : ''}
-                  ${l.descricao_detalhada}
-                </div>
-                ${l.status_atividade ? `<span class="status-pill ${sc[l.status_atividade]||''}">${l.status_atividade}</span>` : ''}
-              </div>`;
-            }).join('')}
+          <!-- Dados gerais -->
+          <div class="card p-5 mb-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Dados do Relatório</p>
+            <div class="divide-y divide-slate-100">
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Cliente</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${obra.cliente_nome||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Local</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${obra.endereco_local||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Atividade</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.atividade||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Período</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.horario_inicio||'—'} — ${rdo.horario_termino||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Tempo Manhã</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.condicao_tempo_manha||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Tempo Tarde</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.condicao_tempo_tarde||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Equipe total</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${total} profissional(is)</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Executante</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${cri.nome_completo||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">OF</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${obra.codigo_of||'—'}</span></div>
+            </div>
           </div>
-        </div>
 
-        ${rdo.observacoes_desvios ? `
-        <div class="card">
-          <div class="card-header">Observações e Desvios</div>
-          <div class="card-body"><div class="obs-box">${rdo.observacoes_desvios}</div></div>
-        </div>` : ''}
-
-        ${rdo.fotos && rdo.fotos.length > 0 ? `
-        <div class="card">
-          <div class="card-header">Fotos da Obra (${rdo.fotos.length})</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.65rem;padding:1rem">
-            ${rdo.fotos.map((src, i) => `
-              <div style="aspect-ratio:1;border-radius:.5rem;overflow:hidden;border:1px solid #E2E8F0;cursor:zoom-in" onclick="verFoto('${i}')">
-                <img src="${src}" alt="Foto ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block">
-              </div>`).join('')}
+          <!-- Atividades hora a hora -->
+          <div class="card p-5 mb-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Atividades Realizadas</p>
+            <div class="divide-y divide-slate-50">
+              ${Utils.getSlots().map(slot => {
+                const l = linhas.find(x => x.horario_ponto === slot);
+                if (slot === rdo.horario_almoco)
+                  return `<div class="flex gap-3 py-2.5 items-start">
+                    <span class="text-sm font-extrabold text-amber-600 min-w-[50px] shrink-0">${slot}</span>
+                    <em class="text-sm text-amber-800">Intervalo de almoço</em>
+                  </div>`;
+                if (!l || !l.descricao_detalhada)
+                  return `<div class="flex gap-3 py-2.5 items-start opacity-35">
+                    <span class="text-sm font-extrabold text-slate-800 min-w-[50px] shrink-0">${slot}</span>
+                    <span class="text-sm text-slate-500">—</span>
+                  </div>`;
+                const pillClass = statusPillClass[l.status_atividade] || '';
+                return `<div class="flex gap-3 py-2.5 items-start">
+                  <span class="text-sm font-extrabold text-slate-800 min-w-[50px] shrink-0">${slot}</span>
+                  <div class="flex-1 text-sm text-slate-700 leading-relaxed">
+                    ${l.referencia_modulo ? `<span class="text-xs text-slate-400 font-semibold">${l.referencia_modulo}</span><br>` : ''}
+                    ${l.descricao_detalhada}
+                  </div>
+                  ${l.status_atividade ? `<span class="text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${pillClass}">${l.status_atividade}</span>` : ''}
+                </div>`;
+              }).join('')}
+            </div>
           </div>
-        </div>` : ''}
 
-        <!-- Aprovação do cliente -->
-        <div class="card">
-          <div class="card-header">Sua Aprovação</div>
-          <div class="card-body">
-            <p style="font-size:.875rem;color:#475569;margin-bottom:1rem">Revise o relatório acima e registre sua aprovação:</p>
-            <div class="aprov-opts" id="aprov-opts">
-              <label class="aprov-opt" onclick="selectAprov(this)">
-                <input type="radio" name="aprov" value="Aprovado">
+          ${rdo.observacoes_desvios ? `
+          <div class="card p-5 mb-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Observações e Desvios</p>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-900 whitespace-pre-wrap">${rdo.observacoes_desvios}</div>
+          </div>` : ''}
+
+          ${rdo.fotos && rdo.fotos.length > 0 ? `
+          <div class="card p-5 mb-4">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fotos da Obra (${rdo.fotos.length})</p>
+            <div class="grid gap-2.5" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
+              ${rdo.fotos.map((src, i) => `
+                <div class="aspect-square rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in" onclick="verFoto('${i}')">
+                  <img src="${src}" alt="Foto ${i+1}" class="w-full h-full object-cover block">
+                </div>`).join('')}
+            </div>
+          </div>` : ''}
+
+          <!-- Aprovação do cliente -->
+          <div class="card p-5 mt-6">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Sua Aprovação</p>
+            <p class="text-sm text-slate-600 mb-4">Revise o relatório acima e registre sua aprovação:</p>
+
+            <!-- Opções -->
+            <div class="flex flex-col gap-2 mb-4" id="aprov-opts">
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-emerald-400" onclick="selectAprov(this)">
+                <input type="radio" name="aprov" value="Aprovado" class="w-5 h-5 accent-emerald-600 cursor-pointer shrink-0">
                 <div>
-                  <p class="aprov-label">✅ Aprovado</p>
-                  <p class="aprov-sub">Confirmo as atividades realizadas conforme descrito.</p>
+                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Aprovado
+                  </p>
+                  <p class="text-xs text-slate-500 mt-0.5">Confirmo as atividades realizadas conforme descrito.</p>
                 </div>
               </label>
-              <label class="aprov-opt" onclick="selectAprov(this)">
-                <input type="radio" name="aprov" value="Aprovado com ressalvas">
+
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-amber-400" onclick="selectAprov(this,'ressalvas')">
+                <input type="radio" name="aprov" value="Aprovado com ressalvas" class="w-5 h-5 accent-amber-500 cursor-pointer shrink-0">
                 <div>
-                  <p class="aprov-label">⚠️ Aprovado com ressalvas</p>
-                  <p class="aprov-sub">Aprovo com comentários adicionais abaixo.</p>
+                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Aprovado com ressalvas
+                  </p>
+                  <p class="text-xs text-slate-500 mt-0.5">Aprovo com comentários adicionais abaixo.</p>
                 </div>
               </label>
             </div>
-            <div class="field" style="margin-bottom:1.25rem">
-              <label style="display:block;font-size:.78rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.4rem">Comentário (opcional)</label>
-              <textarea id="f-coment" placeholder="Escreva aqui qualquer observação ou ressalva…"></textarea>
+
+            <!-- Comentário -->
+            <div class="field mb-4">
+              <label>Comentário (opcional)</label>
+              <textarea id="f-coment" placeholder="Escreva aqui qualquer observação ou ressalva…"
+                class="w-full border-slate-300 rounded-xl p-3 text-sm resize-y min-h-[90px] focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"></textarea>
             </div>
-            <div class="field" style="margin-bottom:0">
-              <label style="display:block;font-size:.78rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.4rem">Seu nome *</label>
-              <input type="text" id="f-nome-cli" placeholder="Nome completo do responsável"
-                style="width:100%;padding:.6rem .85rem;border:1.5px solid #CBD5E1;border-radius:.5rem;font-size:.9rem;margin-bottom:1.25rem">
+
+            <!-- Nome -->
+            <div class="field mb-5">
+              <label>Seu nome *</label>
+              <input type="text" id="f-nome-cli" placeholder="Nome completo do responsável" autocomplete="name">
             </div>
+
             <button class="btn btn-primary btn-full" onclick="confirmarAprovacao()">Confirmar Aprovação</button>
           </div>
+
         </div>
       `;
     }
@@ -247,9 +236,17 @@
       document.body.appendChild(overlay);
     }
 
-    function selectAprov(el) {
-      document.querySelectorAll('.aprov-opt').forEach(x => x.classList.remove('selected'));
-      el.classList.add('selected');
+    function selectAprov(el, tipo) {
+      document.querySelectorAll('#aprov-opts label').forEach(x => {
+        x.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-amber-500', 'bg-amber-50');
+        x.classList.add('border-slate-200');
+      });
+      el.classList.remove('border-slate-200');
+      if (tipo === 'ressalvas') {
+        el.classList.add('border-amber-500', 'bg-amber-50');
+      } else {
+        el.classList.add('border-emerald-500', 'bg-emerald-50');
+      }
     }
 
     function confirmarAprovacao() {
@@ -266,35 +263,48 @@
         data_aprovacao_cliente:       new Date().toISOString()
       });
 
+      /* ── Tela 3: Sucesso ── */
       document.getElementById('main-content').innerHTML = `
-        <div class="success-screen">
-          <div class="icon">✅</div>
-          <h2>Aprovação registrada!</h2>
-          <p><strong>${nome}</strong></p>
-          <p style="margin-top:.25rem">${aprov.value}</p>
-          ${comt ? `<p style="margin-top:1rem;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.5rem;padding:.75rem;font-size:.875rem;color:#334155;text-align:left">"${comt}"</p>` : ''}
-          <p style="margin-top:1.5rem;color:#94A3B8;font-size:.8rem">Obrigado! Este registro foi enviado para a equipe Modular Service.</p>
+        <div class="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
+          <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-1">Aprovação registrada!</h2>
+          <p class="text-slate-500 text-sm mb-1"><strong>${nome}</strong></p>
+          <p class="text-slate-500 text-sm mb-6">${aprov.value}</p>
+          ${comt ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-6">"${comt}"</div>` : ''}
+          <p class="text-xs text-slate-400">Obrigado! Este registro foi enviado para a equipe Modular Service.</p>
         </div>`;
     }
 
     function showAlreadyApproved(rdo) {
+      const isOk = rdo.aprovacao_cliente === 'Aprovado';
       document.getElementById('main-content').innerHTML = `
-        <div class="success-screen">
-          <div class="icon">✅</div>
-          <h2>RDO já aprovado</h2>
-          <p><strong>${rdo.nome_aprovador_cliente}</strong></p>
-          <p><span class="${rdo.aprovacao_cliente === 'Aprovado' ? 'badge-ok' : 'badge-res'}">${rdo.aprovacao_cliente}</span></p>
-          ${rdo.comentario_cliente ? `<p style="margin-top:1rem;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.5rem;padding:.75rem;font-size:.875rem;color:#334155;">"${rdo.comentario_cliente}"</p>` : ''}
-          <p style="margin-top:1rem;font-size:.8rem;color:#94A3B8">Aprovado em ${Utils.formatDate(rdo.data_aprovacao_cliente ? rdo.data_aprovacao_cliente.split('T')[0] : '')}</p>
+        <div class="min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
+          <div class="w-20 h-20 rounded-full ${isOk ? 'bg-emerald-100' : 'bg-amber-100'} flex items-center justify-center mx-auto mb-6">
+            ${isOk
+              ? `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+              : `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+            }
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">RDO já aprovado</h2>
+          <p class="text-slate-600 font-semibold mb-2">${rdo.nome_aprovador_cliente}</p>
+          <span class="${isOk ? 'aprov-ok' : 'aprov-ressalvas'} mb-4">${rdo.aprovacao_cliente}</span>
+          ${rdo.comentario_cliente ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-4">"${rdo.comentario_cliente}"</div>` : ''}
+          <p class="text-xs text-slate-400">Aprovado em ${Utils.formatDate(rdo.data_aprovacao_cliente ? rdo.data_aprovacao_cliente.split('T')[0] : '')}</p>
         </div>`;
     }
 
     function showError(msg) {
       document.getElementById('main-content').innerHTML = `
-        <div class="error-box">
-          <p style="font-size:1.5rem;margin-bottom:.5rem">🔒</p>
-          <p style="font-weight:700;margin-bottom:.25rem">Acesso negado</p>
-          <p style="font-size:.875rem">${msg}</p>
+        <div class="max-w-sm mx-auto mt-12 p-4">
+          <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-3">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <p class="font-bold text-base mb-1">Acesso negado</p>
+            <p class="text-sm text-red-700">${msg}</p>
+          </div>
         </div>`;
     }
 

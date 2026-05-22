@@ -10,29 +10,27 @@
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório Executivo — RDO Digital</title>
+  <link rel="stylesheet" href="../assets/css/output.css">
   <style>
     @page { size: A4; margin: 12mm; }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #F1F5F9; }
-
-    /* Screen controls */
-    .screen-bar { background: #0F172A; color: #fff; padding: .85rem 1.5rem; display: flex; align-items: center; gap: .75rem; position: sticky; top: 0; z-index: 50; }
-    .screen-bar h1 { flex: 1; font-size: 1rem; font-weight: 700; }
-    .logo-m { width: 32px; height: 32px; background: #F97316; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: .9rem; flex-shrink: 0; }
-    .btn { padding: .5rem 1rem; border-radius: .375rem; font-size: .85rem; font-weight: 700; cursor: pointer; border: none; }
-    .btn-primary { background: #F97316; color: #fff; }
-    .btn-ghost   { background: transparent; color: #94A3B8; border: 1px solid #334155; }
-    .date-nav { display: flex; align-items: center; gap: .5rem; }
-    .date-nav input { padding: .4rem .65rem; border: 1px solid #334155; background: #1E293B; color: #fff; border-radius: .375rem; font-size: .875rem; }
-    @media print { .screen-bar { display: none !important; } body { background: #fff; } }
 
     /* Report layout */
-    .report { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
-    @media print { .report { max-width: 100%; margin: 0; padding: 0; } }
+    .admin-content { max-width: none !important; }
+    .report { padding: 0 0 2rem; width: 100%; }
+    @media print {
+      #sidebar, #admin-wrap > .admin-topbar { display: none !important; }
+      #admin-wrap { margin-left: 0 !important; }
+      .admin-content { padding: 0 !important; }
+      .report { max-width: 100%; padding: 0; }
+      .rep-box { border: none; border-radius: 0; box-shadow: none; }
+      .rep-header { border-radius: 0; }
+      .rep-footer { border-radius: 0; }
+      .sec-title a { display: none; }
+      body { background: #fff !important; }
+    }
 
     /* Report header */
     .rep-header { background: #0F172A; color: #fff; border-radius: .75rem .75rem 0 0; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-    @media print { .rep-header { border-radius: 0; } }
     .rep-header .brand { display: flex; align-items: center; gap: .75rem; }
     .rep-header h2 { font-size: 1.1rem; font-weight: 800; }
     .rep-header .meta { text-align: right; font-size: .8rem; color: #64748B; }
@@ -56,10 +54,10 @@
     .sum-table tbody tr:hover td { background: #FAFAFA; }
     .obra-name { font-weight: 700; color: #1E293B; }
     .obra-sub  { font-size: .75rem; color: #94A3B8; }
-    .status-fin { background:#DCFCE7;color:#166534;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
-    .status-rasc{ background:#FEF3C7;color:#92400E;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
-    .status-pend{ background:#DBEAFE;color:#1E40AF;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
-    .status-miss{ background:#FEE2E2;color:#991B1B;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
+    .status-fin  { background:#DCFCE7;color:#166534;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
+    .status-rasc { background:#FEF3C7;color:#92400E;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
+    .status-pend { background:#DBEAFE;color:#1E40AF;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
+    .status-miss { background:#FEE2E2;color:#991B1B;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
     .aprov-ok  { background:#DCFCE7;color:#166534;padding:.1rem .4rem;border-radius:9999px;font-size:.65rem;font-weight:700; }
     .aprov-res { background:#FEF3C7;color:#92400E;padding:.1rem .4rem;border-radius:9999px;font-size:.65rem;font-weight:700; }
     .aprov-pend{ color:#94A3B8;font-size:.7rem;font-style:italic; }
@@ -76,59 +74,117 @@
     /* Section title bar */
     .sec-title { background: #1E293B; color: #fff; padding: .6rem 1rem; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; justify-content: space-between; }
     .sec-title a { color: #F97316; font-size: .72rem; text-decoration: none; }
-    @media print { .sec-title a { display: none; } }
 
     /* Print footer */
     .rep-footer { background: #F8FAFC; border-top: 1px solid #E2E8F0; padding: .75rem 1.5rem; font-size: .75rem; color: #94A3B8; display: flex; justify-content: space-between; border-radius: 0 0 .75rem .75rem; }
-    @media print { .rep-footer { border-radius: 0; } }
 
     /* Wrapper box */
     .rep-box { border: 1px solid #E2E8F0; border-radius: .75rem; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06); }
-    @media print { .rep-box { border: none; border-radius: 0; box-shadow: none; } }
   </style>
 </head>
-<body>
-  <div class="screen-bar">
-    <img src="../assets/img/logo.png" style="height:32px;border-radius:6px;">
-    <h1>Relatório Executivo — RDO Digital</h1>
-    <div class="date-nav">
-      <label style="font-size:.8rem;color:#64748B">Referência:</label>
-      <input type="date" id="date-picker" onchange="render()">
+<body class="bg-slate-50">
+
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar" class="sidebar">
+    <div class="flex justify-center py-4 border-b border-slate-800">
+      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" class="h-14 rounded-xl" style="width:auto">
+      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" class="h-14 w-14 rounded-xl object-contain" style="display:none">
     </div>
-    <a href="backup.html" class="btn btn-ghost" style="border-color:#334155;font-size:.8rem">Backup</a>
-    <a href="dashboard.html" class="btn btn-ghost">← Dashboard</a>
-    <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir</button>
+    <nav class="flex-1 py-3 overflow-y-auto">
+      <a href="dashboard.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="obras.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Obras</span>
+      </a>
+      <a href="usuarios.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-label">Usuários</span>
+      </a>
+      <a href="historico.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span class="nav-label">Histórico RDOs</span>
+      </a>
+      <a href="relatorio-executivo.html" class="sidebar-nav-item active">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-label">Relatório Executivo</span>
+      </a>
+      <a href="backup.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 7 20 21 4 21 4 7"/><rect x="1" y="3" width="22" height="4"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        <span class="nav-label">Backup</span>
+      </a>
+    </nav>
+    <div class="border-t border-slate-800 p-3">
+      <div class="flex items-center gap-2.5 px-2">
+        <div class="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="nav-label flex-1 min-w-0">
+          <p class="text-xs font-semibold text-white truncate" id="user-name">—</p>
+          <p class="text-xs text-slate-500">Administrador</p>
+        </div>
+        <button onclick="Auth.logout()" title="Sair"
+                class="nav-label text-slate-500 hover:text-red-400 transition-colors p-1"
+                style="background:none;border:none;cursor:pointer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main wrap ── -->
+  <div id="admin-wrap" class="admin-main">
+
+    <header class="admin-topbar">
+      <div class="flex items-center gap-3">
+        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Toggle sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
+        <h1 class="text-sm font-bold text-slate-900">Relatório Executivo</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <label class="text-xs text-slate-500 hidden sm:block">Referência:</label>
+        <input type="date" id="date-picker" onchange="render()"
+               style="padding:.35rem .65rem;border:1.5px solid #CBD5E1;border-radius:.5rem;font-size:.875rem;color:#1E293B">
+        <button class="btn btn-primary btn-sm" onclick="window.print()">Imprimir</button>
+      </div>
+    </header>
+
+    <main class="admin-content w-full">
+      <div class="report" id="report">
+        <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
+      </div>
+    </main>
   </div>
 
-  <div class="report" id="report">
-    <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
-  </div>
+  <div class="toast-container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/db.js?v=3"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
+  <script src="../assets/js/ui.js"></script>
   <script>
-    function yesterday() {
-      const d = new Date(); d.setDate(d.getDate() - 1);
-      return d.toISOString().split('T')[0];
-    }
     const picker = document.getElementById('date-picker');
-    picker.value = yesterday();
+    picker.value = Utils.today();
 
     DB.init().then(() => {
-      Auth.requireAuth('ADMIN');
-      render();
+      const me = Auth.requireAuth('ADMIN');
+      if (me) {
+        document.getElementById('user-name').textContent = me.nome_completo;
+        render();
+      }
     });
 
     function render() {
-      const data   = picker.value || yesterday();
+      const data   = picker.value || Utils.today();
       const obras  = DB.getObras();
       const rdos   = DB.getRDOsByData(data);
       const ativas = DB.getObrasAtivas();
 
-      // Match rdos to obras
       const obrasComRDO = new Set(rdos.map(r => r.id_obra));
       const obrasSemRDO = ativas.filter(o => !obrasComRDO.has(o.id_obra));
 
@@ -137,26 +193,20 @@
       const rasc = rdos.filter(r => r.status_documento === 'Rascunho').length;
       const miss = obrasSemRDO.length;
 
-      // Total efetivo
       const totalEfetivo = rdos.reduce((s, r) => {
         const ef = r.efetivo || {};
         return s + Object.values(ef).reduce((a,v) => a+(+v||0), 0);
       }, 0);
 
-      // Total horas preenchidas
       let totalLinhas = 0;
       rdos.forEach(r => { totalLinhas += DB.getRDOLinhas(r.id_rdo).length; });
 
-      // Desvios
-      const desvios = rdos.filter(r => r.observacoes_desvios && r.observacoes_desvios.trim().length > 0);
-
-      // Client approvals
+      const desvios  = rdos.filter(r => r.observacoes_desvios && r.observacoes_desvios.trim().length > 0);
       const aprovados = rdos.filter(r => r.aprovacao_cliente === 'Aprovado').length;
       const ressalvas = rdos.filter(r => r.aprovacao_cliente === 'Aprovado com ressalvas').length;
 
       const html = `
         <div class="rep-box">
-          <!-- Header -->
           <div class="rep-header">
             <div class="brand">
               <img src="../assets/img/logo.png" style="height:28px;border-radius:4px;">
@@ -171,7 +221,6 @@
             </div>
           </div>
 
-          <!-- KPIs -->
           <div class="kpi-strip">
             <div class="kpi green"><div class="kpi-value">${fin}</div><div class="kpi-label">RDOs Finalizados</div></div>
             <div class="kpi blue"><div class="kpi-value">${pend}</div><div class="kpi-label">Pend. Assinatura</div></div>
@@ -181,7 +230,6 @@
             <div class="kpi green"><div class="kpi-value">${aprovados + ressalvas}</div><div class="kpi-label">Aprovados pelo cliente</div></div>
           </div>
 
-          <!-- Summary table -->
           <div class="sec-title">
             <span>Resumo por Obra</span>
             <span>${ativas.length} obra(s) ativa(s)</span>
@@ -196,7 +244,7 @@
                 <th>Clima</th>
                 <th>Status RDO</th>
                 <th>Aprovação Cliente</th>
-                <th class="no-print" style="width:60px">Ação</th>
+                <th style="width:60px">Ação</th>
               </tr>
             </thead>
             <tbody>
@@ -207,7 +255,7 @@
                   <tr>
                     <td><div class="obra-name">${obra.nome_obra}</div><div class="obra-sub">${obra.cliente_nome} · OF: ${obra.codigo_of}</div></td>
                     <td colspan="6" style="color:#94A3B8;font-style:italic">Sem apontamento no dia</td>
-                    <td class="no-print"></td>
+                    <td></td>
                   </tr>`;
 
                 const statusTag = {
@@ -219,8 +267,8 @@
                 const aprovTag = !rdo.aprovacao_cliente
                   ? '<span class="aprov-pend">Aguardando</span>'
                   : rdo.aprovacao_cliente === 'Aprovado'
-                    ? '<span class="aprov-ok">✅ Aprovado</span>'
-                    : '<span class="aprov-res">⚠️ C/ressalvas</span>';
+                    ? '<span class="aprov-ok">Aprovado</span>'
+                    : '<span class="aprov-res">C/ressalvas</span>';
 
                 const clima = [rdo.condicao_tempo_manha, rdo.condicao_tempo_tarde].filter(Boolean).join(' / ') || '—';
 
@@ -232,7 +280,7 @@
                   <td style="font-size:.78rem">${clima}</td>
                   <td>${statusTag}</td>
                   <td>${aprovTag}${rdo.comentario_cliente ? `<br><span style="font-size:.7rem;color:#64748B">${rdo.comentario_cliente.slice(0,50)}${rdo.comentario_cliente.length>50?'…':''}</span>` : ''}</td>
-                  <td class="no-print" style="text-align:center">
+                  <td style="text-align:center">
                     <a href="rdo-view.html?id=${rdo.id_rdo}" style="color:#F97316;font-size:.8rem;font-weight:700;text-decoration:none">Ver</a>
                   </td>
                 </tr>`;
@@ -240,11 +288,10 @@
             </tbody>
           </table>
 
-          <!-- Desvios e Ocorrências -->
           <div class="sec-title"><span>Observações e Desvios do Dia</span><span>${desvios.length} registro(s)</span></div>
           <div class="desvios-section">
             ${desvios.length === 0
-              ? '<div class="no-desvios">✓ Nenhuma observação ou desvio registrado no dia.</div>'
+              ? '<div class="no-desvios">Nenhuma observação ou desvio registrado no dia.</div>'
               : desvios.map(r => {
                   const obra = DB.getObraById(r.id_obra) || {};
                   return `<div class="desvio-item">
@@ -258,9 +305,8 @@
             }
           </div>
 
-          <!-- Comentários de clientes com ressalvas -->
           ${ressalvas > 0 ? `
-          <div class="sec-title"><span>⚠️ Ressalvas de Clientes</span><span>${ressalvas} item(ns)</span></div>
+          <div class="sec-title"><span>Ressalvas de Clientes</span><span>${ressalvas} item(ns)</span></div>
           <div class="desvios-section">
             ${rdos.filter(r => r.aprovacao_cliente === 'Aprovado com ressalvas').map(r => {
               const obra = DB.getObraById(r.id_obra) || {};
@@ -274,7 +320,6 @@
             }).join('')}
           </div>` : ''}
 
-          <!-- Footer -->
           <div class="rep-footer">
             <span>Modular Service — RDO Digital</span>
             <span>Referência: ${Utils.getDayOfWeek(data)}, ${Utils.formatDate(data)} · Total de obras ativas: ${ativas.length}</span>

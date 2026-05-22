@@ -10,104 +10,140 @@
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Backup — RDO Digital</title>
-  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/output.css">
   <style>
-    .header { background: #0F172A; color: #fff; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-    .logo { display: flex; align-items: center; gap: .75rem; }
-    .logo-m { width: 36px; height: 36px; background: #F97316; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #fff; }
-    .logo-text h1 { font-size: 1rem; font-weight: 700; }
-    .logo-text p  { font-size: .75rem; color: #64748B; }
-    nav { background: #1E293B; padding: 0 1.5rem; }
-    nav a { color: #94A3B8; padding: .625rem 1rem; font-size: .875rem; font-weight: 500; text-decoration: none; display: inline-block; }
-    nav a:hover { color: #fff; }
-    nav a.active { color: #fff; background: #334155; border-radius: 0 0 .5rem .5rem; }
-    main { max-width: 700px; margin: 0 auto; padding: 1.5rem; }
-    .user-info { color: #94A3B8; font-size: .875rem; display: flex; align-items: center; gap: 1rem; }
-    .btn-logout { background: none; border: none; color: #64748B; cursor: pointer; font-size: .875rem; padding: .25rem .5rem; border-radius: .375rem; }
-    .btn-logout:hover { color: #fff; background: #334155; }
-    .section { margin-bottom: 1.5rem; }
-    .section-title { font-size: 1rem; font-weight: 700; color: #1E293B; margin-bottom: .25rem; }
-    .section-sub   { font-size: .85rem; color: #64748B; margin-bottom: 1rem; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .75rem; margin-bottom: 1.5rem; }
-    .stat-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: .625rem; padding: .75rem 1rem; text-align: center; }
-    .stat-val { font-size: 1.6rem; font-weight: 800; color: #1E293B; }
-    .stat-lbl { font-size: .7rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: .04em; margin-top: .15rem; }
-    .warn-box { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: .625rem; padding: .85rem 1rem; font-size: .875rem; color: #78350F; margin-bottom: 1.25rem; }
-    .drop-zone { border: 2px dashed #CBD5E1; border-radius: .75rem; padding: 2rem; text-align: center; cursor: pointer; transition: border-color .2s; }
-    .drop-zone:hover { border-color: #F97316; }
-    .drop-zone input { display: none; }
-    .drop-zone p { color: #64748B; font-size: .9rem; margin-top: .5rem; }
-    .danger-zone { border: 1.5px solid #FCA5A5; border-radius: .75rem; padding: 1.25rem; }
+    .stat-box { background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.625rem;padding:.75rem 1rem;text-align:center; }
+    .stat-val { font-size:1.6rem;font-weight:800;color:#1E293B; }
+    .stat-lbl { font-size:.7rem;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.04em;margin-top:.15rem; }
+    .drop-zone { border:2px dashed #CBD5E1;border-radius:.75rem;padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s; }
+    .drop-zone:hover { border-color:#F97316; }
+    .drop-zone input { display:none; }
+    .drop-zone p { color:#64748B;font-size:.9rem;margin-top:.5rem; }
+    .danger-zone { border:1.5px solid #FCA5A5;border-radius:.75rem;padding:1.25rem; }
   </style>
 </head>
-<body>
-  <header class="header">
-    <div class="logo">
-      <img src="../assets/img/logo.png" style="height:38px;border-radius:6px;">
-      <div class="logo-text"><p>RDO Digital</p></div>
+<body class="bg-slate-50">
+
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar" class="sidebar">
+    <div class="flex justify-center py-4 border-b border-slate-800">
+      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" class="h-14 rounded-xl" style="width:auto">
+      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" class="h-14 w-14 rounded-xl object-contain" style="display:none">
     </div>
-    <div class="user-info">
-      <span id="user-name"></span>
-      <button class="btn-logout" onclick="Auth.logout()">Sair</button>
-    </div>
-  </header>
-  <nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="obras.html">Obras</a>
-    <a href="usuarios.html">Usuários</a>
-    <a href="historico.html">Histórico RDOs</a>
-    <a href="relatorio-executivo.html">Relatório Executivo</a>
-    <a href="backup.html" class="active">Backup</a>
-  </nav>
-
-  <main>
-    <p style="font-size:1.15rem;font-weight:700;color:#1E293B;margin-bottom:.25rem">Backup e Restauração</p>
-    <p style="font-size:.85rem;color:#64748B;margin-bottom:1.25rem">Os dados ficam no Supabase (nuvem). Exporte regularmente como contingência.</p>
-
-    <div class="warn-box">
-      ⚠ <strong>Atenção:</strong> A função "Apagar Todos os Dados" remove permanentemente os registros do banco Supabase. Faça backup antes.
-    </div>
-
-    <!-- Estatísticas -->
-    <div class="stats-grid" id="stats-grid"></div>
-
-    <!-- Exportar -->
-    <div class="card section">
-      <div class="card-header">Exportar Backup</div>
-      <div style="padding:1.25rem">
-        <p class="section-sub">Baixa um arquivo <code>.json</code> com todos os dados (obras, RDOs, usuários, fotos).</p>
-        <button class="btn btn-primary" onclick="exportar()">⬇ Baixar Backup Completo</button>
-        <p style="font-size:.75rem;color:#94A3B8;margin-top:.75rem" id="export-size"></p>
+    <nav class="flex-1 py-3 overflow-y-auto">
+      <a href="dashboard.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a href="obras.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nav-label">Obras</span>
+      </a>
+      <a href="usuarios.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-label">Usuários</span>
+      </a>
+      <a href="historico.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span class="nav-label">Histórico RDOs</span>
+      </a>
+      <a href="relatorio-executivo.html" class="sidebar-nav-item">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="nav-label">Relatório Executivo</span>
+      </a>
+      <a href="backup.html" class="sidebar-nav-item active">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 7 20 21 4 21 4 7"/><rect x="1" y="3" width="22" height="4"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        <span class="nav-label">Backup</span>
+      </a>
+    </nav>
+    <div class="border-t border-slate-800 p-3">
+      <div class="flex items-center gap-2.5 px-2">
+        <div class="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="nav-label flex-1 min-w-0">
+          <p class="text-xs font-semibold text-white truncate" id="user-name">—</p>
+          <p class="text-xs text-slate-500">Administrador</p>
+        </div>
+        <button onclick="Auth.logout()" title="Sair"
+                class="nav-label text-slate-500 hover:text-red-400 transition-colors p-1"
+                style="background:none;border:none;cursor:pointer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
     </div>
+  </aside>
 
-    <!-- Importar -->
-    <div class="card section">
-      <div class="card-header">Importar Backup</div>
-      <div style="padding:1.25rem">
-        <p class="section-sub">Selecione um arquivo de backup gerado por este sistema para restaurar os dados.</p>
-        <label class="drop-zone" id="drop-zone">
-          <input type="file" id="file-input" accept=".json" onchange="importar(this)">
-          <div style="font-size:2rem">📂</div>
-          <p>Clique ou arraste o arquivo <strong>.json</strong> aqui</p>
-        </label>
-        <div id="import-result" style="margin-top:.75rem"></div>
+  <!-- ── Main wrap ── -->
+  <div id="admin-wrap" class="admin-main">
+
+    <!-- Top bar -->
+    <header class="admin-topbar">
+      <div class="flex items-center gap-3">
+        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Toggle sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+        </button>
+        <h1 class="text-sm font-bold text-slate-900">Backup e Restauração</h1>
       </div>
-    </div>
+    </header>
 
-    <!-- Danger zone -->
-    <div class="section danger-zone">
-      <p style="font-size:.95rem;font-weight:700;color:#DC2626;margin-bottom:.25rem">Zona de Perigo</p>
-      <p style="font-size:.85rem;color:#64748B;margin-bottom:1rem">Apaga todos os dados permanentemente. Não pode ser desfeito.</p>
-      <button class="btn btn-danger" onclick="resetarDados()">🗑 Apagar Todos os Dados</button>
-    </div>
-  </main>
+    <!-- Content -->
+    <main class="admin-content w-full">
+
+      <p class="text-sm text-slate-500 mb-5">Os dados ficam no Supabase (nuvem). Exporte regularmente como contingência.</p>
+
+      <!-- Warning box -->
+      <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 mb-6">
+        <svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <p><strong>Atenção:</strong> A função "Apagar Todos os Dados" remove permanentemente os registros do banco Supabase. Faça backup antes.</p>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6" id="stats-grid"></div>
+
+      <!-- Exportar -->
+      <div class="card p-5 mb-5">
+        <div class="card-header">Exportar Backup</div>
+        <div class="pt-4">
+          <p class="text-sm text-slate-500 mb-4">Baixa um arquivo <code class="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono">.json</code> com todos os dados (obras, RDOs, usuários, fotos).</p>
+          <button class="btn btn-primary gap-2" onclick="exportar()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar Backup Completo
+          </button>
+          <p class="text-xs text-slate-400 mt-3" id="export-size"></p>
+        </div>
+      </div>
+
+      <!-- Importar -->
+      <div class="card p-5 mb-5">
+        <div class="card-header">Importar Backup</div>
+        <div class="pt-4">
+          <p class="text-sm text-slate-500 mb-4">Selecione um arquivo de backup gerado por este sistema para restaurar os dados.</p>
+          <label class="drop-zone" id="drop-zone">
+            <input type="file" id="file-input" accept=".json" onchange="importar(this)">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <p>Clique ou arraste o arquivo <strong>.json</strong> aqui</p>
+          </label>
+          <div id="import-result" style="margin-top:.75rem"></div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="danger-zone mb-6">
+        <p class="text-sm font-bold text-red-600 mb-1">Zona de Perigo</p>
+        <p class="text-sm text-slate-500 mb-4">Apaga todos os dados permanentemente. Não pode ser desfeito.</p>
+        <button class="btn btn-danger" onclick="resetarDados()">Apagar Todos os Dados</button>
+      </div>
+
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
   <script src="../assets/js/db.js?v=3"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
+  <script src="../assets/js/ui.js"></script>
   <script>
     DB.init().then(() => {
       const me = Auth.requireAuth('ADMIN');
@@ -168,20 +204,20 @@
           _pendingImport = payload;
           const res = document.getElementById('import-result');
           res.innerHTML = `
-            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.5rem;padding:1rem;font-size:.875rem">
-              <p style="font-weight:700;margin-bottom:.5rem">Arquivo válido — confirme a importação:</p>
-              <ul style="list-style:none;color:#475569;margin-bottom:1rem">
-                <li>👤 ${(payload.data.users||[]).length} usuário(s)</li>
-                <li>🏗 ${(payload.data.obras||[]).length} obra(s)</li>
-                <li>📋 ${(payload.data.rdos||[]).length} RDO(s)</li>
-                <li>📅 ${(payload.data.rdo_linhas||[]).length} apontamento(s)</li>
+            <div class="card p-4 text-sm">
+              <p class="font-bold mb-2">Arquivo válido — confirme a importação:</p>
+              <ul class="text-slate-500 mb-4 space-y-1">
+                <li>${(payload.data.users||[]).length} usuário(s)</li>
+                <li>${(payload.data.obras||[]).length} obra(s)</li>
+                <li>${(payload.data.rdos||[]).length} RDO(s)</li>
+                <li>${(payload.data.rdo_linhas||[]).length} apontamento(s)</li>
               </ul>
-              <p style="color:#DC2626;font-size:.8rem;margin-bottom:.75rem">⚠ Isso vai substituir os dados atuais no Supabase.</p>
+              <p class="text-red-500 text-xs mb-3">Isso vai substituir os dados atuais no Supabase.</p>
               <button class="btn btn-danger" onclick="confirmarImport()">Confirmar Importação</button>
             </div>`;
         } catch(ex) {
           document.getElementById('import-result').innerHTML =
-            `<p style="color:#DC2626;font-size:.875rem">Erro ao ler o arquivo: ${ex.message}</p>`;
+            `<p class="text-red-500 text-sm">Erro ao ler o arquivo: ${ex.message}</p>`;
         }
       };
       reader.readAsText(file);
@@ -216,7 +252,6 @@
       }
     }
 
-    // Drag and drop
     const dz = document.getElementById('drop-zone');
     dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = '#F97316'; });
     dz.addEventListener('dragleave', () => { dz.style.borderColor = ''; });
