@@ -17,3 +17,9 @@ Thumbs.db
 # Docker build cache
 docker-compose.override.yml
 *.exe
+
+# Dependências
+node_modules/
+
+# Configuração interna Claude Code
+.claude/
