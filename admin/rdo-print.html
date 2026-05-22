@@ -89,7 +89,7 @@
 <body>
   <div class="screen-bar">
     <h1 id="screen-title">RDO — Carregando…</h1>
-    <a class="btn-back" onclick="history.back()">← Voltar</a>
+    <a class="btn-back" onclick="if(window.opener){window.close()}else if(history.length>1){history.back()}else{location.href='rdo-view.html?id='+new URLSearchParams(location.search).get('id')}">← Voltar</a>
     <button class="btn-print" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
   </div>
 
