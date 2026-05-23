@@ -61,6 +61,33 @@ function UIConfirm(message, onConfirm, { danger = false, confirmText = 'Confirma
   overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
 }
 
+// ── Dark mode ────────────────────────────────────────────
+function initDarkMode() {
+  const saved = localStorage.getItem('dark-mode');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved !== null ? saved === '1' : prefersDark;
+  document.documentElement.classList.toggle('dark', isDark);
+}
+
+function toggleDarkMode() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('dark-mode', isDark ? '1' : '0');
+  updateDarkToggleIcon();
+}
+
+function updateDarkToggleIcon() {
+  const isDark = document.documentElement.classList.contains('dark');
+  const btn = document.getElementById('dark-toggle');
+  if (!btn) return;
+  btn.innerHTML = isDark
+    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  btn.title = isDark ? 'Modo claro' : 'Modo escuro';
+  btn.setAttribute('aria-label', isDark ? 'Ativar modo claro' : 'Ativar modo escuro');
+}
+
+initDarkMode();
+
 // ── Sidebar toggle (admin) ───────────────────────────────
 function initSidebar() {
   const sidebar  = document.getElementById('sidebar');
@@ -82,6 +109,18 @@ function initSidebar() {
     applySidebarState(!isCollapsed);
     localStorage.setItem('sidebar-collapsed', !isCollapsed ? '1' : '0');
   });
+
+  // Inject dark mode toggle button into sidebar footer
+  const logoutBtn = sidebar.querySelector('[aria-label="Sair"]');
+  if (logoutBtn && !document.getElementById('dark-toggle')) {
+    const darkBtn = document.createElement('button');
+    darkBtn.id = 'dark-toggle';
+    darkBtn.onclick = toggleDarkMode;
+    darkBtn.className = 'nav-label text-slate-500 hover:text-amber-400 transition-colors p-1';
+    darkBtn.style.cssText = 'background:none;border:none;cursor:pointer';
+    logoutBtn.parentElement.insertBefore(darkBtn, logoutBtn);
+    updateDarkToggleIcon();
+  }
 
   function applySidebarState(collapse, instant) {
     const logoFull  = sidebar.querySelector('#logo-full');

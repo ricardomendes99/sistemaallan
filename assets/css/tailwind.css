@@ -11,7 +11,8 @@
   html { font-family: 'Inter', system-ui, sans-serif; }
 
   body {
-    @apply bg-slate-50 text-slate-800 antialiased;
+    @apply bg-slate-50 text-slate-800 antialiased
+           dark:bg-slate-950 dark:text-slate-200;
     line-height: 1.5;
   }
 
@@ -49,9 +50,12 @@
   .btn-primary:active:not(:disabled) { @apply translate-y-0; }
 
   .btn-secondary {
-    @apply bg-slate-100 text-slate-600;
+    @apply bg-slate-100 text-slate-600
+           dark:bg-slate-700 dark:text-slate-200;
   }
-  .btn-secondary:hover:not(:disabled) { @apply bg-slate-200; }
+  .btn-secondary:hover:not(:disabled) {
+    @apply bg-slate-200 dark:bg-slate-600;
+  }
 
   .btn-danger {
     @apply bg-red-500 text-white;
@@ -59,46 +63,59 @@
   .btn-danger:hover:not(:disabled) { @apply bg-red-600; }
 
   .btn-ghost {
-    @apply bg-transparent text-slate-500 border border-slate-200;
+    @apply bg-transparent text-slate-500 border border-slate-200
+           dark:border-slate-600 dark:text-slate-400;
   }
-  .btn-ghost:hover:not(:disabled) { @apply bg-slate-50 border-slate-300; }
+  .btn-ghost:hover:not(:disabled) {
+    @apply bg-slate-50 border-slate-300
+           dark:bg-slate-700 dark:border-slate-500 dark:text-slate-200;
+  }
 
   .btn-sm { @apply px-3 py-1.5 text-xs; }
   .btn-full { @apply w-full justify-center py-3 text-base; }
 
   /* Cards */
   .card {
-    @apply bg-white rounded-xl border border-slate-200 shadow-card;
+    @apply bg-white rounded-xl border border-slate-200 shadow-card
+           dark:bg-slate-800 dark:border-slate-700;
   }
   .card-header {
-    @apply px-5 py-4 border-b border-slate-100 font-semibold text-slate-800;
+    @apply px-5 py-4 border-b border-slate-100 font-semibold text-slate-800
+           dark:border-slate-700 dark:text-slate-100;
   }
 
   /* Form fields */
   .field { @apply mb-4; }
   .field label {
-    @apply block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide;
+    @apply block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide
+           dark:text-slate-400;
   }
   .field input,
   .field select,
   .field textarea {
     @apply w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-800
            bg-white transition-all duration-150 focus:outline-none focus:border-brand-500
-           focus:ring-2 focus:ring-brand-500/10;
+           focus:ring-2 focus:ring-brand-500/10
+           dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100
+           dark:focus:border-brand-500 dark:focus:ring-brand-500/20;
   }
   .field textarea { @apply resize-y min-h-[80px]; }
-  .field .hint { @apply text-xs text-slate-400 mt-1; }
+  .field .hint { @apply text-xs text-slate-400 dark:text-slate-500; }
 
   /* Tables */
   .tbl { @apply w-full border-collapse text-sm; }
   .tbl th {
-    @apply bg-slate-50 text-slate-500 font-semibold text-left px-4 py-2.5 border-b border-slate-200;
+    @apply bg-slate-50 text-slate-500 font-semibold text-left px-4 py-2.5 border-b border-slate-200
+           dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700;
   }
   .tbl td {
-    @apply px-4 py-3 border-b border-slate-100 text-slate-700 transition-colors duration-100;
+    @apply px-4 py-3 border-b border-slate-100 text-slate-700 transition-colors duration-100
+           dark:border-slate-700/60 dark:text-slate-300;
   }
   .tbl tr:last-child td { @apply border-b-0; }
-  .tbl tbody tr:hover td { @apply bg-orange-50/60; }
+  .tbl tbody tr:hover td {
+    @apply bg-orange-50/60 dark:bg-slate-700/40;
+  }
 
   /* Modal */
   .modal-overlay {
@@ -107,38 +124,46 @@
   }
   .modal-box {
     @apply bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-modal
-           animate-slide-up;
+           animate-slide-up
+           dark:bg-slate-800;
   }
   .modal-header {
-    @apply px-6 py-5 border-b border-slate-100 text-base font-bold flex justify-between items-center;
+    @apply px-6 py-5 border-b border-slate-100 text-base font-bold flex justify-between items-center
+           dark:border-slate-700 dark:text-slate-100;
   }
   .modal-body   { @apply p-6; }
   .modal-footer {
-    @apply px-6 py-4 border-t border-slate-100 flex gap-3 justify-end;
+    @apply px-6 py-4 border-t border-slate-100 flex gap-3 justify-end
+           dark:border-slate-700;
   }
 
   /* Status tags — usadas via JS */
   .tag-ok {
     @apply inline-flex items-center gap-1 bg-emerald-50 text-emerald-700
-           text-xs font-bold px-2.5 py-1 rounded-full;
+           text-xs font-bold px-2.5 py-1 rounded-full
+           dark:bg-emerald-900/30 dark:text-emerald-400;
   }
   .tag-alerta {
     @apply inline-flex items-center gap-1 bg-red-50 text-red-700
-           text-xs font-bold px-2.5 py-1 rounded-full;
+           text-xs font-bold px-2.5 py-1 rounded-full
+           dark:bg-red-900/30 dark:text-red-400;
   }
   .tag-pending {
     @apply inline-flex items-center gap-1 bg-amber-50 text-amber-700
-           text-xs font-bold px-2.5 py-1 rounded-full;
+           text-xs font-bold px-2.5 py-1 rounded-full
+           dark:bg-amber-900/30 dark:text-amber-400;
   }
   .tag-info {
     @apply inline-flex items-center gap-1 bg-blue-50 text-blue-700
-           text-xs font-bold px-2.5 py-1 rounded-full;
+           text-xs font-bold px-2.5 py-1 rounded-full
+           dark:bg-blue-900/30 dark:text-blue-400;
   }
 
-  /* Metric cards — cores via JS/classes */
+  /* Metric cards */
   .metric-card {
     @apply bg-white rounded-xl border border-slate-200 p-5 relative overflow-hidden
-           shadow-card transition-shadow duration-200;
+           shadow-card transition-shadow duration-200
+           dark:bg-slate-800 dark:border-slate-700;
   }
   .metric-card::before {
     content: '';
@@ -150,7 +175,8 @@
   .mc-red::before   { @apply bg-red-500; }
 
   .metric-label {
-    @apply text-xs font-semibold text-slate-500 uppercase tracking-wider;
+    @apply text-xs font-semibold text-slate-500 uppercase tracking-wider
+           dark:text-slate-400;
   }
   .metric-value {
     @apply text-3xl font-extrabold mt-1 leading-none;
@@ -158,44 +184,46 @@
 
   /* Signature pad */
   .sig-wrap {
-    @apply border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 overflow-hidden;
+    @apply border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 overflow-hidden
+           dark:border-slate-600 dark:bg-slate-800;
   }
   .sig-wrap canvas { @apply block w-full touch-none; }
   .sig-wrap.has-sig { @apply border-emerald-400 border-solid; }
 
   /* Hora slots — RDO campo */
   .hora-slot {
-    @apply border border-slate-200 rounded-xl mb-2 overflow-hidden transition-all duration-200;
+    @apply border border-slate-200 rounded-xl mb-2 overflow-hidden transition-all duration-200
+           dark:border-slate-700 dark:bg-slate-800/50;
   }
-  .hora-slot.filled   { @apply border-emerald-300; }
-  .hora-slot.in-lunch { @apply border-amber-300 bg-amber-50/50; }
+  .hora-slot.filled   { @apply border-emerald-300 dark:border-emerald-700; }
+  .hora-slot.in-lunch { @apply border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-900/20; }
   .hora-slot:hover    { @apply shadow-card; }
 
   .hora-slot-header {
     @apply flex items-center justify-between px-4 py-3 cursor-pointer select-none
-           transition-colors duration-150 hover:bg-slate-50;
+           transition-colors duration-150 hover:bg-slate-50 dark:hover:bg-slate-700/50;
   }
-  .hora-label   { @apply text-sm font-bold text-slate-800 min-w-[52px]; }
-  .hora-preview { @apply text-xs text-slate-500 flex-1 mx-3 truncate; }
+  .hora-label   { @apply text-sm font-bold text-slate-800 min-w-[52px] dark:text-slate-200; }
+  .hora-preview { @apply text-xs text-slate-500 flex-1 mx-3 truncate dark:text-slate-400; }
   .hora-dot     { @apply w-2.5 h-2.5 rounded-full shrink-0; }
-  .dot-empty    { @apply bg-slate-300; }
+  .dot-empty    { @apply bg-slate-300 dark:bg-slate-600; }
   .dot-filled   { @apply bg-emerald-400; }
   .dot-lunch    { @apply bg-amber-400; }
 
-  .hora-body      { @apply px-4 pt-3 pb-4 border-t border-slate-100 hidden; }
+  .hora-body      { @apply px-4 pt-3 pb-4 border-t border-slate-100 hidden dark:border-slate-700; }
   .hora-body.open { @apply block; }
 
   /* User badges */
   .perfil-badge   { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold; }
-  .perfil-admin   { @apply bg-violet-100 text-violet-700; }
-  .perfil-user    { @apply bg-blue-100 text-blue-700; }
-  .status-ativo   { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700; }
-  .status-inativo { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700; }
+  .perfil-admin   { @apply bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300; }
+  .perfil-user    { @apply bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300; }
+  .status-ativo   { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400; }
+  .status-inativo { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400; }
 
-  /* Approval badges — cliente/ver.html + rdo-view */
-  .aprov-ok        { @apply inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full; }
-  .aprov-ressalvas { @apply inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full; }
-  .aprov-pendente  { @apply inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full; }
+  /* Approval badges */
+  .aprov-ok        { @apply inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full dark:bg-emerald-900/30 dark:text-emerald-400; }
+  .aprov-ressalvas { @apply inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full dark:bg-amber-900/30 dark:text-amber-400; }
+  .aprov-pendente  { @apply inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full dark:bg-slate-700 dark:text-slate-400; }
 
   /* Skeleton shimmer */
   .skeleton {
@@ -203,25 +231,30 @@
     background-size: 800px 100%;
     @apply rounded animate-shimmer;
   }
+  .dark .skeleton {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 800px 100%;
+  }
 
   /* Sidebar admin layout */
   .sidebar {
     @apply fixed left-0 top-0 bottom-0 w-64 bg-slate-900 flex flex-col z-30
-           transition-transform duration-300;
+           transition-transform duration-300 dark:bg-slate-950;
   }
   .sidebar-nav-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400
            cursor-pointer transition-all duration-150 mx-2;
   }
-  .sidebar-nav-item:hover   { @apply bg-slate-800 text-white; }
-  .sidebar-nav-item.active  { @apply bg-slate-800 text-white; }
+  .sidebar-nav-item:hover   { @apply bg-slate-800 text-white dark:bg-slate-800; }
+  .sidebar-nav-item.active  { @apply bg-slate-800 text-white dark:bg-slate-700; }
   .sidebar-nav-item .icon   { @apply w-5 h-5 shrink-0; }
 
   .admin-main {
     @apply ml-64 min-h-screen flex flex-col;
   }
   .admin-topbar {
-    @apply h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-20;
+    @apply h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-20
+           dark:bg-slate-900 dark:border-slate-800;
   }
   .admin-content {
     @apply p-6 flex-1 w-full;
@@ -234,7 +267,8 @@
   .toast {
     @apply flex items-start gap-3 bg-white border border-slate-200 shadow-modal
            rounded-xl px-4 py-3 text-sm font-medium text-slate-700
-           pointer-events-auto animate-slide-up min-w-[280px] max-w-sm;
+           pointer-events-auto animate-slide-up min-w-[280px] max-w-sm
+           dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200;
   }
   .toast-success { @apply border-l-4 border-l-emerald-500; }
   .toast-error   { @apply border-l-4 border-l-red-500; }
