@@ -65,7 +65,7 @@
           <p class="text-xs font-semibold text-white truncate" id="user-name">—</p>
           <p class="text-xs text-slate-500">Administrador</p>
         </div>
-        <button onclick="Auth.logout()" title="Sair"
+        <button onclick="Auth.logout()" title="Sair" aria-label="Sair"
                 class="nav-label text-slate-500 hover:text-red-400 transition-colors p-1"
                 style="background:none;border:none;cursor:pointer">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -188,7 +188,7 @@
       a.download = `RDO_Backup_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      Utils.toast('Backup exportado!');
+      Toast.success('Backup exportado!');
     }
 
     let _pendingImport = null;
@@ -231,25 +231,27 @@
       try {
         await DB.importAll(_pendingImport.data);
         _pendingImport = null;
-        Utils.toast('Dados restaurados com sucesso!');
+        Toast.success('Dados restaurados com sucesso!');
         renderStats();
         document.getElementById('import-result').innerHTML = '';
       } catch(ex) {
-        Utils.toast('Erro ao importar: ' + ex.message, 'error');
+        Toast.error('Erro ao importar: ' + ex.message);
         if (btn) { btn.disabled = false; btn.textContent = 'Confirmar Importação'; }
       }
     }
 
-    async function resetarDados() {
-      if (!confirm('Apagar TODOS os dados no Supabase? Esta ação não pode ser desfeita.')) return;
-      if (!confirm('Tem certeza? Isso apaga obras, RDOs, usuários e fotos.')) return;
-      try {
-        await DB.deleteAll();
-        Utils.toast('Dados apagados. Redirecionando…', 'warning');
-        setTimeout(() => location.href = '../index.html', 1500);
-      } catch(ex) {
-        Utils.toast('Erro ao apagar: ' + ex.message, 'error');
-      }
+    function resetarDados() {
+      UIConfirm('Apagar TODOS os dados no Supabase? Esta ação não pode ser desfeita.', () => {
+        UIConfirm('Tem certeza? Isso apaga obras, RDOs, usuários e fotos.', async () => {
+          try {
+            await DB.deleteAll();
+            Toast.warning('Dados apagados. Redirecionando…');
+            setTimeout(() => location.href = '../index.html', 1500);
+          } catch(ex) {
+            Toast.error('Erro ao apagar: ' + ex.message);
+          }
+        }, { danger: true, confirmText: 'Sim, apagar tudo' });
+      }, { danger: true, confirmText: 'Continuar' });
     }
 
     const dz = document.getElementById('drop-zone');

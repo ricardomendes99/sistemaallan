@@ -186,11 +186,11 @@
   .hora-body.open { @apply block; }
 
   /* User badges */
-  .perfil-badge { @apply px-2.5 py-0.5 rounded-full text-xs font-bold; }
-  .perfil-admin { @apply bg-violet-100 text-violet-700; }
-  .perfil-user  { @apply bg-blue-100 text-blue-700; }
-  .status-ativo   { @apply bg-emerald-100 text-emerald-700; }
-  .status-inativo { @apply bg-red-100 text-red-700; }
+  .perfil-badge   { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold; }
+  .perfil-admin   { @apply bg-violet-100 text-violet-700; }
+  .perfil-user    { @apply bg-blue-100 text-blue-700; }
+  .status-ativo   { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700; }
+  .status-inativo { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700; }
 
   /* Approval badges — cliente/ver.html + rdo-view */
   .aprov-ok        { @apply inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full; }

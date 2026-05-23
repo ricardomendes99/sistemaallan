@@ -11,13 +11,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Usuários — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
-  <style>
-    .perfil-badge { padding: .2rem .65rem; border-radius: 9999px; font-size: .72rem; font-weight: 700; }
-    .perfil-admin { background: #EDE9FE; color: #5B21B6; }
-    .perfil-user  { background: #DBEAFE; color: #1E40AF; }
-    .status-ativo   { background: #DCFCE7; color: #166534; padding: .2rem .65rem; border-radius: 9999px; font-size: .72rem; font-weight: 700; }
-    .status-inativo { background: #FEE2E2; color: #991B1B; padding: .2rem .65rem; border-radius: 9999px; font-size: .72rem; font-weight: 700; }
-  </style>
 </head>
 <body class="bg-slate-50">
 
@@ -62,7 +55,7 @@
           <p class="text-xs font-semibold text-white truncate" id="user-name">—</p>
           <p class="text-xs text-slate-500">Administrador</p>
         </div>
-        <button onclick="Auth.logout()" title="Sair"
+        <button onclick="Auth.logout()" title="Sair" aria-label="Sair"
                 class="nav-label text-slate-500 hover:text-red-400 transition-colors p-1"
                 style="background:none;border:none;cursor:pointer">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -117,7 +110,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <span id="modal-title">Novo Usuário</span>
-        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+        <button onclick="closeModal()" aria-label="Fechar" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="edit-id">
@@ -238,12 +231,12 @@
       const senha = document.getElementById('f-senha').value;
       const id    = document.getElementById('edit-id').value;
 
-      if (!nome || !email) { Utils.toast('Preencha nome e e-mail.', 'error'); return; }
-      if (!id && !senha)   { Utils.toast('Informe a senha para o novo usuário.', 'error'); return; }
-      if (senha && senha.length < 6) { Utils.toast('Senha mínima: 6 caracteres.', 'error'); return; }
+      if (!nome || !email) { Toast.error('Preencha nome e e-mail.'); return; }
+      if (!id && !senha)   { Toast.error('Informe a senha para o novo usuário.'); return; }
+      if (senha && senha.length < 6) { Toast.error('Senha mínima: 6 caracteres.'); return; }
 
       const existing = DB.getUserByEmail(email);
-      if (existing && existing.id !== id) { Utils.toast('E-mail já cadastrado.', 'error'); return; }
+      if (existing && existing.id !== id) { Toast.error('E-mail já cadastrado.'); return; }
 
       const data = {
         nome_completo: nome, email,
@@ -257,12 +250,13 @@
       else DB.createUser(data);
 
       closeModal(); render();
-      Utils.toast(id ? 'Usuário atualizado!' : 'Usuário criado!');
+      Toast.success(id ? 'Usuário atualizado!' : 'Usuário criado!');
     }
 
     function del(id) {
-      if (!confirm('Excluir este usuário?')) return;
-      DB.deleteUser(id); render(); Utils.toast('Usuário excluído.', 'warning');
+      UIConfirm('Deseja excluir este usuário? Esta ação não pode ser desfeita.', () => {
+        DB.deleteUser(id); render(); Toast.warning('Usuário excluído.');
+      }, { danger: true, confirmText: 'Excluir' });
     }
   </script>
 </body>
