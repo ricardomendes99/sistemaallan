@@ -12,10 +12,10 @@
   <title>Aprovação de RDO — Modular Service</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-100 min-h-screen dark:bg-slate-950">
 
   <!-- ── Header ── -->
-  <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+  <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 dark:bg-slate-900 dark:border-slate-800">
     <img src="../assets/img/logo.png" class="h-8 rounded-lg" alt="Modular Service">
     <span class="text-xs text-slate-500 font-medium">Portal de Aprovação</span>
   </header>
@@ -54,7 +54,7 @@
       document.getElementById('main-content').innerHTML = `
         <div class="max-w-sm mx-auto mt-12 p-4">
           <div class="card p-6">
-            <h2 class="text-xl font-bold text-slate-900 mb-1">Verificação de Identidade</h2>
+            <h2 class="text-xl font-bold text-slate-900 mb-1 dark:text-slate-100">Verificação de Identidade</h2>
             <p class="text-sm text-slate-500 mb-6">Para acessar o RDO da obra <strong>${obra.nome_obra}</strong>, informe o código de verificação que você recebeu.</p>
             <div class="field mb-4">
               <label>Código de acesso</label>
@@ -100,56 +100,56 @@
       const total  = Object.values(ef).reduce((s,v) => s+(+v||0), 0);
 
       const statusPillClass = {
-        'Iniciada':      'bg-blue-100 text-blue-800',
-        'Em Andamento':  'bg-amber-100 text-amber-800',
-        'Concluída':     'bg-emerald-100 text-emerald-800'
+        'Iniciada':      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+        'Em Andamento':  'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+        'Concluída':     'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
       };
 
       document.getElementById('main-content').innerHTML = `
-        <div class="max-w-2xl mx-auto p-4">
+        <div class="max-w-5xl mx-auto px-4 py-4">
 
           <!-- Título -->
           <div class="mb-4">
-            <p class="text-lg font-bold text-slate-900">${obra.nome_obra || '—'}</p>
+            <p class="text-lg font-bold text-slate-900 dark:text-slate-100">${obra.nome_obra || '—'}</p>
             <p class="text-sm text-slate-500">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)}</p>
           </div>
 
           <!-- Dados gerais -->
           <div class="card p-5 mb-4">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Dados do Relatório</p>
-            <div class="divide-y divide-slate-100">
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Cliente</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${obra.cliente_nome||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Local</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${obra.endereco_local||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Atividade</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.atividade||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Período</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.horario_inicio||'—'} — ${rdo.horario_termino||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Tempo Manhã</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.condicao_tempo_manha||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Tempo Tarde</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${rdo.condicao_tempo_tarde||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Equipe total</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${total} profissional(is)</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Executante</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${cri.nome_completo||'—'}</span></div>
-              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">OF</span><span class="font-semibold text-slate-800 text-right max-w-[60%]">${obra.codigo_of||'—'}</span></div>
+            <div class="divide-y divide-slate-100 dark:divide-slate-700/60">
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Cliente</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${obra.cliente_nome||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Local</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${obra.endereco_local||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Atividade</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${rdo.atividade||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Período</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${rdo.horario_inicio||'—'} — ${rdo.horario_termino||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Tempo Manhã</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${rdo.condicao_tempo_manha||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Tempo Tarde</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${rdo.condicao_tempo_tarde||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Equipe total</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${total} profissional(is)</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">Executante</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${cri.nome_completo||'—'}</span></div>
+              <div class="flex justify-between items-start py-2 text-sm"><span class="text-slate-500">OF</span><span class="font-semibold text-slate-800 text-right max-w-[60%] dark:text-slate-200">${obra.codigo_of||'—'}</span></div>
             </div>
           </div>
 
           <!-- Atividades hora a hora -->
           <div class="card p-5 mb-4">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Atividades Realizadas</p>
-            <div class="divide-y divide-slate-50">
+            <div class="divide-y divide-slate-50 dark:divide-slate-700/30">
               ${Utils.getSlots().map(slot => {
                 const l = linhas.find(x => x.horario_ponto === slot);
                 if (slot === rdo.horario_almoco)
                   return `<div class="flex gap-3 py-2.5 items-start">
                     <span class="text-sm font-extrabold text-amber-600 min-w-[50px] shrink-0">${slot}</span>
-                    <em class="text-sm text-amber-800">Intervalo de almoço</em>
+                    <em class="text-sm text-amber-800 dark:text-amber-300">Intervalo de almoço</em>
                   </div>`;
                 if (!l || !l.descricao_detalhada)
                   return `<div class="flex gap-3 py-2.5 items-start opacity-35">
-                    <span class="text-sm font-extrabold text-slate-800 min-w-[50px] shrink-0">${slot}</span>
+                    <span class="text-sm font-extrabold text-slate-800 min-w-[50px] shrink-0 dark:text-slate-100">${slot}</span>
                     <span class="text-sm text-slate-500">—</span>
                   </div>`;
                 const pillClass = statusPillClass[l.status_atividade] || '';
                 return `<div class="flex gap-3 py-2.5 items-start">
-                  <span class="text-sm font-extrabold text-slate-800 min-w-[50px] shrink-0">${slot}</span>
-                  <div class="flex-1 text-sm text-slate-700 leading-relaxed">
+                  <span class="text-sm font-extrabold text-slate-800 min-w-[50px] shrink-0 dark:text-slate-100">${slot}</span>
+                  <div class="flex-1 text-sm text-slate-700 leading-relaxed dark:text-slate-300">
                     ${l.referencia_modulo ? `<span class="text-xs text-slate-400 font-semibold">${l.referencia_modulo}</span><br>` : ''}
                     ${l.descricao_detalhada}
                   </div>
@@ -162,7 +162,7 @@
           ${rdo.observacoes_desvios ? `
           <div class="card p-5 mb-4">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Observações e Desvios</p>
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-900 whitespace-pre-wrap">${rdo.observacoes_desvios}</div>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-900 whitespace-pre-wrap dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-200">${rdo.observacoes_desvios}</div>
           </div>` : ''}
 
           ${rdo.fotos && rdo.fotos.length > 0 ? `
@@ -170,7 +170,7 @@
             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fotos da Obra (${rdo.fotos.length})</p>
             <div class="grid gap-2.5" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
               ${rdo.fotos.map((src, i) => `
-                <div class="aspect-square rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in" onclick="verFoto('${i}')">
+                <div class="aspect-square rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in dark:border-slate-700" onclick="verFoto('${i}')">
                   <img src="${src}" alt="Foto ${i+1}" class="w-full h-full object-cover block">
                 </div>`).join('')}
             </div>
@@ -183,10 +183,10 @@
 
             <!-- Opções -->
             <div class="flex flex-col gap-2 mb-4" id="aprov-opts">
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-emerald-400" onclick="selectAprov(this)">
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-emerald-400 dark:border-slate-600 dark:hover:border-emerald-500" onclick="selectAprov(this)">
                 <input type="radio" name="aprov" value="Aprovado" class="w-5 h-5 accent-emerald-600 cursor-pointer shrink-0">
                 <div>
-                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     Aprovado
                   </p>
@@ -194,10 +194,10 @@
                 </div>
               </label>
 
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-amber-400" onclick="selectAprov(this,'ressalvas')">
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-amber-400 dark:border-slate-600 dark:hover:border-amber-500" onclick="selectAprov(this,'ressalvas')">
                 <input type="radio" name="aprov" value="Aprovado com ressalvas" class="w-5 h-5 accent-amber-500 cursor-pointer shrink-0">
                 <div>
-                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     Aprovado com ressalvas
                   </p>
@@ -210,7 +210,7 @@
             <div class="field mb-4">
               <label>Comentário (opcional)</label>
               <textarea id="f-coment" placeholder="Escreva aqui qualquer observação ou ressalva…"
-                class="w-full border-slate-300 rounded-xl p-3 text-sm resize-y min-h-[90px] focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all"></textarea>
+                class="w-full border-slate-300 rounded-xl p-3 text-sm resize-y min-h-[90px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 dark:focus:border-brand-500"></textarea>
             </div>
 
             <!-- Nome -->
@@ -237,15 +237,17 @@
     }
 
     function selectAprov(el, tipo) {
+      const isDark = document.documentElement.classList.contains('dark');
       document.querySelectorAll('#aprov-opts label').forEach(x => {
-        x.classList.remove('border-emerald-500', 'bg-emerald-50', 'border-amber-500', 'bg-amber-50');
-        x.classList.add('border-slate-200');
+        x.classList.remove('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20',
+                           'border-amber-500', 'bg-amber-50', 'dark:bg-amber-900/20');
+        x.classList.add('border-slate-200', 'dark:border-slate-600');
       });
-      el.classList.remove('border-slate-200');
+      el.classList.remove('border-slate-200', 'dark:border-slate-600');
       if (tipo === 'ressalvas') {
-        el.classList.add('border-amber-500', 'bg-amber-50');
+        el.classList.add('border-amber-500', 'bg-amber-50', 'dark:bg-amber-900/20');
       } else {
-        el.classList.add('border-emerald-500', 'bg-emerald-50');
+        el.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20');
       }
     }
 
@@ -253,8 +255,8 @@
       const aprov = document.querySelector('input[name="aprov"]:checked');
       const nome  = document.getElementById('f-nome-cli').value.trim();
       const comt  = document.getElementById('f-coment').value.trim();
-      if (!aprov) { alert('Selecione uma opção de aprovação.'); return; }
-      if (!nome)  { alert('Informe seu nome.'); return; }
+      if (!aprov) { Toast.error('Selecione uma opção de aprovação.'); return; }
+      if (!nome)  { Toast.error('Informe seu nome.'); return; }
 
       DB.updateRDO(rdoId, {
         aprovacao_cliente:            aprov.value,
@@ -269,10 +271,10 @@
           <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <h2 class="text-2xl font-bold text-slate-900 mb-1">Aprovação registrada!</h2>
+          <h2 class="text-2xl font-bold text-slate-900 mb-1 dark:text-slate-100">Aprovação registrada!</h2>
           <p class="text-slate-500 text-sm mb-1"><strong>${nome}</strong></p>
           <p class="text-slate-500 text-sm mb-6">${aprov.value}</p>
-          ${comt ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-6">"${comt}"</div>` : ''}
+          ${comt ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-6 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">"${comt}"</div>` : ''}
           <p class="text-xs text-slate-400">Obrigado! Este registro foi enviado para a equipe Modular Service.</p>
         </div>`;
     }
@@ -287,10 +289,10 @@
               : `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
             }
           </div>
-          <h2 class="text-2xl font-bold text-slate-900 mb-2">RDO já aprovado</h2>
-          <p class="text-slate-600 font-semibold mb-2">${rdo.nome_aprovador_cliente}</p>
+          <h2 class="text-2xl font-bold text-slate-900 mb-2 dark:text-slate-100">RDO já aprovado</h2>
+          <p class="text-slate-600 font-semibold mb-2 dark:text-slate-300">${rdo.nome_aprovador_cliente}</p>
           <span class="${isOk ? 'aprov-ok' : 'aprov-ressalvas'} mb-4">${rdo.aprovacao_cliente}</span>
-          ${rdo.comentario_cliente ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-4">"${rdo.comentario_cliente}"</div>` : ''}
+          ${rdo.comentario_cliente ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-4 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">"${rdo.comentario_cliente}"</div>` : ''}
           <p class="text-xs text-slate-400">Aprovado em ${Utils.formatDate(rdo.data_aprovacao_cliente ? rdo.data_aprovacao_cliente.split('T')[0] : '')}</p>
         </div>`;
     }

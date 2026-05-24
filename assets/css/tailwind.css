@@ -280,3 +280,11 @@
     .no-print { display: none !important; }
   }
 }
+
+/* ── Dark mode: elementos com cores hardcoded ───────── */
+.dark .admin-topbar h1 {
+  color: rgb(241 245 249); /* slate-100 */
+}
+.dark .admin-topbar .text-slate-900 {
+  color: rgb(241 245 249);
+}

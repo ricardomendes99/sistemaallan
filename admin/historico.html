@@ -11,9 +11,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Histórico RDOs — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
-  <style>
-    .filters select, .filters input { padding: .5rem .85rem; border: 1.5px solid #CBD5E1; border-radius: .5rem; font-size: .875rem; color: #1E293B; background: #fff; }
-  </style>
 </head>
 <body class="bg-slate-50">
 
@@ -88,17 +85,21 @@
           Filtros
         </div>
         <div class="filters p-4 flex gap-3 flex-wrap">
-          <select id="f-obra" onchange="render()">
+          <select id="f-obra" onchange="render()"
+            class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
             <option value="">Todas as obras</option>
           </select>
-          <select id="f-status" onchange="render()">
+          <select id="f-status" onchange="render()"
+            class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
             <option value="">Todos os status</option>
             <option value="Rascunho">Rascunho</option>
             <option value="Pendente_Assinatura">Pendente Assinatura</option>
             <option value="Finalizado">Finalizado</option>
           </select>
-          <input type="date" id="f-data-ini" onchange="render()">
-          <input type="date" id="f-data-fim" onchange="render()">
+          <input type="date" id="f-data-ini" onchange="render()"
+            class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
+          <input type="date" id="f-data-fim" onchange="render()"
+            class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
           <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Limpar filtros</button>
         </div>
       </div>
@@ -160,9 +161,9 @@
         const obra = DB.getObraById(r.id_obra);
         const cri  = DB.getUserById(r.id_usuario_criador);
         return `<tr>
-          <td style="font-weight:600">${obra ? obra.nome_obra : '—'}</td>
+          <td class="font-semibold">${obra ? obra.nome_obra : '—'}</td>
           <td>${Utils.formatDate(r.data_apontamento)}</td>
-          <td style="color:#64748B;font-size:.85rem">${Utils.getDayOfWeek(r.data_apontamento)}</td>
+          <td class="text-slate-500 text-sm">${Utils.getDayOfWeek(r.data_apontamento)}</td>
           <td>${cri ? cri.nome_completo : '—'}</td>
           <td>${Utils.statusBadge(r.status_documento)}</td>
           <td><a href="rdo-view.html?id=${r.id_rdo}" class="text-sm font-semibold text-brand-500 hover:text-brand-600 transition-colors">Ver →</a></td>

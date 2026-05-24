@@ -167,7 +167,7 @@ const PDFGen = (() => {
     line(ML+22, y, ML+22, y+hdrH, [64,100,140]);
     y += hdrH;
 
-    const slots = Utils.getSlots();
+    const slots = Utils.getSlotsInRange(rdo.horario_inicio, rdo.horario_termino);
     const slotH = 10;
     slots.forEach((slot, idx) => {
       const slotY = y + idx * slotH;
@@ -175,7 +175,7 @@ const PDFGen = (() => {
       rect(ML, slotY, CW, slotH, bg);
       rect(ML, slotY, CW, slotH, null, [226,232,240]);
 
-      const isLunch = slot === rdo.horario_almoco;
+      const isLunch = slot === Utils.floorHour(rdo.horario_almoco);
       doc.setFontSize(8.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...(isLunch ? [217,119,6] : dark));
