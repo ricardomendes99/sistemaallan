@@ -26,7 +26,12 @@
       <p id="obra-nome" class="text-slate-900 text-sm font-semibold truncate max-w-[180px] dark:text-slate-100">Carregando…</p>
       <p id="data-label" class="text-slate-400 text-xs"></p>
     </div>
-    <div id="save-indicator" class="text-xs text-slate-400 flex items-center gap-1 min-w-[52px] justify-end"></div>
+    <div class="flex items-center gap-1 min-w-[52px] justify-end">
+      <button id="dark-toggle" onclick="toggleDarkMode()"
+              class="text-slate-400 hover:text-amber-400 transition-colors p-1.5 rounded-lg"
+              style="background:none;border:none;cursor:pointer" title="Alternar tema"></button>
+      <div id="save-indicator" class="text-xs text-slate-400 flex items-center gap-1"></div>
+    </div>
   </header>
 
   <!-- ── Progress bar (fina, sticky abaixo do top bar) ── -->
@@ -352,7 +357,7 @@
     // ── Init ───────────────────────────────────────────────
     DB.init().then(() => {
       me = Auth.requireAuth('USUARIO');
-      if (me && obraId) init();
+      if (me && obraId) { init(); updateDarkToggleIcon(); }
     });
 
     function init() {
@@ -525,15 +530,6 @@
             <div class="field">
               <label>Horário Exato</label>
               <input type="time" id="htime-${slot.replace(':','')}" value="${linha && linha.horario_exato ? linha.horario_exato : slot}" onchange="saveLinhaField('${slot}')">
-            </div>
-            <div class="field">
-              <label>Status da Atividade</label>
-              <select id="status-${slot.replace(':','')}" onchange="saveLinhaField('${slot}')">
-                <option value="">Selecione…</option>
-                <option value="Iniciada"${linha && linha.status_atividade === 'Iniciada' ? ' selected' : ''}>Iniciada</option>
-                <option value="Em Andamento"${linha && linha.status_atividade === 'Em Andamento' ? ' selected' : ''}>Em Andamento</option>
-                <option value="Concluída"${linha && linha.status_atividade === 'Concluída' ? ' selected' : ''}>Concluída</option>
-              </select>
             </div>
             <div class="field">
               <label>Módulo / Referência</label>

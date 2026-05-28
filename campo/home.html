@@ -17,7 +17,10 @@
   <!-- ── Top bar ── -->
   <header class="h-14 bg-white border-b border-slate-200 flex items-center gap-3 px-4 sticky top-0 z-10 dark:bg-slate-900 dark:border-slate-800">
     <img src="../assets/img/logo.png" alt="Modular" class="h-10 shrink-0" style="width:auto">
-    <span class="text-slate-900 font-bold text-sm dark:text-slate-100">RDO Digital</span>
+    <span class="text-slate-900 font-bold text-sm dark:text-slate-100 flex-1">RDO Digital</span>
+    <button id="dark-toggle" onclick="toggleDarkMode()"
+            class="text-slate-400 hover:text-amber-400 transition-colors p-2 rounded-lg"
+            style="background:none;border:none;cursor:pointer" title="Alternar tema"></button>
   </header>
 
   <!-- ── Main ── -->
@@ -85,7 +88,7 @@
     let me = null;
     DB.init().then(() => {
       me = Auth.requireAuth('USUARIO');
-      if (me) render();
+      if (me) { render(); updateDarkToggleIcon(); }
     });
 
     function render() {
