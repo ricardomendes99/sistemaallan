@@ -170,6 +170,7 @@
            </div>`
         : status === 'assinado'
         ? `<div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+             <button class="btn btn-ghost btn-sm" onclick="visualizarDocumentoAssinado()">Visualizar</button>
              <button class="btn btn-primary btn-sm" onclick="baixarDocumentoAssinado()">Baixar RDO Assinado</button>
              <span style="font-size:.825rem;color:#166534">Assinado em ${rdo.assinafy_signed_at ? new Date(rdo.assinafy_signed_at).toLocaleString('pt-BR') : '—'}</span>
            </div>`
@@ -415,6 +416,26 @@
     async function reenviarAssinatura() {
       DB.updateRDO(rdoId, { assinafy_status: 'nao_enviado', assinafy_document_id: null, assinafy_sent_at: null });
       setTimeout(() => { load(); setTimeout(() => enviarAssinatura(), 300); }, 300);
+    }
+
+    async function visualizarDocumentoAssinado() {
+      if (!rdo || !rdo.assinafy_document_id) return;
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Carregando...';
+      try {
+        const blob = await Assinafy.downloadSignedDocument(rdo.assinafy_document_id);
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        // revoke after a delay to let the new tab load
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      } catch (e) {
+        Toast.error('Erro ao visualizar documento: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
     }
 
     async function baixarDocumentoAssinado() {
