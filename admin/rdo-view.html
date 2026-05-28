@@ -305,6 +305,13 @@
       `;
 
       document.getElementById('main-content').innerHTML = html;
+
+      // Inicia polling automático se aguardando assinatura
+      if (rdo.assinafy_status === 'enviado' && rdo.assinafy_document_id) {
+        _startPolling();
+      } else {
+        _stopPolling();
+      }
     }
 
     function verFotoAdmin(idx) {
@@ -374,25 +381,49 @@
       }
     }
 
-    async function verificarStatusAssinafy() {
+    // Assinafy status map: API value → internal value
+    function _mapAssinafyStatus(apiStatus) {
+      if (apiStatus === 'certificated' || apiStatus === 'signed' || apiStatus === 'completed') return 'assinado';
+      if (apiStatus === 'rejected' || apiStatus === 'declined') return 'rejeitado';
+      return 'enviado';
+    }
+
+    async function verificarStatusAssinafy(silent = false) {
       const rdo = DB.getRDOById(rdoId);
-      if (!rdo.assinafy_document_id) { Utils.toast('ID do documento não encontrado.', 'error'); return; }
+      if (!rdo || !rdo.assinafy_document_id) return;
       try {
         const doc = await Assinafy.getDocumentStatus(rdo.assinafy_document_id);
-        const status = doc.status === 'signed' ? 'assinado' : doc.status === 'rejected' ? 'rejeitado' : 'enviado';
-        const update = { assinafy_status: status };
-        if (status === 'assinado') update.assinafy_signed_at = new Date().toISOString();
-        DB.updateRDO(rdoId, update);
-        Utils.toast(`Status atualizado: ${status}`, 'info');
-        setTimeout(() => load(), 400);
+        const status = _mapAssinafyStatus(doc.status);
+        if (status !== (rdo.assinafy_status || 'enviado')) {
+          const update = { assinafy_status: status };
+          if (status === 'assinado') update.assinafy_signed_at = new Date().toISOString();
+          DB.updateRDO(rdoId, update);
+          if (status === 'assinado') {
+            Utils.toast('RDO assinado pelo cliente!', 'success');
+            _stopPolling();
+          }
+          setTimeout(() => load(), 400);
+        } else if (!silent) {
+          Utils.toast('Ainda aguardando assinatura.', 'info');
+        }
       } catch (e) {
-        Utils.toast('Erro ao verificar status: ' + e.message, 'error');
+        if (!silent) Utils.toast('Erro ao verificar status: ' + e.message, 'error');
       }
     }
 
     async function reenviarAssinatura() {
       DB.updateRDO(rdoId, { assinafy_status: 'nao_enviado', assinafy_document_id: null, assinafy_sent_at: null });
       setTimeout(() => { load(); setTimeout(() => enviarAssinatura(), 300); }, 300);
+    }
+
+    // ── Polling automático ────────────────────────────
+    let _pollTimer = null;
+    function _startPolling() {
+      if (_pollTimer) return;
+      _pollTimer = setInterval(() => verificarStatusAssinafy(true), 30000); // a cada 30s
+    }
+    function _stopPolling() {
+      if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
     }
   </script>
 </body>
