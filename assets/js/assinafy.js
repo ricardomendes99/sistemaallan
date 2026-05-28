@@ -37,8 +37,16 @@ const Assinafy = (() => {
   // Create or reuse a signer, returns signer id
   async function createSigner(fullName, email) {
     const accId = _accountId();
-    const signer = await _request('POST', `/accounts/${accId}/signers`, { full_name: fullName, email });
-    return signer.id;
+    try {
+      const signer = await _request('POST', `/accounts/${accId}/signers`, { full_name: fullName, email });
+      return signer.id;
+    } catch (e) {
+      // Signer with this email already exists — find and reuse
+      const list = await _request('GET', `/accounts/${accId}/signers`);
+      const existing = (list || []).find(s => s.email === email);
+      if (existing) return existing.id;
+      throw e;
+    }
   }
 
   // Request signatures — sends email to all signers at once
