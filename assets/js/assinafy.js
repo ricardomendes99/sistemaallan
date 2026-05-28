@@ -41,12 +41,12 @@ const Assinafy = (() => {
     return signer.id;
   }
 
-  // Request signature from a signer on a document
-  async function requestAssignment(documentId, signerId) {
+  // Request signatures — sends email to all signers at once
+  // signerIds: array of signer IDs
+  async function requestAssignment(documentId, signerIds) {
     await _request('POST', `/documents/${documentId}/assignments`, {
-      signer_id: signerId,
-      method: 'email',
-      send_email: true,
+      method: 'virtual',
+      signers: signerIds.map(id => ({ id })),
     });
   }
 
@@ -56,25 +56,26 @@ const Assinafy = (() => {
     return doc; // { id, status, ... }
   }
 
-  // Full flow: generate PDF → upload → create signers → request assignments
+  // Full flow: generate PDF → upload → create signers → one assignment for all
   // signatarios: [{ nome, email }]
   async function enviarParaAssinatura(rdo, obra, criador, linhas, signatarios) {
     if (!_accountId()) throw new Error('ASSINAFY_ACCOUNT_ID não configurado.');
     if (!signatarios || signatarios.length === 0) throw new Error('Nenhum signatário configurado na obra.');
 
     // 1. Generate PDF as Blob
-    const { jsPDF } = window.jspdf;
     const pdfBlob = PDFGen.generateBlob(rdo, obra, criador, linhas);
     const nomeArq = `RDO_${obra.codigo_of || 'DOC'}_${rdo.data_apontamento || ''}`;
 
     // 2. Upload document
     const documentId = await uploadDocument(pdfBlob, nomeArq);
 
-    // 3. Create signers and request assignments sequentially
-    for (const sig of signatarios) {
-      const signerId = await createSigner(sig.nome || sig.email, sig.email);
-      await requestAssignment(documentId, signerId);
-    }
+    // 3. Create all signers in parallel
+    const signerIds = await Promise.all(
+      signatarios.map(sig => createSigner(sig.nome || sig.email, sig.email))
+    );
+
+    // 4. One assignment request with all signers — sends email to each
+    await requestAssignment(documentId, signerIds);
 
     return documentId;
   }
