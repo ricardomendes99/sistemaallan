@@ -169,8 +169,9 @@
              <button class="btn btn-ghost btn-sm" onclick="reenviarAssinatura()">Reenviar</button>
            </div>`
         : status === 'assinado'
-        ? `<div style="font-size:.825rem;color:#166534">
-             Assinado em ${rdo.assinafy_signed_at ? new Date(rdo.assinafy_signed_at).toLocaleString('pt-BR') : '—'}
+        ? `<div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+             <button class="btn btn-primary btn-sm" onclick="baixarDocumentoAssinado()">Baixar RDO Assinado</button>
+             <span style="font-size:.825rem;color:#166534">Assinado em ${rdo.assinafy_signed_at ? new Date(rdo.assinafy_signed_at).toLocaleString('pt-BR') : '—'}</span>
            </div>`
         : '';
 
@@ -414,6 +415,30 @@
     async function reenviarAssinatura() {
       DB.updateRDO(rdoId, { assinafy_status: 'nao_enviado', assinafy_document_id: null, assinafy_sent_at: null });
       setTimeout(() => { load(); setTimeout(() => enviarAssinatura(), 300); }, 300);
+    }
+
+    async function baixarDocumentoAssinado() {
+      if (!rdo || !rdo.assinafy_document_id) return;
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Baixando...';
+      try {
+        const blob = await Assinafy.downloadSignedDocument(rdo.assinafy_document_id);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `RDO_Assinado_${obra.codigo_of || ''}_${rdo.data_apontamento || ''}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        Toast.error('Erro ao baixar documento: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = orig;
+      }
     }
 
     // ── Polling automático ────────────────────────────

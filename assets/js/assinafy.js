@@ -64,6 +64,13 @@ const Assinafy = (() => {
     return doc; // { id, status, ... }
   }
 
+  // Download the signed (certificated) PDF as a Blob via nginx proxy
+  async function downloadSignedDocument(documentId) {
+    const res = await fetch(`${PROXY}/documents/${documentId}/download`, { method: 'GET' });
+    if (!res.ok) throw new Error(`Erro ao baixar documento assinado: ${res.status}`);
+    return res.blob();
+  }
+
   // Full flow: generate PDF → upload → create signers → one assignment for all
   // signatarios: [{ nome, email }]
   async function enviarParaAssinatura(rdo, obra, criador, linhas, signatarios) {
@@ -88,5 +95,5 @@ const Assinafy = (() => {
     return documentId;
   }
 
-  return { enviarParaAssinatura, getDocumentStatus, uploadDocument, createSigner, requestAssignment };
+  return { enviarParaAssinatura, getDocumentStatus, downloadSignedDocument, uploadDocument, createSigner, requestAssignment };
 })();
