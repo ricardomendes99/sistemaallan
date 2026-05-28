@@ -116,6 +116,7 @@
   <script src="../assets/js/utils.js?v=3"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="../assets/js/pdf-gen.js"></script>
+  <script src="../assets/js/assinafy.js"></script>
   <script src="../assets/js/ui.js"></script>
   <script>
     const params = new URLSearchParams(location.search);
@@ -138,6 +139,57 @@
       return a === 'Aprovado'
         ? '<span class="aprov-aprovado">Aprovado</span>'
         : '<span class="aprov-ressalvas">Aprovado com ressalvas</span>';
+    }
+
+    function renderAssinaturaCard(rdo, obra) {
+      const sigs = obra.emails_signatarios || [];
+      const status = rdo.assinafy_status || 'nao_enviado';
+
+      const statusBadge = {
+        nao_enviado: '<span style="background:#F1F5F9;color:#64748B;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Não enviado</span>',
+        enviado:     '<span style="background:#DBEAFE;color:#1E40AF;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">✉ Aguardando assinatura</span>',
+        assinado:    '<span style="background:#DCFCE7;color:#166534;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">✅ Assinado</span>',
+        rejeitado:   '<span style="background:#FEE2E2;color:#991B1B;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Rejeitado</span>',
+      }[status] || '';
+
+      const sigList = sigs.length === 0
+        ? '<p style="font-size:.825rem;color:#94A3B8;margin:.5rem 0">Nenhum signatário configurado. Acesse <strong>Obras → Signatários</strong> para cadastrar.</p>'
+        : sigs.map(s => `<div style="display:flex;align-items:center;gap:.5rem;font-size:.825rem;color:#334155;margin:.25rem 0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span><strong>${s.nome}</strong> — ${s.email}</span>
+          </div>`).join('');
+
+      const actionArea = status === 'nao_enviado'
+        ? `<button class="btn btn-primary btn-sm" id="btn-assinar" onclick="enviarAssinatura()" ${sigs.length === 0 ? 'disabled title="Cadastre signatários na obra primeiro"' : ''}>
+             Enviar para Assinatura Digital
+           </button>`
+        : status === 'enviado'
+        ? `<div style="display:flex;gap:.5rem;flex-wrap:wrap">
+             <button class="btn btn-ghost btn-sm" onclick="verificarStatusAssinafy()">Verificar Status</button>
+             <button class="btn btn-ghost btn-sm" onclick="reenviarAssinatura()">Reenviar</button>
+           </div>`
+        : status === 'assinado'
+        ? `<div style="font-size:.825rem;color:#166534">
+             Assinado em ${rdo.assinafy_signed_at ? new Date(rdo.assinafy_signed_at).toLocaleString('pt-BR') : '—'}
+           </div>`
+        : '';
+
+      const enviadoInfo = (status !== 'nao_enviado' && rdo.assinafy_sent_at)
+        ? `<p style="font-size:.75rem;color:#64748B;margin-top:.5rem">Enviado em ${new Date(rdo.assinafy_sent_at).toLocaleString('pt-BR')}</p>` : '';
+
+      return `
+        <div class="card" style="margin-bottom:1.25rem">
+          <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Assinatura Digital</span>
+            ${statusBadge}
+          </div>
+          <div style="padding:1rem 1.25rem">
+            <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#64748B;margin-bottom:.4rem">Signatários</p>
+            ${sigList}
+            ${enviadoInfo}
+            <div style="margin-top:.85rem">${actionArea}</div>
+          </div>
+        </div>`;
     }
 
     function load() {
@@ -175,29 +227,7 @@
           </div>
         </div>
 
-        <div class="card" style="margin-bottom:1.25rem">
-          <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
-            <span>Aprovação do Cliente</span>
-            ${aprovBadge(rdo.aprovacao_cliente)}
-          </div>
-          <div style="padding:1rem 1.25rem">
-            ${rdo.aprovacao_cliente ? `
-              <p style="font-size:.875rem;color:#334155"><strong>Aprovado por:</strong> ${rdo.nome_aprovador_cliente || '—'}</p>
-              ${rdo.comentario_cliente ? `<div style="margin-top:.75rem;background:#FFFBEB;border:1px solid #FCD34D;border-radius:.5rem;padding:.75rem 1rem;font-size:.875rem;color:#78350F">"${rdo.comentario_cliente}"</div>` : ''}
-            ` : `
-              <p style="font-size:.875rem;color:#64748B;margin-bottom:.85rem">Gere um link para o cliente revisar e aprovar o relatório:</p>
-              ${clienteLink ? `
-                <div class="link-box" style="margin-bottom:.75rem">
-                  <input type="text" readonly id="link-input" value="${clienteLink}">
-                  <button class="btn btn-ghost btn-sm" onclick="copyLink()">Copiar</button>
-                </div>
-                <p style="font-size:.75rem;color:#94A3B8">Envie este link por WhatsApp ou e-mail para o cliente.</p>
-              ` : `
-                <button class="btn btn-primary btn-sm" onclick="gerarLink()">Gerar Link para Cliente</button>
-              `}
-            `}
-          </div>
-        </div>
+        ${renderAssinaturaCard(rdo, obra)}
 
         <div class="info-grid">
           <div class="info-box"><p class="info-label">Cliente</p><p class="info-value">${obra.cliente_nome||'—'}</p></div>
@@ -314,6 +344,55 @@
       const cri    = DB.getUserById(rdo.id_usuario_criador) || {};
       const linhas = DB.getRDOLinhas(rdoId);
       PDFGen.generate(rdo, obra, cri, linhas);
+    }
+
+    async function enviarAssinatura() {
+      const rdo    = DB.getRDOById(rdoId);
+      const obra   = DB.getObraById(rdo.id_obra) || {};
+      const cri    = DB.getUserById(rdo.id_usuario_criador) || {};
+      const linhas = DB.getRDOLinhas(rdoId);
+      const sigs   = obra.emails_signatarios || [];
+
+      if (sigs.length === 0) { Utils.toast('Cadastre signatários na obra primeiro.', 'warning'); return; }
+
+      const btn = document.getElementById('btn-assinar');
+      if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+
+      try {
+        const documentId = await Assinafy.enviarParaAssinatura(rdo, obra, cri, linhas, sigs);
+        DB.updateRDO(rdoId, {
+          assinafy_document_id: documentId,
+          assinafy_status: 'enviado',
+          assinafy_sent_at: new Date().toISOString(),
+        });
+        Utils.toast(`RDO enviado para ${sigs.length} signatário(s)!`, 'success');
+        setTimeout(() => load(), 600);
+      } catch (e) {
+        console.error('[Assinafy]', e);
+        Utils.toast('Erro ao enviar: ' + (e.message || 'Tente novamente.'), 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Enviar para Assinatura Digital'; }
+      }
+    }
+
+    async function verificarStatusAssinafy() {
+      const rdo = DB.getRDOById(rdoId);
+      if (!rdo.assinafy_document_id) { Utils.toast('ID do documento não encontrado.', 'error'); return; }
+      try {
+        const doc = await Assinafy.getDocumentStatus(rdo.assinafy_document_id);
+        const status = doc.status === 'signed' ? 'assinado' : doc.status === 'rejected' ? 'rejeitado' : 'enviado';
+        const update = { assinafy_status: status };
+        if (status === 'assinado') update.assinafy_signed_at = new Date().toISOString();
+        DB.updateRDO(rdoId, update);
+        Utils.toast(`Status atualizado: ${status}`, 'info');
+        setTimeout(() => load(), 400);
+      } catch (e) {
+        Utils.toast('Erro ao verificar status: ' + e.message, 'error');
+      }
+    }
+
+    async function reenviarAssinatura() {
+      DB.updateRDO(rdoId, { assinafy_status: 'nao_enviado', assinafy_document_id: null, assinafy_sent_at: null });
+      setTimeout(() => { load(); setTimeout(() => enviarAssinatura(), 300); }, 300);
     }
   </script>
 </body>

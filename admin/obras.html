@@ -252,6 +252,47 @@
     </div>
   </div>
 
+  <!-- Modal: Signatários (e-mails para assinatura digital via Assinafy) -->
+  <div class="modal-overlay" id="modal-signatarios" style="display:none" onclick="if(event.target===this)closeSignatariosModal()">
+    <div class="modal-box" style="max-width:500px">
+      <div class="modal-header">
+        <div>
+          <p style="font-weight:700;font-size:1rem" id="sig-obra-nome">Signatários da Obra</p>
+          <p style="font-size:.75rem;color:#64748B">E-mails que receberão o RDO para assinatura digital</p>
+        </div>
+        <button onclick="closeSignatariosModal()" aria-label="Fechar" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="sig-obra-id">
+
+        <!-- Lista de signatários cadastrados -->
+        <div id="sig-list" style="margin-bottom:1rem"></div>
+
+        <!-- Adicionar novo -->
+        <div style="border:1px solid #E2E8F0;border-radius:.5rem;padding:.85rem 1rem;background:#F8FAFC">
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#475569;margin-bottom:.6rem">Adicionar Signatário</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.6rem">
+            <div class="field" style="margin:0">
+              <label style="font-size:.78rem">Nome</label>
+              <input type="text" id="sig-novo-nome" placeholder="Nome completo" style="font-size:.875rem">
+            </div>
+            <div class="field" style="margin:0">
+              <label style="font-size:.78rem">E-mail *</label>
+              <input type="email" id="sig-novo-email" placeholder="email@empresa.com" style="font-size:.875rem">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="adicionarSignatario()" style="width:100%">+ Adicionar</button>
+        </div>
+
+        <p style="font-size:.72rem;color:#94A3B8;margin-top:.75rem">Os signatários receberão um e-mail da Assinafy com o link para assinar o RDO quando você clicar em "Enviar para Assinatura" na tela do RDO.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeSignatariosModal()">Fechar</button>
+        <button class="btn btn-primary" onclick="saveSignatarios()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-container"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -297,6 +338,7 @@
             <button class="btn btn-ghost btn-sm" onclick="openEquipeModal('${o.id_obra}')">Equipe</button>
             <button class="btn btn-ghost btn-sm" onclick="openAnexosModal('${o.id_obra}')" style="margin-left:.3rem">Plantas${nAnexos > 0 ? ` <span style="background:#F97316;color:#fff;border-radius:9999px;padding:0 .4rem;font-size:.7rem">${nAnexos}</span>` : ''}</button>
             <button class="btn btn-ghost btn-sm" onclick="openCodigoModal('${o.id_obra}')" style="margin-left:.3rem">Código</button>
+            <button class="btn btn-ghost btn-sm" onclick="openSignatariosModal('${o.id_obra}')" style="margin-left:.3rem;color:#2563EB;border-color:#BFDBFE">✉ Signatários${(o.emails_signatarios||[]).length > 0 ? ` <span style="background:#2563EB;color:#fff;border-radius:9999px;padding:0 .4rem;font-size:.7rem">${(o.emails_signatarios||[]).length}</span>` : ''}</button>
             <button class="btn btn-ghost btn-sm" onclick="editObra('${o.id_obra}')" style="margin-left:.3rem">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="delObra('${o.id_obra}')" style="margin-left:.3rem">Excluir</button>
           </td>
@@ -486,6 +528,67 @@
           Toast.error('Erro ao remover anexo.');
         }
       }, { danger: true, confirmText: 'Remover' });
+    }
+
+    // ── SIGNATÁRIOS MODAL ─────────────────────────────
+    let _signatariosTemp = [];
+
+    function openSignatariosModal(obraId) {
+      const obra = DB.getObraById(obraId);
+      if (!obra) return;
+      document.getElementById('sig-obra-id').value = obraId;
+      document.getElementById('sig-obra-nome').textContent = obra.nome_obra;
+      document.getElementById('sig-novo-nome').value = '';
+      document.getElementById('sig-novo-email').value = '';
+      _signatariosTemp = JSON.parse(JSON.stringify(obra.emails_signatarios || []));
+      renderSigList();
+      document.getElementById('modal-signatarios').style.display = 'flex';
+    }
+    function closeSignatariosModal() { document.getElementById('modal-signatarios').style.display = 'none'; }
+
+    function renderSigList() {
+      const el = document.getElementById('sig-list');
+      if (_signatariosTemp.length === 0) {
+        el.innerHTML = '<p style="color:#94A3B8;font-size:.875rem;padding:.5rem 0">Nenhum signatário cadastrado.</p>';
+        return;
+      }
+      el.innerHTML = _signatariosTemp.map((s, i) => `
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;border:1px solid #E2E8F0;border-radius:.5rem;margin-bottom:.4rem;background:#fff">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div style="flex:1;min-width:0">
+            <p style="font-size:.875rem;font-weight:600;color:#1E293B;margin:0">${s.nome || '—'}</p>
+            <p style="font-size:.78rem;color:#64748B;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.email}</p>
+          </div>
+          <button onclick="removerSignatario(${i})" style="background:none;border:none;cursor:pointer;color:#EF4444;font-size:1.1rem;line-height:1;padding:.2rem">×</button>
+        </div>`).join('');
+    }
+
+    function adicionarSignatario() {
+      const nome  = document.getElementById('sig-novo-nome').value.trim();
+      const email = document.getElementById('sig-novo-email').value.trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        Toast.error('Informe um e-mail válido.'); return;
+      }
+      if (_signatariosTemp.find(s => s.email === email)) {
+        Toast.warning('Este e-mail já está na lista.'); return;
+      }
+      _signatariosTemp.push({ nome: nome || email.split('@')[0], email });
+      document.getElementById('sig-novo-nome').value = '';
+      document.getElementById('sig-novo-email').value = '';
+      renderSigList();
+    }
+
+    function removerSignatario(idx) {
+      _signatariosTemp.splice(idx, 1);
+      renderSigList();
+    }
+
+    function saveSignatarios() {
+      const obraId = document.getElementById('sig-obra-id').value;
+      DB.updateObra(obraId, { emails_signatarios: _signatariosTemp });
+      closeSignatariosModal();
+      render();
+      Toast.success(`${_signatariosTemp.length} signatário(s) salvo(s)!`);
     }
   </script>
 </body>
