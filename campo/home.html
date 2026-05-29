@@ -9,6 +9,8 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
   <title>Selecionar Obra — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
@@ -16,11 +18,11 @@
 
   <!-- ── Top bar ── -->
   <header class="h-14 bg-white border-b border-slate-200 flex items-center gap-3 px-4 sticky top-0 z-10 dark:bg-slate-900 dark:border-slate-800">
-    <img src="../assets/img/logo.png" alt="Modular" class="h-10 shrink-0" style="width:auto">
+    <img src="../assets/img/logo.png" alt="Modular" width="3759" height="2115" class="h-10 w-auto shrink-0">
     <span class="text-slate-900 font-bold text-sm dark:text-slate-100 flex-1">RDO Digital</span>
     <button id="dark-toggle" onclick="toggleDarkMode()"
             class="text-slate-400 hover:text-amber-400 transition-colors p-2 rounded-lg"
-            style="background:none;border:none;cursor:pointer" title="Alternar tema"></button>
+            style="background:none;border:none;cursor:pointer" title="Alternar tema" aria-label="Alternar tema"></button>
   </header>
 
   <!-- ── Main ── -->
@@ -28,12 +30,12 @@
 
     <!-- Greeting -->
     <div class="mb-6">
-      <p class="text-lg font-bold text-slate-900" id="greeting"></p>
-      <p class="text-sm text-slate-500 mt-0.5" id="date-str"></p>
+      <p class="text-lg font-bold text-slate-900 dark:text-slate-100" id="greeting"></p>
+      <p class="text-sm text-slate-500 mt-0.5 dark:text-slate-400" id="date-str"></p>
     </div>
 
     <!-- Section title -->
-    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Selecione a obra do dia</p>
+    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 dark:text-slate-500">Selecione a obra do dia</p>
 
     <!-- Obras list -->
     <div id="obras-list"></div>
@@ -59,7 +61,7 @@
   </div>
 
   <!-- ── User bar (rodapé, igual sidebar admin) ── -->
-  <div class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-10">
+  <div class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-10" style="padding-bottom:env(safe-area-inset-bottom)">
     <div class="flex items-center gap-2.5 px-3 py-3">
       <div class="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -68,7 +70,7 @@
         <p class="text-xs font-semibold text-white truncate" id="user-display">—</p>
         <p class="text-xs text-slate-500">Campo</p>
       </div>
-      <button onclick="Auth.logout()" title="Sair"
+      <button onclick="Auth.logout()" title="Sair" aria-label="Sair"
               class="text-slate-500 hover:text-red-400 transition-colors p-1"
               style="background:none;border:none;cursor:pointer">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -78,12 +80,14 @@
 
   <div class="toast-container"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/vendor/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
-  <script src="../assets/js/db.js?v=3"></script>
+  <script src="../assets/js/idb.js"></script>
+  <script src="../assets/js/db.js?v=4"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
   <script src="../assets/js/ui.js"></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
   <script>
     let me = null;
     DB.init().then(() => {
@@ -137,23 +141,22 @@
         }
 
         const nAnexos = DB.getAnexosByObra(o.id_obra).length;
-        return `<div class="card p-4 mb-3 cursor-pointer active:scale-[.99] transition-all hover:border-brand-500 hover:shadow-card-hover"
-                     onclick="selectObra('${o.id_obra}')">
-          <div class="flex items-start justify-between gap-3">
+        return `<div class="card p-4 mb-3 active:scale-[.99] transition hover:border-brand-500 hover:shadow-card-hover">
+          <a href="rdo.html?obra=${o.id_obra}" class="flex items-start justify-between gap-3 no-underline text-current">
             <div class="flex-1 min-w-0">
-              <p class="font-bold text-slate-800 text-base leading-snug truncate">${o.nome_obra}</p>
+              <p class="font-bold text-slate-800 text-base leading-snug truncate dark:text-slate-100">${o.nome_obra}</p>
               <p class="text-sm text-slate-500 mt-0.5 truncate">${o.cliente_nome}</p>
               <p class="text-xs text-slate-400 mt-0.5">${o.endereco_local || 'Local não informado'} · OF: ${o.codigo_of}</p>
-              ${nAnexos > 0 ? `
-              <button onclick="event.stopPropagation();verPlantas('${o.id_obra}')"
-                      class="mt-2 inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 rounded-full px-2.5 py-1 text-xs font-bold cursor-pointer transition-colors hover:bg-blue-100"
-                      style="border:none;">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                ${nAnexos} planta${nAnexos > 1 ? 's' : ''}
-              </button>` : ''}
             </div>
             <div class="shrink-0 mt-0.5">${tagHtml}</div>
-          </div>
+          </a>
+          ${nAnexos > 0 ? `
+          <button type="button" onclick="verPlantas('${o.id_obra}')"
+                  class="mt-2 inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 rounded-full px-2.5 py-1 text-xs font-bold cursor-pointer transition-colors hover:bg-blue-100"
+                  style="border:none;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            ${nAnexos} planta${nAnexos > 1 ? 's' : ''}
+          </button>` : ''}
         </div>`;
       }).join('');
     }

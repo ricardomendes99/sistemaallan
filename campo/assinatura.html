@@ -9,6 +9,8 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
   <title>Assinatura do Cliente — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
@@ -29,14 +31,16 @@
     <div class="text-center py-12 text-slate-400">Carregando…</div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/vendor/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
-  <script src="../assets/js/db.js?v=3"></script>
+  <script src="../assets/js/idb.js"></script>
+  <script src="../assets/js/db.js?v=4"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
   <script src="../assets/js/ui.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="../assets/js/vendor/jspdf.umd.min.js"></script>
   <script src="../assets/js/pdf-gen.js"></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
   <script>
     const params = new URLSearchParams(location.search);
     const rdoId  = params.get('rdo');
@@ -100,8 +104,8 @@
 
         <!-- Nome do responsável -->
         <div class="field mb-5">
-          <label>Nome do Responsável pela Assinatura *</label>
-          <input type="text" id="f-nome-cliente" placeholder="Nome completo do cliente/responsável" autocomplete="name">
+          <label for="f-nome-cliente">Nome do Responsável pela Assinatura *</label>
+          <input type="text" id="f-nome-cliente" name="nome_responsavel" placeholder="Nome completo do cliente/responsável" autocomplete="name">
         </div>
 
         <!-- Assinatura -->
@@ -109,9 +113,9 @@
           <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Assinatura do Cliente</p>
           <p class="text-xs text-slate-400 mb-2">Assine no espaço abaixo usando o dedo ou caneta touch:</p>
           <div class="sig-wrap">
-            <canvas id="sig-canvas" style="display:block;width:100%;height:220px;touch-action:none;cursor:crosshair;border-radius:.5rem;border:2px dashed #CBD5E1;background:#fff;"></canvas>
+            <canvas id="sig-canvas" role="img" aria-label="Área de assinatura do cliente — desenhe com o dedo ou caneta touch" style="display:block;width:100%;height:220px;touch-action:none;cursor:crosshair;border-radius:.5rem;border:2px dashed #CBD5E1;background:#fff;"></canvas>
           </div>
-          <p id="sig-status" class="text-xs text-center mt-2 transition-colors text-slate-400">Aguardando assinatura…</p>
+          <p id="sig-status" role="status" aria-live="polite" class="text-xs text-center mt-2 transition-colors text-slate-400">Aguardando assinatura…</p>
           <button class="btn btn-ghost btn-sm w-full mt-2" onclick="clearSig()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             Limpar assinatura

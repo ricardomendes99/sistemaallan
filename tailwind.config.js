@@ -19,9 +19,7 @@ module.exports = {
     'status-ativo', 'status-inativo',
     'sig-wrap', 'has-sig',
     'aprov-ok', 'aprov-ressalvas', 'aprov-pendente',
-    // cliente/ver.html: dark states adicionados dinamicamente via classList
-    'dark:bg-emerald-900/20', 'dark:bg-amber-900/20',
-    'dark:border-slate-600',
+    'aprov-selected-ok', 'aprov-selected-res',
   ],
   theme: {
     extend: {

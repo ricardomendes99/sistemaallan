@@ -562,6 +562,11 @@ video {
 
 html {
   font-family: 'Inter', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body{
@@ -652,13 +657,20 @@ input[type="number"]::-webkit-inner-spin-button,
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 600;
-  transition-property: all;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
 
 .btn:focus-visible{
   outline-width: 2px;
+}
+
+.btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:disabled{
@@ -832,7 +844,9 @@ input[type="number"]::-webkit-inner-spin-button,
   line-height: 1.25rem;
   --tw-text-opacity: 1;
   color: rgb(30 41 59 / var(--tw-text-opacity, 1));
-  transition-property: all;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -893,6 +907,8 @@ input[type="number"]::-webkit-inner-spin-button,
   border-collapse: collapse;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
 }
 
 .tbl th{
@@ -989,6 +1005,7 @@ input[type="number"]::-webkit-inner-spin-button,
 .modal-box{
   animation: slideUp .25s ease-out;
   overflow-y: auto;
+  overscroll-behavior: contain;
   border-radius: 1rem;
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
@@ -1225,6 +1242,8 @@ input[type="number"]::-webkit-inner-spin-button,
   font-size: 1.875rem;
   line-height: 2.25rem;
   font-weight: 800;
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
   line-height: 1;
 }
 
@@ -1269,7 +1288,9 @@ input[type="number"]::-webkit-inner-spin-button,
   border-width: 1px;
   --tw-border-opacity: 1;
   border-color: rgb(226 232 240 / var(--tw-border-opacity, 1));
-  transition-property: all;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }
@@ -1619,7 +1640,9 @@ input[type="number"]::-webkit-inner-spin-button,
   font-weight: 500;
   --tw-text-opacity: 1;
   color: rgb(148 163 184 / var(--tw-text-opacity, 1));
-  transition-property: all;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -2029,6 +2052,10 @@ input[type="number"]::-webkit-inner-spin-button,
   height: 100%;
 }
 
+.min-h-\[3\.5rem\]{
+  min-height: 3.5rem;
+}
+
 .min-h-\[52px\]{
   min-height: 52px;
 }
@@ -2079,6 +2106,10 @@ input[type="number"]::-webkit-inner-spin-button,
 
 .w-96{
   width: 24rem;
+}
+
+.w-auto{
+  width: auto;
 }
 
 .w-full{
@@ -2329,6 +2360,10 @@ input[type="number"]::-webkit-inner-spin-button,
   border-width: 1px;
 }
 
+.border-0{
+  border-width: 0px;
+}
+
 .border-2{
   border-width: 2px;
 }
@@ -2350,11 +2385,6 @@ input[type="number"]::-webkit-inner-spin-button,
   border-color: rgb(253 230 138 / var(--tw-border-opacity, 1));
 }
 
-.border-amber-500{
-  --tw-border-opacity: 1;
-  border-color: rgb(245 158 11 / var(--tw-border-opacity, 1));
-}
-
 .border-brand-100{
   --tw-border-opacity: 1;
   border-color: rgb(255 237 213 / var(--tw-border-opacity, 1));
@@ -2363,11 +2393,6 @@ input[type="number"]::-webkit-inner-spin-button,
 .border-brand-500{
   --tw-border-opacity: 1;
   border-color: rgb(249 115 22 / var(--tw-border-opacity, 1));
-}
-
-.border-emerald-500{
-  --tw-border-opacity: 1;
-  border-color: rgb(16 185 129 / var(--tw-border-opacity, 1));
 }
 
 .border-red-200{
@@ -2439,11 +2464,6 @@ input[type="number"]::-webkit-inner-spin-button,
   background-color: rgb(52 211 153 / var(--tw-bg-opacity, 1));
 }
 
-.bg-emerald-50{
-  --tw-bg-opacity: 1;
-  background-color: rgb(236 253 245 / var(--tw-bg-opacity, 1));
-}
-
 .bg-red-100{
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
@@ -2478,6 +2498,10 @@ input[type="number"]::-webkit-inner-spin-button,
   background-color: rgb(15 23 42 / 0.7);
 }
 
+.bg-transparent{
+  background-color: transparent;
+}
+
 .bg-white{
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
@@ -2501,12 +2525,20 @@ input[type="number"]::-webkit-inner-spin-button,
   padding: 0.25rem;
 }
 
+.p-1\.5{
+  padding: 0.375rem;
+}
+
 .p-10{
   padding: 2.5rem;
 }
 
 .p-12{
   padding: 3rem;
+}
+
+.p-2{
+  padding: 0.5rem;
 }
 
 .p-3{
@@ -2798,6 +2830,10 @@ input[type="number"]::-webkit-inner-spin-button,
   color: rgb(249 115 22 / var(--tw-text-opacity, 1));
 }
 
+.text-current{
+  color: currentColor;
+}
+
 .text-emerald-500{
   --tw-text-opacity: 1;
   color: rgb(16 185 129 / var(--tw-text-opacity, 1));
@@ -2878,6 +2914,10 @@ input[type="number"]::-webkit-inner-spin-button,
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
+.no-underline{
+  text-decoration-line: none;
+}
+
 .accent-amber-500{
   accent-color: #f59e0b;
 }
@@ -2915,8 +2955,16 @@ input[type="number"]::-webkit-inner-spin-button,
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
-.transition-all{
-  transition-property: all;
+.transition{
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-\[width\]{
+  transition-property: width;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -2944,6 +2992,30 @@ input[type="number"]::-webkit-inner-spin-button,
 /* ── Base overrides ──────────────────────────────── */
 
 /* ── Shared components ───────────────────────────── */
+
+/* ── Approval option selected states (cliente/ver.html) ── */
+
+.aprov-selected-ok{
+  --tw-border-opacity: 1;
+  border-color: rgb(16 185 129 / var(--tw-border-opacity, 1));
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 253 245 / var(--tw-bg-opacity, 1));
+}
+
+.aprov-selected-ok:is(.dark *){
+  background-color: rgb(6 78 59 / 0.2);
+}
+
+.aprov-selected-res{
+  --tw-border-opacity: 1;
+  border-color: rgb(245 158 11 / var(--tw-border-opacity, 1));
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
+}
+
+.aprov-selected-res:is(.dark *){
+  background-color: rgb(120 53 15 / 0.2);
+}
 
 /* ── Dark mode: elementos com cores hardcoded ───────── */
 
@@ -3010,6 +3082,11 @@ input[type="number"]::-webkit-inner-spin-button,
   background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
 
+.hover\:text-amber-400:hover{
+  --tw-text-opacity: 1;
+  color: rgb(251 191 36 / var(--tw-text-opacity, 1));
+}
+
 .hover\:text-brand-600:hover{
   --tw-text-opacity: 1;
   color: rgb(234 108 10 / var(--tw-text-opacity, 1));
@@ -3036,9 +3113,66 @@ input[type="number"]::-webkit-inner-spin-button,
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.focus\:not-sr-only:focus{
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+.focus\:fixed:focus{
+  position: fixed;
+}
+
+.focus\:left-3:focus{
+  left: 0.75rem;
+}
+
+.focus\:top-3:focus{
+  top: 0.75rem;
+}
+
+.focus\:z-\[200\]:focus{
+  z-index: 200;
+}
+
+.focus\:rounded-lg:focus{
+  border-radius: 0.5rem;
+}
+
 .focus\:border-brand-500:focus{
   --tw-border-opacity: 1;
   border-color: rgb(249 115 22 / var(--tw-border-opacity, 1));
+}
+
+.focus\:bg-white:focus{
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+
+.focus\:px-4:focus{
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.focus\:py-2:focus{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.focus\:text-slate-900:focus{
+  --tw-text-opacity: 1;
+  color: rgb(15 23 42 / var(--tw-text-opacity, 1));
+}
+
+.focus\:shadow-modal:focus{
+  --tw-shadow: 0 24px 64px 0 rgb(0 0 0 / .22);
+  --tw-shadow-colored: 0 24px 64px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 .focus\:outline-none:focus{
@@ -3050,6 +3184,11 @@ input[type="number"]::-webkit-inner-spin-button,
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-brand-500:focus{
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(249 115 22 / var(--tw-ring-opacity, 1));
 }
 
 .focus\:ring-brand-500\/10:focus{
@@ -3106,10 +3245,6 @@ input[type="number"]::-webkit-inner-spin-button,
   background-color: rgb(30 58 138 / 0.3);
 }
 
-.dark\:bg-emerald-900\/20:is(.dark *){
-  background-color: rgb(6 78 59 / 0.2);
-}
-
 .dark\:bg-emerald-900\/30:is(.dark *){
   background-color: rgb(6 78 59 / 0.3);
 }
@@ -3162,6 +3297,16 @@ input[type="number"]::-webkit-inner-spin-button,
 .dark\:text-slate-300:is(.dark *){
   --tw-text-opacity: 1;
   color: rgb(203 213 225 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-slate-400:is(.dark *){
+  --tw-text-opacity: 1;
+  color: rgb(148 163 184 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-slate-500:is(.dark *){
+  --tw-text-opacity: 1;
+  color: rgb(100 116 139 / var(--tw-text-opacity, 1));
 }
 
 .dark\:hover\:border-amber-500:hover:is(.dark *){

@@ -1,13 +1,37 @@
-// Data layer — Supabase-backed with in-memory cache
-// All read methods are synchronous (from cache).
-// All write methods update cache immediately and fire Supabase writes in background.
-// Only DB.init() is async and must be awaited before any use.
+// Data layer — Supabase-backed with in-memory cache.
+//
+// OFFLINE-FIRST (quando idb.js está carregado e IndexedDB existe):
+//  - init(): carrega snapshot local (IndexedDB) primeiro → app abre sem rede;
+//    depois tenta sincronizar a fila e baixar dados frescos do Supabase.
+//  - Leituras: síncronas, do cache em memória.
+//  - Escritas: atualizam o cache, persistem o snapshot, ENFILEIRAM a operação
+//    (outbox) e tentam enviar. Sem rede, ficam na fila e sobem ao reconectar
+//    (evento 'online', retry periódico e no próximo init).
+//
+// SEM IndexedDB (ex.: páginas que não carregam idb.js): comportamento online
+// clássico — escrita "fire-and-forget", init só busca do Supabase.
 const DB = (() => {
   const SUPABASE_URL = window.SUPABASE_URL  || '';
   const SUPABASE_KEY = window.SUPABASE_ANON_KEY || '';
   const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  const _offline = (typeof IDB !== 'undefined') && (typeof indexedDB !== 'undefined');
+
   let _cache = { users: [], obras: [], rdos: [], rdo_linhas: [], obra_usuarios: [], obra_anexos: [] };
+
+  // ── Estado de sincronização ───────────────────────
+  let _online   = (typeof navigator !== 'undefined') ? navigator.onLine : true;
+  let _pending  = 0;
+  let _syncing  = false;
+  let _pTimer   = null;
+  let _retry    = null;
+  const _subs   = new Set();
+
+  function getSyncState() { return { offlineEnabled: _offline, online: _online, pending: _pending, syncing: _syncing }; }
+  function _emit() { const s = getSyncState(); _subs.forEach(fn => { try { fn(s); } catch (e) {} }); }
+  function onSyncChange(fn) { _subs.add(fn); try { fn(getSyncState()); } catch (e) {} return () => _subs.delete(fn); }
+  function isOnline() { return _online; }
+  function getPendingCount() { return _pending; }
 
   function uuid() {
     if (crypto.randomUUID) return crypto.randomUUID();
@@ -17,12 +41,69 @@ const DB = (() => {
     });
   }
 
-  // Fire-and-forget: runs async write, logs errors silently
-  function _bg(promise) {
-    promise.then(({ error }) => { if (error) console.error('[DB write]', error); });
+  // Fire-and-forget (modo online clássico)
+  function _bg(promise) { promise.then(({ error }) => { if (error) console.error('[DB write]', error); }); }
+
+  // Persiste o snapshot do cache (debounce) — só no modo offline
+  function _persist() {
+    if (!_offline) return;
+    clearTimeout(_pTimer);
+    _pTimer = setTimeout(() => { IDB.set('kv', 'cache', _cache).catch(e => console.error('[snapshot]', e)); }, 250);
   }
 
-  async function init() {
+  // Executa uma operação no Supabase (thenable {data,error})
+  function _apply(op) {
+    const q = _sb.from(op.table);
+    switch (op.type) {
+      case 'insert': return q.insert(op.payload);
+      case 'update': return q.update(op.payload).eq(op.match.col, op.match.val);
+      case 'upsert': return q.upsert(op.payload, op.match && op.match.opts);
+      case 'delete': return q.delete().eq(op.match.col, op.match.val);
+    }
+    return Promise.resolve({ error: null });
+  }
+
+  // Registra uma escrita: enfileira (offline) ou dispara direto (online clássico)
+  function _queue(table, type, payload, match) {
+    if (_offline) {
+      IDB.add('outbox', { table, type, payload, match, ts: Date.now() })
+        .then(() => IDB.count('outbox'))
+        .then(n => { _pending = n; _emit(); sync(); })
+        .catch(e => { console.error('[outbox]', e); _bg(_apply({ table, type, payload, match })); }); // IndexedDB indisponível → tenta direto
+    } else {
+      _bg(_apply({ table, type, payload, match }));
+    }
+  }
+
+  // Drena a fila para o Supabase, em ordem. Retorna true se esvaziou (online).
+  async function sync() {
+    if (!_offline || _syncing) return _pending === 0;
+    _syncing = true; _emit();
+    let drained = true;
+    try {
+      const items = await IDB.all('outbox'); // ordenados por _key (ordem de inserção)
+      for (const item of items) {
+        try {
+          const res = await _apply(item);
+          if (res && res.error) console.error('[sync] erro do servidor, descartando item:', item.table, res.error);
+          await IDB.del('outbox', item._key); // sucesso OU erro de servidor → remove (evita travar a fila)
+        } catch (netErr) {
+          drained = false; _online = false; break; // falha de rede → mantém item e para
+        }
+      }
+      _pending = await IDB.count('outbox');
+      if (drained) _online = true;
+    } catch (e) {
+      drained = false;
+    } finally {
+      _syncing = false; _emit();
+      // Pega itens enfileirados durante esta sincronização
+      if (_online && _pending > 0) setTimeout(() => sync(), 400);
+    }
+    return drained && _pending === 0;
+  }
+
+  async function _fetchAll() {
     const [u, o, r, rl, ou, oa] = await Promise.all([
       _sb.from('usuarios').select('*'),
       _sb.from('obras').select('*'),
@@ -31,23 +112,48 @@ const DB = (() => {
       _sb.from('obra_usuarios').select('*'),
       _sb.from('obra_anexos').select('*')
     ]);
-    _cache.users         = u.data  || [];
-    _cache.obras         = o.data  || [];
-    _cache.rdos          = r.data  || [];
-    _cache.rdo_linhas    = rl.data || [];
-    _cache.obra_usuarios = ou.data || [];
-    _cache.obra_anexos   = oa.data || [];
+    const errd = [u, o, r, rl, ou, oa].find(x => x && x.error);
+    if (errd) throw errd.error; // não sobrescreve o cache com vazio em caso de erro
+    return {
+      users:         u.data  || [],
+      obras:         o.data  || [],
+      rdos:          r.data  || [],
+      rdo_linhas:    rl.data || [],
+      obra_usuarios: ou.data || [],
+      obra_anexos:   oa.data || []
+    };
+  }
 
-    // Ensure admin user always exists
-    const adminExists = _cache.users.find(u => u.email === 'admin@modular.com');
-    if (!adminExists) {
-      const admin = {
-        id: uuid(), nome_completo: 'Administrador', email: 'admin@modular.com',
-        senha_hash: btoa('admin123'), perfil: 'ADMIN', funcao_principal: 'Encarregado', ativo: true
-      };
-      await _sb.from('usuarios').insert(admin);
-      _cache.users.push(admin);
+  async function _ensureAdmin() {
+    if (_cache.users.find(u => u.email === 'admin@modular.com')) return;
+    const admin = {
+      id: uuid(), nome_completo: 'Administrador', email: 'admin@modular.com',
+      senha_hash: btoa('admin123'), perfil: 'ADMIN', funcao_principal: 'Encarregado', ativo: true
+    };
+    const { error } = await _sb.from('usuarios').insert(admin);
+    if (!error) { _cache.users.push(admin); _persist(); }
+  }
+
+  async function init() {
+    if (_offline) {
+      try { const snap = await IDB.get('kv', 'cache'); if (snap) _cache = snap; } catch (e) {}
+      try { _pending = await IDB.count('outbox'); } catch (e) {}
+      _emit();
+      window.addEventListener('online',  () => { _online = true;  _emit(); sync(); });
+      window.addEventListener('offline', () => { _online = false; _emit(); });
+      if (!_retry) _retry = setInterval(() => { if (_pending > 0) sync(); }, 30000);
     }
+    try {
+      if (_offline && _pending > 0) await sync();        // sobe pendências primeiro
+      const fresh = await _fetchAll();                   // lança se offline
+      _cache = fresh;
+      _online = true;
+      if (_offline) await IDB.set('kv', 'cache', _cache).catch(() => {});
+      await _ensureAdmin();
+    } catch (e) {
+      _online = false; // offline: segue com o snapshot local
+    }
+    _emit();
   }
 
   // ── USERS ──────────────────────────────────────────
@@ -57,17 +163,17 @@ const DB = (() => {
 
   function createUser(data) {
     const user = { id: uuid(), ativo: true, ...data };
-    _cache.users.push(user);
-    _bg(_sb.from('usuarios').insert(user));
+    _cache.users.push(user); _persist();
+    _queue('usuarios', 'insert', user);
     return user;
   }
   function updateUser(id, data) {
-    _cache.users = _cache.users.map(u => u.id === id ? { ...u, ...data } : u);
-    _bg(_sb.from('usuarios').update(data).eq('id', id));
+    _cache.users = _cache.users.map(u => u.id === id ? { ...u, ...data } : u); _persist();
+    _queue('usuarios', 'update', data, { col: 'id', val: id });
   }
   function deleteUser(id) {
-    _cache.users = _cache.users.filter(u => u.id !== id);
-    _bg(_sb.from('usuarios').delete().eq('id', id));
+    _cache.users = _cache.users.filter(u => u.id !== id); _persist();
+    _queue('usuarios', 'delete', null, { col: 'id', val: id });
   }
 
   // ── OBRAS ──────────────────────────────────────────
@@ -77,17 +183,17 @@ const DB = (() => {
 
   function createObra(data) {
     const obra = { id_obra: uuid(), data_cadastro: new Date().toISOString(), codigo_cliente: generateCodigoCliente(), ...data };
-    _cache.obras.push(obra);
-    _bg(_sb.from('obras').insert(obra));
+    _cache.obras.push(obra); _persist();
+    _queue('obras', 'insert', obra);
     return obra;
   }
   function updateObra(id, data) {
-    _cache.obras = _cache.obras.map(o => o.id_obra === id ? { ...o, ...data } : o);
-    _bg(_sb.from('obras').update(data).eq('id_obra', id));
+    _cache.obras = _cache.obras.map(o => o.id_obra === id ? { ...o, ...data } : o); _persist();
+    _queue('obras', 'update', data, { col: 'id_obra', val: id });
   }
   function deleteObra(id) {
-    _cache.obras = _cache.obras.filter(o => o.id_obra !== id);
-    _bg(_sb.from('obras').delete().eq('id_obra', id));
+    _cache.obras = _cache.obras.filter(o => o.id_obra !== id); _persist();
+    _queue('obras', 'delete', null, { col: 'id_obra', val: id });
   }
 
   // ── RDOs ──────────────────────────────────────────
@@ -106,13 +212,14 @@ const DB = (() => {
 
   function createRDO(data) {
     const rdo = { id_rdo: uuid(), ...data };
-    _cache.rdos.push(rdo);
-    _bg(_sb.from('rdos').insert(rdo));
+    _cache.rdos.push(rdo); _persist();
+    _queue('rdos', 'insert', rdo);
     return rdo;
   }
   function updateRDO(id, data) {
-    _cache.rdos = _cache.rdos.map(r => r.id_rdo === id ? { ...r, ...data } : r);
-    _bg(_sb.from('rdos').update({ ...data, updated_at: new Date().toISOString() }).eq('id_rdo', id));
+    const payload = { ...data, updated_at: new Date().toISOString() };
+    _cache.rdos = _cache.rdos.map(r => r.id_rdo === id ? { ...r, ...data } : r); _persist();
+    _queue('rdos', 'update', payload, { col: 'id_rdo', val: id });
   }
 
   // ── RDO LINHAS ────────────────────────────────────
@@ -130,7 +237,8 @@ const DB = (() => {
       linha = { id_linha: uuid(), ...data };
       _cache.rdo_linhas.push(linha);
     }
-    _bg(_sb.from('rdo_linhas').upsert(linha, { onConflict: 'id_rdo,horario_ponto' }));
+    _persist();
+    _queue('rdo_linhas', 'upsert', linha, { opts: { onConflict: 'id_rdo,horario_ponto' } });
   }
 
   // ── OBRA USUARIOS ─────────────────────────────────
@@ -143,17 +251,27 @@ const DB = (() => {
   function setObraUsuarios(id_obra, user_ids) {
     _cache.obra_usuarios = _cache.obra_usuarios.filter(x => x.id_obra !== id_obra);
     user_ids.forEach(id_usuario => _cache.obra_usuarios.push({ id_obra, id_usuario }));
-    (async () => {
-      await _sb.from('obra_usuarios').delete().eq('id_obra', id_obra);
+    _persist();
+    if (_offline) {
+      // Offline: outbox processa delete→insert em ordem (chaves sequenciais)
+      _queue('obra_usuarios', 'delete', null, { col: 'id_obra', val: id_obra });
       if (user_ids.length > 0) {
-        const { error } = await _sb.from('obra_usuarios').insert(user_ids.map(id_usuario => ({ id_obra, id_usuario })));
-        if (error) console.error('[DB] setObraUsuarios:', error);
+        _queue('obra_usuarios', 'insert', user_ids.map(id_usuario => ({ id_obra, id_usuario })));
       }
-    })();
+    } else {
+      // Online clássico: delete e DEPOIS insert (sequencial, sem corrida)
+      (async () => {
+        await _sb.from('obra_usuarios').delete().eq('id_obra', id_obra);
+        if (user_ids.length > 0) {
+          const { error } = await _sb.from('obra_usuarios').insert(user_ids.map(id_usuario => ({ id_obra, id_usuario })));
+          if (error) console.error('[DB] setObraUsuarios:', error);
+        }
+      })();
+    }
   }
   function isUserInObra(id_obra, id_usuario) { return getUserIdsByObra(id_obra).includes(id_usuario); }
 
-  // ── OBRA ANEXOS ───────────────────────────────────
+  // ── OBRA ANEXOS (Storage — requer internet) ───────
   function getAnexosByObra(obra_id) {
     return _cache.obra_anexos.filter(a => a.obra_id === obra_id);
   }
@@ -172,13 +290,13 @@ const DB = (() => {
     };
     const { error: insErr } = await _sb.from('obra_anexos').insert(anexo);
     if (insErr) throw insErr;
-    _cache.obra_anexos.push(anexo);
+    _cache.obra_anexos.push(anexo); _persist();
     return anexo;
   }
   async function deleteAnexo(id, arquivo_path) {
     await _sb.storage.from('obra-anexos').remove([arquivo_path]);
     await _sb.from('obra_anexos').delete().eq('id', id);
-    _cache.obra_anexos = _cache.obra_anexos.filter(a => a.id !== id);
+    _cache.obra_anexos = _cache.obra_anexos.filter(a => a.id !== id); _persist();
   }
 
   // ── CLIENT TOKEN / CODIGO ─────────────────────────
@@ -222,10 +340,11 @@ const DB = (() => {
     await _sb.from('obras').delete().not('id_obra',          'is', null);
     await _sb.from('usuarios').delete().not('id',            'is', null);
     _cache = { users: [], obras: [], rdos: [], rdo_linhas: [], obra_usuarios: [], obra_anexos: [] };
+    if (_offline) { await IDB.set('kv', 'cache', _cache).catch(() => {}); await IDB.clear('outbox').catch(() => {}); _pending = 0; _emit(); }
   }
 
   return {
-    init, uuid,
+    init, uuid, sync, onSyncChange, getSyncState, isOnline, getPendingCount,
     getUsers, getUserByEmail, getUserById, createUser, updateUser, deleteUser,
     getObras, getObrasAtivas, getObraById, createObra, updateObra, deleteObra,
     getRDOs, getRDOById, getRDOsByData, getRDOByObraAndData, getRDOByObraDataUsuario, getRDOsByObraData, createRDO, updateRDO,

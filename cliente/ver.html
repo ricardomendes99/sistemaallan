@@ -9,6 +9,8 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f5f9">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
   <title>Aprovação de RDO — Modular Service</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
@@ -16,7 +18,7 @@
 
   <!-- ── Header ── -->
   <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 dark:bg-slate-900 dark:border-slate-800">
-    <img src="../assets/img/logo.png" class="h-8 rounded-lg" alt="Modular Service">
+    <img src="../assets/img/logo.png" class="h-8 w-auto rounded-lg" width="3759" height="2115" alt="Modular Service">
     <span class="text-xs text-slate-500 font-medium">Portal de Aprovação</span>
   </header>
 
@@ -57,14 +59,14 @@
             <h2 class="text-xl font-bold text-slate-900 mb-1 dark:text-slate-100">Verificação de Identidade</h2>
             <p class="text-sm text-slate-500 mb-6">Para acessar o RDO da obra <strong>${obra.nome_obra}</strong>, informe o código de verificação que você recebeu.</p>
             <div class="field mb-4">
-              <label>Código de acesso</label>
-              <input type="text" id="f-codigo-cli" placeholder="Ex: A3F7K2"
+              <label for="f-codigo-cli">Código de acesso</label>
+              <input type="text" id="f-codigo-cli" name="codigo_acesso" placeholder="Ex: A3F7K2"
                 class="text-center text-2xl font-bold tracking-[.5rem] uppercase"
-                maxlength="6"
+                maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false"
                 oninput="this.value=this.value.toUpperCase()"
                 onkeydown="if(event.key==='Enter')verificarCodigo()">
             </div>
-            <div id="codigo-err" class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm flex items-center gap-2 mb-4" style="display:none!important">
+            <div id="codigo-err" role="alert" aria-live="assertive" class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm flex items-center gap-2 mb-4" style="display:none!important">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               Código incorreto. Verifique com a Modular Service.
             </div>
@@ -170,9 +172,9 @@
             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Fotos da Obra (${rdo.fotos.length})</p>
             <div class="grid gap-2.5" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
               ${rdo.fotos.map((src, i) => `
-                <div class="aspect-square rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in dark:border-slate-700" onclick="verFoto('${i}')">
-                  <img src="${src}" alt="Foto ${i+1}" class="w-full h-full object-cover block">
-                </div>`).join('')}
+                <button type="button" aria-label="Ampliar foto ${i+1}" class="aspect-square rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in p-0 bg-transparent block w-full dark:border-slate-700" onclick="verFoto('${i}')">
+                  <img src="${src}" alt="Foto ${i+1}" loading="lazy" class="w-full h-full object-cover block">
+                </button>`).join('')}
             </div>
           </div>` : ''}
 
@@ -183,7 +185,7 @@
 
             <!-- Opções -->
             <div class="flex flex-col gap-2 mb-4" id="aprov-opts">
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-emerald-400 dark:border-slate-600 dark:hover:border-emerald-500" onclick="selectAprov(this)">
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-emerald-400 dark:border-slate-600 dark:hover:border-emerald-500" onclick="selectAprov(this)">
                 <input type="radio" name="aprov" value="Aprovado" class="w-5 h-5 accent-emerald-600 cursor-pointer shrink-0">
                 <div>
                   <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
@@ -194,7 +196,7 @@
                 </div>
               </label>
 
-              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-amber-400 dark:border-slate-600 dark:hover:border-amber-500" onclick="selectAprov(this,'ressalvas')">
+              <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-amber-400 dark:border-slate-600 dark:hover:border-amber-500" onclick="selectAprov(this,'ressalvas')">
                 <input type="radio" name="aprov" value="Aprovado com ressalvas" class="w-5 h-5 accent-amber-500 cursor-pointer shrink-0">
                 <div>
                   <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
@@ -208,15 +210,15 @@
 
             <!-- Comentário -->
             <div class="field mb-4">
-              <label>Comentário (opcional)</label>
-              <textarea id="f-coment" placeholder="Escreva aqui qualquer observação ou ressalva…"
-                class="w-full border-slate-300 rounded-xl p-3 text-sm resize-y min-h-[90px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 dark:focus:border-brand-500"></textarea>
+              <label for="f-coment">Comentário (opcional)</label>
+              <textarea id="f-coment" name="comentario" placeholder="Escreva aqui qualquer observação ou ressalva…"
+                class="w-full border-slate-300 rounded-xl p-3 text-sm resize-y min-h-[90px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100 dark:focus:border-brand-500"></textarea>
             </div>
 
             <!-- Nome -->
             <div class="field mb-5">
-              <label>Seu nome *</label>
-              <input type="text" id="f-nome-cli" placeholder="Nome completo do responsável" autocomplete="name">
+              <label for="f-nome-cli">Seu nome *</label>
+              <input type="text" id="f-nome-cli" name="nome_aprovador" placeholder="Nome completo do responsável" autocomplete="name">
             </div>
 
             <button class="btn btn-primary btn-full" onclick="confirmarAprovacao()">Confirmar Aprovação</button>
@@ -230,33 +232,33 @@
       const rdo = DB.getRDOById(rdoId);
       if (!rdo || !rdo.fotos) return;
       const overlay = document.createElement('div');
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', `Foto ${+idx + 1} ampliada`);
+      overlay.tabIndex = -1;
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;cursor:zoom-out';
-      overlay.innerHTML = `<img src="${rdo.fotos[idx]}" style="max-width:100%;max-height:100%;border-radius:.5rem;object-fit:contain">`;
-      overlay.onclick = () => overlay.remove();
+      overlay.innerHTML = `<img src="${rdo.fotos[idx]}" alt="Foto ${+idx + 1}" style="max-width:100%;max-height:100%;border-radius:.5rem;object-fit:contain">`;
+      const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
+      const onKey = e => { if (e.key === 'Escape') close(); };
+      overlay.onclick = close;
+      document.addEventListener('keydown', onKey);
       document.body.appendChild(overlay);
+      overlay.focus();
     }
 
     function selectAprov(el, tipo) {
-      const isDark = document.documentElement.classList.contains('dark');
       document.querySelectorAll('#aprov-opts label').forEach(x => {
-        x.classList.remove('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20',
-                           'border-amber-500', 'bg-amber-50', 'dark:bg-amber-900/20');
-        x.classList.add('border-slate-200', 'dark:border-slate-600');
+        x.classList.remove('aprov-selected-ok', 'aprov-selected-res');
       });
-      el.classList.remove('border-slate-200', 'dark:border-slate-600');
-      if (tipo === 'ressalvas') {
-        el.classList.add('border-amber-500', 'bg-amber-50', 'dark:bg-amber-900/20');
-      } else {
-        el.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20');
-      }
+      el.classList.add(tipo === 'ressalvas' ? 'aprov-selected-res' : 'aprov-selected-ok');
     }
 
     function confirmarAprovacao() {
       const aprov = document.querySelector('input[name="aprov"]:checked');
       const nome  = document.getElementById('f-nome-cli').value.trim();
       const comt  = document.getElementById('f-coment').value.trim();
-      if (!aprov) { Toast.error('Selecione uma opção de aprovação.'); return; }
-      if (!nome)  { Toast.error('Informe seu nome.'); return; }
+      if (!aprov) { Toast.error('Selecione uma opção de aprovação.'); document.querySelector('input[name="aprov"]')?.focus(); return; }
+      if (!nome)  { Toast.error('Informe seu nome.'); document.getElementById('f-nome-cli').focus(); return; }
 
       DB.updateRDO(rdoId, {
         aprovacao_cliente:            aprov.value,
@@ -274,7 +276,7 @@
           <h2 class="text-2xl font-bold text-slate-900 mb-1 dark:text-slate-100">Aprovação registrada!</h2>
           <p class="text-slate-500 text-sm mb-1"><strong>${nome}</strong></p>
           <p class="text-slate-500 text-sm mb-6">${aprov.value}</p>
-          ${comt ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-6 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">"${comt}"</div>` : ''}
+          ${comt ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-6 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">“${comt}”</div>` : ''}
           <p class="text-xs text-slate-400">Obrigado! Este registro foi enviado para a equipe Modular Service.</p>
         </div>`;
     }
@@ -292,7 +294,7 @@
           <h2 class="text-2xl font-bold text-slate-900 mb-2 dark:text-slate-100">RDO já aprovado</h2>
           <p class="text-slate-600 font-semibold mb-2 dark:text-slate-300">${rdo.nome_aprovador_cliente}</p>
           <span class="${isOk ? 'aprov-ok' : 'aprov-ressalvas'} mb-4">${rdo.aprovacao_cliente}</span>
-          ${rdo.comentario_cliente ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-4 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">"${rdo.comentario_cliente}"</div>` : ''}
+          ${rdo.comentario_cliente ? `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 text-left max-w-sm w-full mb-4 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">“${rdo.comentario_cliente}”</div>` : ''}
           <p class="text-xs text-slate-400">Aprovado em ${Utils.formatDate(rdo.data_aprovacao_cliente ? rdo.data_aprovacao_cliente.split('T')[0] : '')}</p>
         </div>`;
     }

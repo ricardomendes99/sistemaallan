@@ -9,6 +9,7 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e293b">
   <title>RDO — Impressão</title>
   <style>
     @page { size: A4; margin: 10mm; }
@@ -95,7 +96,7 @@
 <body>
   <div class="screen-bar">
     <h1 id="screen-title">RDO — Carregando…</h1>
-    <a class="btn-back" onclick="if(window.opener){window.close()}else if(history.length>1){history.back()}else{location.href='rdo-view.html?id='+new URLSearchParams(location.search).get('id')}">← Voltar</a>
+    <button type="button" class="btn-back" onclick="if(window.opener){window.close()}else if(history.length>1){history.back()}else{location.href='rdo-view.html?id='+new URLSearchParams(location.search).get('id')}">← Voltar</button>
     <button class="btn-print" onclick="window.print()">🖨 Imprimir / Salvar PDF</button>
   </div>
 
@@ -199,14 +200,14 @@
           <span class="${rdo.aprovacao_cliente === 'Aprovado' ? 'stamp-ok' : 'stamp-res'}">
             ${rdo.aprovacao_cliente} — ${rdo.nome_aprovador_cliente || ''}
           </span>
-          ${rdo.comentario_cliente ? `<br><span style="font-size:6.5pt;color:#64748B">"${rdo.comentario_cliente}"</span>` : ''}
+          ${rdo.comentario_cliente ? `<br><span style="font-size:6.5pt;color:#64748B">“${rdo.comentario_cliente}”</span>` : ''}
         </div>` : '';
 
       document.getElementById('page-content').innerHTML = `
         <!-- HEADER -->
         <div class="rdo-header">
           <div class="logo-cell">
-            <img src="../assets/img/logo.png" style="height:12mm;max-width:36mm;object-fit:contain;border-radius:2mm;">
+            <img src="../assets/img/logo.png" alt="Modular Service" width="3759" height="2115" style="height:12mm;width:auto;max-width:36mm;object-fit:contain;border-radius:2mm;">
           </div>
           <div class="title-cell"><h1>RDO — RELATÓRIO DIÁRIO DE OBRA</h1></div>
           <div class="rev-cell">

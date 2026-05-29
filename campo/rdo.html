@@ -9,6 +9,8 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
   <title>Preenchimento RDO — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
@@ -29,14 +31,14 @@
     <div class="flex items-center gap-1 min-w-[52px] justify-end">
       <button id="dark-toggle" onclick="toggleDarkMode()"
               class="text-slate-400 hover:text-amber-400 transition-colors p-1.5 rounded-lg"
-              style="background:none;border:none;cursor:pointer" title="Alternar tema"></button>
-      <div id="save-indicator" class="text-xs text-slate-400 flex items-center gap-1"></div>
+              style="background:none;border:none;cursor:pointer" title="Alternar tema" aria-label="Alternar tema"></button>
+      <div id="save-indicator" role="status" aria-live="polite" class="text-xs text-slate-400 flex items-center gap-1"></div>
     </div>
   </header>
 
   <!-- ── Progress bar (fina, sticky abaixo do top bar) ── -->
   <div class="h-1 bg-slate-100 sticky top-14 z-10">
-    <div id="progress-fill" class="h-full bg-brand-500 transition-all duration-500" style="width:0%"></div>
+    <div id="progress-fill" class="h-full bg-brand-500 transition-[width] duration-500" style="width:0%"></div>
   </div>
 
   <!-- ── Tab contents ── -->
@@ -80,11 +82,11 @@
       <div class="card p-4 mb-4">
         <div class="field">
           <label>Executantes (nomes da equipe)</label>
-          <input type="text" id="f-executantes" placeholder="Ex: Warleson Silva, Kelton Souza" maxlength="200">
+          <input type="text" id="f-executantes" name="executantes" autocomplete="off" placeholder="Ex: Warleson Silva, Kelton Souza" maxlength="200">
         </div>
         <div class="field mb-0">
           <label>Atividade Principal do Dia</label>
-          <input type="text" id="f-atividade" placeholder="Ex: Montagem estrutura módulo 148" maxlength="120">
+          <input type="text" id="f-atividade" name="atividade" autocomplete="off" placeholder="Ex: Montagem estrutura módulo 148" maxlength="120">
         </div>
       </div>
 
@@ -92,17 +94,17 @@
       <div class="card p-4 mb-4">
         <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Status da Atividade</p>
         <div class="grid grid-cols-3 gap-2" id="status-atividade-group">
-          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
             <input type="radio" name="sa" value="Iniciada" class="sr-only">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             <span class="text-xs font-semibold text-slate-600 text-center">Iniciada</span>
           </label>
-          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
             <input type="radio" name="sa" value="Em Andamento" class="sr-only">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span class="text-xs font-semibold text-slate-600 text-center">Em Andamento</span>
           </label>
-          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+          <label class="radio-card flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
             <input type="radio" name="sa" value="Concluída" class="sr-only">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><polyline points="20 6 9 17 4 12"/></svg>
             <span class="text-xs font-semibold text-slate-600 text-center">Concluída</span>
@@ -116,17 +118,17 @@
         <div class="mb-4">
           <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Tempo — Manhã</p>
           <div class="grid grid-cols-3 gap-2" id="tempo-manha">
-            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
               <input type="radio" name="tm" value="Bom (sem chuva)" class="sr-only">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
               <span class="text-[11px] font-semibold text-slate-600 text-center">Bom</span>
             </label>
-            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
               <input type="radio" name="tm" value="Chuva Leve" class="sr-only">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
               <span class="text-[11px] font-semibold text-slate-600 text-center">Chuva Leve</span>
             </label>
-            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
               <input type="radio" name="tm" value="Chuva Extrema" class="sr-only">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>
               <span class="text-[11px] font-semibold text-slate-600 text-center">Extrema</span>
@@ -136,17 +138,17 @@
         <div>
           <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Tempo — Tarde</p>
           <div class="grid grid-cols-3 gap-2" id="tempo-tarde">
-            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
               <input type="radio" name="tt" value="Bom (sem chuva)" class="sr-only">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
               <span class="text-[11px] font-semibold text-slate-600 text-center">Bom</span>
             </label>
-            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
               <input type="radio" name="tt" value="Chuva Leve" class="sr-only">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
               <span class="text-[11px] font-semibold text-slate-600 text-center">Chuva Leve</span>
             </label>
-            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-brand-300">
+            <label class="radio-card flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-200 cursor-pointer transition hover:border-brand-300">
               <input type="radio" name="tt" value="Chuva Extrema" class="sr-only">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"/><polyline points="13 11 9 17 15 17 11 23"/></svg>
               <span class="text-[11px] font-semibold text-slate-600 text-center">Extrema</span>
@@ -183,39 +185,39 @@
         <div class="grid grid-cols-3 gap-3 mb-4" id="efetivo-grid">
           <div class="flex flex-col items-center gap-1.5">
             <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Montador</label>
-            <input type="number" min="0" max="99" id="ef-montador" value="0"
+            <input type="number" inputmode="numeric" min="0" max="99" id="ef-montador" value="0"
               class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition">
           </div>
           <div class="flex flex-col items-center gap-1.5">
             <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Aux. Montagem</label>
-            <input type="number" min="0" max="99" id="ef-auxiliar" value="0"
+            <input type="number" inputmode="numeric" min="0" max="99" id="ef-auxiliar" value="0"
               class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition">
           </div>
           <div class="flex flex-col items-center gap-1.5">
             <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Eletricista</label>
-            <input type="number" min="0" max="99" id="ef-eletricista" value="0"
+            <input type="number" inputmode="numeric" min="0" max="99" id="ef-eletricista" value="0"
               class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition">
           </div>
           <div class="flex flex-col items-center gap-1.5">
             <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Soldador</label>
-            <input type="number" min="0" max="99" id="ef-soldador" value="0"
+            <input type="number" inputmode="numeric" min="0" max="99" id="ef-soldador" value="0"
               class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition">
           </div>
           <div class="flex flex-col items-center gap-1.5">
             <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Encarregado</label>
-            <input type="number" min="0" max="99" id="ef-encarregado" value="0"
+            <input type="number" inputmode="numeric" min="0" max="99" id="ef-encarregado" value="0"
               class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition">
           </div>
           <div class="flex flex-col items-center gap-1.5">
             <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 text-center">Tec. Segurança</label>
-            <input type="number" min="0" max="99" id="ef-tecnico" value="0"
+            <input type="number" inputmode="numeric" min="0" max="99" id="ef-tecnico" value="0"
               class="w-full min-h-[52px] text-center text-xl font-bold border-2 border-slate-200 rounded-xl text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition">
           </div>
         </div>
         <!-- Total -->
@@ -239,19 +241,19 @@
             <label>Início</label>
             <input type="time" id="f-inicio" onchange="buildSlots()"
               class="w-full border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all accent-brand-500">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition accent-brand-500">
           </div>
           <div class="field mb-0">
             <label>Almoço</label>
             <input type="time" id="f-almoco"
               class="w-full border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all accent-brand-500">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition accent-brand-500">
           </div>
           <div class="field mb-0">
             <label>Término</label>
             <input type="time" id="f-termino" onchange="buildSlots()"
               class="w-full border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800
-                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition-all accent-brand-500">
+                     focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition accent-brand-500">
           </div>
         </div>
       </div>
@@ -289,7 +291,7 @@
       <div class="grid grid-cols-3 gap-2 mb-3" id="fotos-grid"></div>
 
       <!-- Botão adicionar -->
-      <label id="btn-add-foto" class="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-brand-400 hover:bg-brand-50 transition-all">
+      <label id="btn-add-foto" class="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-brand-400 hover:bg-brand-50 transition">
         <input type="file" id="foto-input" accept="image/*" multiple class="hidden" onchange="addFotos(this)">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         <span class="text-xs font-semibold text-slate-400">Adicionar Foto</span>
@@ -301,7 +303,7 @@
   </div><!-- fim tab contents -->
 
   <!-- ── Bottom navigation ── -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-20 flex h-14">
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-20 flex min-h-[3.5rem]" style="padding-bottom:env(safe-area-inset-bottom)">
     <button class="tab-btn flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-semibold transition-colors text-brand-500" data-tab="info">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span>Info</span>
@@ -322,12 +324,14 @@
 
   <div class="toast-container"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/vendor/supabase.min.js"></script>
   <script src="../assets/js/config.js"></script>
-  <script src="../assets/js/db.js?v=3"></script>
+  <script src="../assets/js/idb.js"></script>
+  <script src="../assets/js/db.js?v=4"></script>
   <script src="../assets/js/auth.js?v=3"></script>
   <script src="../assets/js/utils.js?v=3"></script>
   <script src="../assets/js/ui.js"></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
   <script>
     const params = new URLSearchParams(location.search);
     const obraId = params.get('obra');
@@ -516,13 +520,13 @@
               : `<span class="hora-preview text-slate-300">Toque para preencher…</span>`);
 
         div.innerHTML = `
-          <div class="hora-slot-header" onclick="toggleSlot('${slot}')">
+          <button type="button" class="hora-slot-header w-full text-left bg-transparent border-0" style="font:inherit;color:inherit" onclick="toggleSlot('${slot}')" aria-expanded="false" aria-controls="body-${slot.replace(':','')}">
             <span class="hora-label">${displayTime}</span>
             ${preview}
             ${statusPill}
             <span class="hora-dot ${dotClass} mx-2"></span>
             <svg id="chev-${slot.replace(':','')}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 transition-transform duration-200"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
+          </button>
           <div class="hora-body" id="body-${slot.replace(':','')}">
             ${isLunch
               ? `<p class="text-sm text-amber-700 font-medium text-center py-2">Horário de almoço configurado na aba Horas.</p>`
@@ -559,11 +563,13 @@
     function expandAllSlots() {
       document.querySelectorAll('.hora-body').forEach(b => b.classList.add('open'));
       document.querySelectorAll('[id^="chev-"]').forEach(c => c.style.transform = 'rotate(180deg)');
+      document.querySelectorAll('.hora-slot-header').forEach(h => h.setAttribute('aria-expanded', 'true'));
     }
 
     function collapseAllSlots() {
       document.querySelectorAll('.hora-body').forEach(b => b.classList.remove('open'));
       document.querySelectorAll('[id^="chev-"]').forEach(c => c.style.transform = '');
+      document.querySelectorAll('.hora-slot-header').forEach(h => h.setAttribute('aria-expanded', 'false'));
     }
 
     function onDescInputRender(slot, linha) {
@@ -593,6 +599,8 @@
       const chev = document.getElementById('chev-' + id);
       const open = body.classList.toggle('open');
       if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+      const header = document.querySelector('#slot-' + id + ' .hora-slot-header');
+      if (header) header.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
     function saveLinhaField(slot) {
@@ -788,9 +796,11 @@
       const grid = document.getElementById('fotos-grid');
       if (!grid) return;
       grid.innerHTML = fotosArr.map((src, i) => `
-        <div class="relative aspect-square rounded-xl overflow-hidden bg-slate-100 cursor-pointer border border-slate-200">
-          <img src="${src}" alt="Foto ${i+1}" class="w-full h-full object-cover block" onclick="verFoto(${i})">
-          ${!isLocked ? `<button onclick="removerFoto(${i})" title="Remover"
+        <div class="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+          <button type="button" onclick="verFoto(${i})" aria-label="Ampliar foto ${i+1}" class="w-full h-full block p-0 border-0 bg-transparent cursor-zoom-in">
+            <img src="${src}" alt="Foto ${i+1}" loading="lazy" class="w-full h-full object-cover block">
+          </button>
+          ${!isLocked ? `<button onclick="removerFoto(${i})" title="Remover" aria-label="Remover foto ${i+1}"
             class="absolute top-1.5 right-1.5 bg-slate-900/70 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors hover:bg-red-600" style="border:none;cursor:pointer">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>` : ''}

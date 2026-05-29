@@ -9,16 +9,19 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
   <title>Histórico RDOs — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
 <body class="bg-slate-50">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:bg-white focus:text-slate-900 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-modal focus:ring-2 focus:ring-brand-500">Pular para o conteúdo</a>
 
   <!-- ── Sidebar ── -->
   <aside id="sidebar" class="sidebar">
     <div class="flex justify-center py-4 border-b border-slate-800">
-      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" class="h-14 rounded-xl" style="width:auto">
-      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" class="h-14 w-14 rounded-xl object-contain" style="display:none">
+      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" width="3759" height="2115" class="h-14 w-auto rounded-xl">
+      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" width="3759" height="2115" class="h-14 w-14 rounded-xl object-contain" style="display:none">
     </div>
     <nav class="flex-1 py-3 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-nav-item">
@@ -69,14 +72,14 @@
 
     <header class="admin-topbar">
       <div class="flex items-center gap-3">
-        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Toggle sidebar">
+        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Alternar menu lateral">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
         </button>
         <h1 class="text-sm font-bold text-slate-900">Histórico de RDOs</h1>
       </div>
     </header>
 
-    <main class="admin-content w-full">
+    <main id="conteudo" tabindex="-1" class="admin-content w-full">
 
       <!-- Filters card -->
       <div class="card mb-5">
@@ -85,20 +88,20 @@
           Filtros
         </div>
         <div class="filters p-4 flex gap-3 flex-wrap">
-          <select id="f-obra" onchange="render()"
+          <select id="f-obra" onchange="render()" aria-label="Filtrar por obra"
             class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
             <option value="">Todas as obras</option>
           </select>
-          <select id="f-status" onchange="render()"
+          <select id="f-status" onchange="render()" aria-label="Filtrar por status"
             class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
             <option value="">Todos os status</option>
             <option value="Rascunho">Rascunho</option>
             <option value="Pendente_Assinatura">Pendente Assinatura</option>
             <option value="Finalizado">Finalizado</option>
           </select>
-          <input type="date" id="f-data-ini" onchange="render()"
+          <input type="date" id="f-data-ini" onchange="render()" aria-label="Data inicial"
             class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
-          <input type="date" id="f-data-fim" onchange="render()"
+          <input type="date" id="f-data-fim" onchange="render()" aria-label="Data final"
             class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white focus:outline-none focus:border-brand-500 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100">
           <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Limpar filtros</button>
         </div>

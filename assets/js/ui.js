@@ -6,9 +6,11 @@ const Toast = (() => {
 
   function getContainer() {
     if (!container) {
-      container = document.createElement('div');
+      container = document.querySelector('.toast-container') || document.createElement('div');
       container.className = 'toast-container';
-      document.body.appendChild(container);
+      container.setAttribute('role', 'status');
+      container.setAttribute('aria-live', 'polite');
+      if (!container.isConnected) document.body.appendChild(container);
     }
     return container;
   }
@@ -27,7 +29,7 @@ const Toast = (() => {
     el.innerHTML = `
       ${ICONS[type] || ICONS.info}
       <span class="flex-1">${message}</span>
-      <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 ml-1 shrink-0" style="background:none;border:none;cursor:pointer;line-height:1;padding:0">
+      <button type="button" aria-label="Fechar aviso" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 ml-1 shrink-0" style="background:none;border:none;cursor:pointer;line-height:1;padding:0">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>`;
     c.appendChild(el);
@@ -158,3 +160,110 @@ function initSidebar() {
 }
 
 document.addEventListener('DOMContentLoaded', initSidebar);
+
+// ── Badge de sincronização (offline / pendentes) ─────────
+// Aparece só quando offline ou há itens na fila; some quando tudo sincronizado.
+function initSyncBadge() {
+  if (!(window.DB && typeof DB.onSyncChange === 'function')) return;
+  let el = document.getElementById('sync-badge');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sync-badge';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.style.cssText = 'position:fixed;left:.75rem;bottom:4.75rem;z-index:90;display:none;align-items:center;gap:.4rem;padding:.35rem .7rem;border-radius:9999px;font-size:.72rem;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.18);pointer-events:none';
+    document.body.appendChild(el);
+  }
+  DB.onSyncChange(st => {
+    if (!st.offlineEnabled || (st.online && st.pending === 0)) { el.style.display = 'none'; return; }
+    let bg, fg, txt, icon;
+    if (!st.online)      { bg = '#FEF3C7'; fg = '#92400E'; icon = '⚡'; txt = st.pending > 0 ? `Offline · ${st.pending} p/ enviar` : 'Offline'; }
+    else if (st.syncing) { bg = '#DBEAFE'; fg = '#1E40AF'; icon = '⟳'; txt = `Sincronizando… ${st.pending}`; }
+    else                 { bg = '#DBEAFE'; fg = '#1E40AF'; icon = '⟳'; txt = `${st.pending} p/ enviar`; }
+    el.style.background = bg; el.style.color = fg;
+    el.textContent = icon + ' ' + txt;
+    el.style.display = 'inline-flex';
+  });
+}
+document.addEventListener('DOMContentLoaded', initSyncBadge);
+
+// ── A11y: esconde SVGs decorativos de leitores de tela ───
+// Cobre conteúdo injetado dinamicamente via MutationObserver.
+(function () {
+  function hideSvgs(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll('svg').forEach(svg => {
+      if (!svg.hasAttribute('aria-hidden') && !svg.hasAttribute('aria-label') && svg.getAttribute('role') !== 'img') {
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('focusable', 'false');
+      }
+    });
+  }
+  function run() {
+    hideSvgs(document);
+    new MutationObserver(muts => {
+      muts.forEach(m => m.addedNodes.forEach(n => {
+        if (n.nodeType !== 1) return;
+        if (n.tagName === 'svg') hideSvgs(n.parentNode || n); else hideSvgs(n);
+      }));
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+})();
+
+// ── A11y: modais (.modal-overlay) — Esc, trap de foco, foco inicial/retorno ─
+(function () {
+  const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  let lastFocused = null;
+
+  const isShown = o => o.isConnected && getComputedStyle(o).display !== 'none';
+  const visibleFocusables = o => [...o.querySelectorAll(FOCUSABLE)].filter(el => el.offsetParent !== null || el === document.activeElement);
+
+  function activate(overlay) {
+    if (overlay.dataset.a11yActive === '1') return;
+    overlay.dataset.a11yActive = '1';
+    lastFocused = document.activeElement;
+    const box = overlay.querySelector('.modal-box, [role="dialog"]') || overlay.firstElementChild;
+    if (box) {
+      if (!box.getAttribute('role')) box.setAttribute('role', 'dialog');
+      box.setAttribute('aria-modal', 'true');
+    }
+    const f = visibleFocusables(overlay);
+    if (f.length) f[0].focus();
+  }
+  function deactivate(overlay) {
+    if (overlay.dataset.a11yActive !== '1') return;
+    overlay.dataset.a11yActive = '0';
+    if (lastFocused && document.contains(lastFocused)) { try { lastFocused.focus(); } catch (e) {} }
+  }
+  function close(overlay) {
+    if (overlay.id) overlay.style.display = 'none'; else overlay.remove();
+    deactivate(overlay);
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' && e.key !== 'Tab') return;
+    const open = [...document.querySelectorAll('.modal-overlay')].filter(isShown);
+    if (!open.length) return;
+    const overlay = open[open.length - 1];
+    if (e.key === 'Escape') { e.preventDefault(); close(overlay); return; }
+    const f = visibleFocusables(overlay);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  function watch(overlay) {
+    new MutationObserver(() => { isShown(overlay) ? activate(overlay) : deactivate(overlay); })
+      .observe(overlay, { attributes: true, attributeFilter: ['style', 'class'] });
+    if (isShown(overlay)) activate(overlay);
+  }
+  function scan() {
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      if (!o.dataset.a11yWatch) { o.dataset.a11yWatch = '1'; watch(o); }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan); else scan();
+  new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
+})();

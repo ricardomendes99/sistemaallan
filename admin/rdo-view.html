@@ -9,6 +9,8 @@
   <link rel="manifest" href="/faviconemodular/manifest.json">
   <meta name="msapplication-config" content="/faviconemodular/browserconfig.xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
   <title>Visualizar RDO — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
   <style>
@@ -29,19 +31,20 @@
     .section-body  { border: 1px solid #E2E8F0; border-top: none; border-radius: 0 0 .5rem .5rem; min-height: 70px; padding: 1rem; font-size: .9rem; color: #334155; white-space: pre-wrap; }
     .link-box { display: flex; align-items: center; gap: .5rem; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: .5rem; padding: .5rem .75rem; }
     .link-box input { flex: 1; border: none; background: transparent; font-size: .78rem; color: #334155; font-family: monospace; }
-    .link-box input:focus { outline: none; }
+    .link-box input:focus-visible { outline: 2px solid #F97316; outline-offset: 2px; border-radius: .25rem; }
     .aprov-aprovado   { background:#DCFCE7; color:#166534; padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
     .aprov-ressalvas  { background:#FEF3C7; color:#92400E; padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
     .aprov-pendente   { background:#F1F5F9; color:#64748B; padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
   </style>
 </head>
 <body class="bg-slate-50">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:bg-white focus:text-slate-900 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-modal focus:ring-2 focus:ring-brand-500">Pular para o conteúdo</a>
 
   <!-- ── Sidebar ── -->
   <aside id="sidebar" class="sidebar">
     <div class="flex justify-center py-4 border-b border-slate-800">
-      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" class="h-14 rounded-xl" style="width:auto">
-      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" class="h-14 w-14 rounded-xl object-contain" style="display:none">
+      <img id="logo-full" src="../assets/img/logo.png" alt="Modular" width="3759" height="2115" class="h-14 w-auto rounded-xl">
+      <img id="logo-icon" src="../assets/img/M%20logo.png" alt="M" width="3759" height="2115" class="h-14 w-14 rounded-xl object-contain" style="display:none">
     </div>
     <nav class="flex-1 py-3 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-nav-item">
@@ -92,7 +95,7 @@
 
     <header class="admin-topbar">
       <div class="flex items-center gap-3">
-        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Toggle sidebar">
+        <button id="sidebar-toggle" class="text-slate-500 hover:text-slate-800 transition-colors" style="background:none;border:none;cursor:pointer" aria-label="Alternar menu lateral">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
         </button>
         <a href="historico.html" class="btn btn-ghost btn-sm">← Histórico</a>
@@ -100,7 +103,7 @@
       </div>
     </header>
 
-    <main class="admin-content w-full">
+    <main id="conteudo" tabindex="-1" class="admin-content w-full">
       <div id="main-content">
         <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
       </div>
@@ -286,16 +289,16 @@
           <div class="card-header">Fotos da Obra (${rdo.fotos.length})</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem;padding:1rem">
             ${rdo.fotos.map((src, i) => `
-              <div style="aspect-ratio:1;border-radius:.5rem;overflow:hidden;border:1px solid #E2E8F0;cursor:zoom-in" onclick="verFotoAdmin('${i}')">
-                <img src="${src}" alt="Foto ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block">
-              </div>`).join('')}
+              <button type="button" aria-label="Ampliar foto ${i+1}" style="aspect-ratio:1;border-radius:.5rem;overflow:hidden;border:1px solid #E2E8F0;cursor:zoom-in;padding:0;background:none;display:block;width:100%" onclick="verFotoAdmin('${i}')">
+                <img src="${src}" alt="Foto ${i+1}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">
+              </button>`).join('')}
           </div>
         </div>` : ''}
 
         <div style="margin-bottom:1.25rem">
           <div class="section-label">Comentários de Fiscalização (Admin)</div>
           <div class="section-body" style="padding:0">
-            <textarea id="coment-field"
+            <textarea id="coment-field" aria-label="Comentários de fiscalização"
               style="width:100%;min-height:100px;padding:1rem;border:none;resize:vertical;font-family:inherit;font-size:.9rem;border-radius:0 0 .5rem .5rem"
               placeholder="Escreva os comentários de fiscalização aqui…"
             >${rdo.comentarios_fiscalizacao || ''}</textarea>
@@ -320,10 +323,18 @@
       const rdo = DB.getRDOById(rdoId);
       if (!rdo || !rdo.fotos) return;
       const overlay = document.createElement('div');
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', `Foto ${+idx + 1} ampliada`);
+      overlay.tabIndex = -1;
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;cursor:zoom-out';
-      overlay.innerHTML = `<img src="${rdo.fotos[idx]}" style="max-width:100%;max-height:100%;border-radius:.5rem;object-fit:contain">`;
-      overlay.onclick = () => overlay.remove();
+      overlay.innerHTML = `<img src="${rdo.fotos[idx]}" alt="Foto ${+idx + 1}" style="max-width:100%;max-height:100%;border-radius:.5rem;object-fit:contain">`;
+      const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
+      const onKey = e => { if (e.key === 'Escape') close(); };
+      overlay.onclick = close;
+      document.addEventListener('keydown', onKey);
       document.body.appendChild(overlay);
+      overlay.focus();
     }
 
     function gerarLink() {
@@ -423,7 +434,7 @@
       const btn = event.target;
       const orig = btn.textContent;
       btn.disabled = true;
-      btn.textContent = 'Carregando...';
+      btn.textContent = 'Carregando…';
       try {
         const blob = await Assinafy.downloadSignedDocument(rdo.assinafy_document_id);
         const url = URL.createObjectURL(blob);
@@ -443,7 +454,7 @@
       const btn = event.target;
       const orig = btn.textContent;
       btn.disabled = true;
-      btn.textContent = 'Baixando...';
+      btn.textContent = 'Baixando…';
       try {
         const blob = await Assinafy.downloadSignedDocument(rdo.assinafy_document_id);
         const url = URL.createObjectURL(blob);

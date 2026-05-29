@@ -8,7 +8,8 @@
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
-  html { font-family: 'Inter', system-ui, sans-serif; }
+  html { font-family: 'Inter', system-ui, sans-serif; color-scheme: light; }
+  html.dark { color-scheme: dark; }
 
   body {
     @apply bg-slate-50 text-slate-800 antialiased
@@ -37,7 +38,9 @@
   /* Buttons */
   .btn {
     @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer border-none
-           transition-all duration-150 focus-visible:outline-2;
+           transition duration-150 focus-visible:outline-2;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .btn:disabled { @apply opacity-50 cursor-not-allowed; }
 
@@ -94,7 +97,7 @@
   .field select,
   .field textarea {
     @apply w-full px-3.5 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-800
-           bg-white transition-all duration-150 focus:outline-none focus:border-brand-500
+           bg-white transition duration-150 focus:outline-none focus:border-brand-500
            focus:ring-2 focus:ring-brand-500/10
            dark:bg-slate-900 dark:border-slate-600 dark:text-slate-100
            dark:focus:border-brand-500 dark:focus:ring-brand-500/20;
@@ -103,7 +106,7 @@
   .field .hint { @apply text-xs text-slate-400 dark:text-slate-500; }
 
   /* Tables */
-  .tbl { @apply w-full border-collapse text-sm; }
+  .tbl { @apply w-full border-collapse text-sm tabular-nums; }
   .tbl th {
     @apply bg-slate-50 text-slate-500 font-semibold text-left px-4 py-2.5 border-b border-slate-200
            dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700;
@@ -123,7 +126,7 @@
     backdrop-filter: blur(4px);
   }
   .modal-box {
-    @apply bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-modal
+    @apply bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto overscroll-contain shadow-modal
            animate-slide-up
            dark:bg-slate-800;
   }
@@ -179,7 +182,7 @@
            dark:text-slate-400;
   }
   .metric-value {
-    @apply text-3xl font-extrabold mt-1 leading-none;
+    @apply text-3xl font-extrabold mt-1 leading-none tabular-nums;
   }
 
   /* Signature pad */
@@ -192,7 +195,7 @@
 
   /* Hora slots — RDO campo */
   .hora-slot {
-    @apply border border-slate-200 rounded-xl mb-2 overflow-hidden transition-all duration-200
+    @apply border border-slate-200 rounded-xl mb-2 overflow-hidden transition duration-200
            dark:border-slate-700 dark:bg-slate-800/50;
   }
   .hora-slot.filled   { @apply border-emerald-300 dark:border-emerald-700; }
@@ -243,7 +246,7 @@
   }
   .sidebar-nav-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400
-           cursor-pointer transition-all duration-150 mx-2;
+           cursor-pointer transition duration-150 mx-2;
   }
   .sidebar-nav-item:hover   { @apply bg-slate-800 text-white dark:bg-slate-800; }
   .sidebar-nav-item.active  { @apply bg-slate-800 text-white dark:bg-slate-700; }
@@ -280,6 +283,10 @@
     .no-print { display: none !important; }
   }
 }
+
+/* ── Approval option selected states (cliente/ver.html) ── */
+.aprov-selected-ok  { @apply border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20; }
+.aprov-selected-res { @apply border-amber-500 bg-amber-50 dark:bg-amber-900/20; }
 
 /* ── Dark mode: elementos com cores hardcoded ───────── */
 .dark .admin-topbar h1 {
