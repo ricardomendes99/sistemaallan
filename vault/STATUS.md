@@ -102,18 +102,21 @@ Implementado para o **uso de campo** (login + listar obras + preencher RDO hora-
 
 **Como testar offline (Chrome):** abrir 1x online → DevTools ▸ Network ▸ **Offline** → recarregar (app abre) → preencher e assinar um RDO (badge "Offline") → voltar online → badge "Sincronizando…" some e o RDO aparece no admin/Supabase. Validado por harness de lógica (mock Supabase+IndexedDB): preencher offline → reabrir offline (dados persistem) → reconectar → sobe na ordem correta.
 
-## Banco — colunas pendentes na tabela `rdos` (rodar no SQL editor do Supabase)
+## Banco — colunas da tabela `rdos` — ✅ todas aplicadas
 
-Verificado em 2026-05-29 contra o Supabase real: faltam 3 colunas em `rdos` que o código grava (o anon key não roda DDL, então rodar manualmente):
+Todas as colunas necessárias já existem no Supabase (aplicadas até 2026-05-30):
 
-```sql
-alter table public.rdos
-  add column if not exists comentarios_fiscalizacao   text,  -- comentário de fiscalização (admin) — NÃO salvava sem isso
-  add column if not exists assinatura_modular_base64   text,  -- assinatura do Responsável Modular (gerente)
-  add column if not exists assinatura_modular_nome      text;
+```
+comentarios_fiscalizacao   text
+assinatura_modular_base64  text
+assinatura_modular_nome    text
+assinafy_document_id       text
+assinafy_status            text   -- nao_enviado | enviado | assinado | rejeitado
+assinafy_sent_at           timestamptz
+assinafy_signed_at         timestamptz
 ```
 
-> ⚠️ Sem essas colunas, a finalização/edição que as inclui falha no sync (em modo offline o item da fila é descartado → perda). O Supabase é **compartilhado** com outros projetos (há tabelas de outros sistemas), mas as 6 tabelas do RDO são isoladas.
+> O Supabase é compartilhado com outros projetos, mas as 6 tabelas do RDO são isoladas.
 
 ## Assinaturas do RDO (modelo — 2026-05-29, atualizado 2026-05-30)
 
@@ -150,13 +153,13 @@ O servidor de dev expõe `/assinafy-proxy/*` que injeta `Authorization: Bearer <
 **Download do PDF assinado:**  
 `GET /documents/{id}` retorna `data.artifacts.certificated` com a URL completa. O código extrai o path e roteia pelo proxy: `new URL(artifactUrl).pathname.replace('/v1', '')` → `fetch(PROXY + apiPath)`.
 
-**Colunas na tabela `rdos` (Supabase) — adicionar se não existirem:**
+**Colunas na tabela `rdos` (Supabase) — ✅ aplicadas em 2026-05-30:**
 ```sql
-alter table public.rdos
-  add column if not exists assinafy_document_id  text,
-  add column if not exists assinafy_status        text,   -- nao_enviado | enviado | assinado | rejeitado
-  add column if not exists assinafy_sent_at       timestamptz,
-  add column if not exists assinafy_signed_at     timestamptz;
+-- já existem no banco:
+assinafy_document_id  text
+assinafy_status        text   -- nao_enviado | enviado | assinado | rejeitado
+assinafy_sent_at       timestamptz
+assinafy_signed_at     timestamptz
 ```
 
 **Status mapeado da API:** `certificated` / `signed` / `completed` → `assinado`; `rejected` / `declined` → `rejeitado`; demais → `enviado`.
