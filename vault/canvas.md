@@ -250,9 +250,10 @@ flowchart LR
 - **Config necessária:** `window.ASSINAFY_ACCOUNT_ID` (⚠️ hoje não está em `config.js` — confirmar onde é definido) e o proxy nginx `/assinafy-proxy`.
 - Mapeamento de status: `certificated/signed/completed` → **assinado**; `rejected/declined` → **rejeitado**.
 
-> [!note] Diferença entre as duas "assinaturas"
-> - **Assinatura no campo** (`campo/assinatura.html`): pad touch, vira imagem base64 no RDO. Funciona offline.
-> - **Assinatura digital** (Assinafy): documento certificado por e-mail. Exige internet.
+> [!note] Três papéis de assinatura — fluxo: campo → gerente (admin) → cliente
+> - **Responsável pela Obra** (executor: montador/soldador/eletricista) — preenche e assina **no campo** (`campo/assinatura.html`), pad obrigatório → `assinatura_cliente_base64` + `assinatura_nome_confirmacao`. Offline.
+> - **Responsável Modular** (gerente) — valida e assina **no admin** (`rdo-view`): pad opcional + nome obrigatório (NÃO via API) → `assinatura_modular_base64` + `assinatura_modular_nome`.
+> - **Cliente** — assinatura **digital via Assinafy** (e-mail, certificado), **depois** que o gerente assina. Exige internet.
 
 ---
 

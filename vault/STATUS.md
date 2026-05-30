@@ -1,7 +1,7 @@
 # STATUS — RDO Digital
 
 **Data:** 2026-05-16  
-**Última atualização:** 2026-05-29 — passe de acessibilidade (Web Interface Guidelines) + modo offline (PWA) no fluxo de campo  
+**Última atualização:** 2026-05-30 — integração Assinafy corrigida end-to-end (proxy local, trava de envio, download do PDF assinado via artifacts.certificated)  
 **Fase:** MVP v2 — completo e pronto para uso local
 
 ## Arquivos do sistema
@@ -101,6 +101,74 @@ Implementado para o **uso de campo** (login + listar obras + preencher RDO hora-
 - Conflitos: "última escrita vence" via `updated_at`.
 
 **Como testar offline (Chrome):** abrir 1x online → DevTools ▸ Network ▸ **Offline** → recarregar (app abre) → preencher e assinar um RDO (badge "Offline") → voltar online → badge "Sincronizando…" some e o RDO aparece no admin/Supabase. Validado por harness de lógica (mock Supabase+IndexedDB): preencher offline → reabrir offline (dados persistem) → reconectar → sobe na ordem correta.
+
+## Banco — colunas pendentes na tabela `rdos` (rodar no SQL editor do Supabase)
+
+Verificado em 2026-05-29 contra o Supabase real: faltam 3 colunas em `rdos` que o código grava (o anon key não roda DDL, então rodar manualmente):
+
+```sql
+alter table public.rdos
+  add column if not exists comentarios_fiscalizacao   text,  -- comentário de fiscalização (admin) — NÃO salvava sem isso
+  add column if not exists assinatura_modular_base64   text,  -- assinatura do Responsável Modular (gerente)
+  add column if not exists assinatura_modular_nome      text;
+```
+
+> ⚠️ Sem essas colunas, a finalização/edição que as inclui falha no sync (em modo offline o item da fila é descartado → perda). O Supabase é **compartilhado** com outros projetos (há tabelas de outros sistemas), mas as 6 tabelas do RDO são isoladas.
+
+## Assinaturas do RDO (modelo — 2026-05-29, atualizado 2026-05-30)
+
+Três papéis distintos:
+- **Responsável pela Obra** (executor: montador/soldador/eletricista) → preenche e assina **no campo** (`campo/assinatura.html`), pad obrigatório → `assinatura_cliente_base64` + `assinatura_nome_confirmacao`.
+- **Responsável Modular** (gerente) → **no painel admin** (`rdo-view`): valida o RDO e assina (pad opcional + **nome obrigatório**) → `assinatura_modular_base64` + `assinatura_modular_nome`. NÃO via API.
+- **Cliente** → assinatura digital **via API (Assinafy)**, no admin, **depois** que o gerente valida/assina.
+
+Fluxo: **campo preenche+assina → gerente valida+assina no admin → envia ao cliente (Assinafy)**. O botão "Enviar para Assinatura Digital" fica **bloqueado** até **3 condições simultâneas**: **(1)** ≥1 signatário (e-mail do cliente) na obra, **(2)** campo assinou (`assinatura_cliente_base64`), **(3)** gerente assinou (`assinatura_modular_nome`). Trava na UI (aviso visual) + em `enviarAssinatura()`. Signatários cadastrados no card "Assinatura Digital" do `rdo-view` ou em Obras → Signatários.
+
+Exibidas em `rdo-view.html`, `rdo-print.html` e no **PDF (`pdf-gen.js`)** — esquerda = Responsável Modular (gerente), direita = Responsável pela Obra.
+
+### Integração Assinafy — estado técnico (2026-05-30)
+
+**Configuração (.env):**
+```
+ASSINAFY_API_KEY=<chave>
+ASSINAFY_ACCOUNT_ID=<workspace_id>   ← é o Workspace ID (não Account ID)
+```
+
+**Proxy local (`_serve.js`):**  
+O servidor de dev expõe `/assinafy-proxy/*` que injeta `Authorization: Bearer <API_KEY>` e encaminha para `https://api.assinafy.com.br/v1/*`. Em produção o nginx faz o mesmo. `config.js` é gerado dinamicamente do `.env` (expõe `window.ASSINAFY_ACCOUNT_ID`).
+
+**Endpoints usados (paths sem `/assinafy-proxy`):**
+| Ação | Método | Path |
+|------|--------|------|
+| Upload PDF | POST | `/workspaces/{id}/documents` |
+| Criar signatário | POST | `/workspaces/{id}/signers` |
+| Listar signatários (reuso) | GET | `/workspaces/{id}/signers` |
+| Criar assignment | POST | `/documents/{id}/assignments` |
+| Verificar status | GET | `/documents/{id}` |
+| Download assinado | GET | `/documents/{id}/download/certificated` |
+
+**Download do PDF assinado:**  
+`GET /documents/{id}` retorna `data.artifacts.certificated` com a URL completa. O código extrai o path e roteia pelo proxy: `new URL(artifactUrl).pathname.replace('/v1', '')` → `fetch(PROXY + apiPath)`.
+
+**Colunas na tabela `rdos` (Supabase) — adicionar se não existirem:**
+```sql
+alter table public.rdos
+  add column if not exists assinafy_document_id  text,
+  add column if not exists assinafy_status        text,   -- nao_enviado | enviado | assinado | rejeitado
+  add column if not exists assinafy_sent_at       timestamptz,
+  add column if not exists assinafy_signed_at     timestamptz;
+```
+
+**Status mapeado da API:** `certificated` / `signed` / `completed` → `assinado`; `rejected` / `declined` → `rejeitado`; demais → `enviado`.
+
+## Modo escuro — sistema todo (2026-05-29)
+
+O conteúdo do **admin** não era feito p/ dark (cores fixas claras → texto sumia no escuro). Resolvido com **tokens de cor** em `tailwind.css`:
+- `:root` (claro) e `html.dark` (escuro) definem `--c-text`, `--c-text-2`, `--c-text-3`, `--c-muted`, `--c-surface`, `--c-surface-2`, `--c-border`. `@media print` reseta p/ claro (não imprime escuro).
+- As cores neutras fixas (inline e nos `<style>`) das 7 telas admin foram convertidas p/ `var(--c-*)`. Barras escuras (`section-label`, `kpi-strip`, `rep-header`), badges de status e o laranja da marca **mantidos**.
+- Overrides `.dark .admin-content/.modal-box/.report .text-slate-900/800/700/600` cobrem classes Tailwind fixas (ex.: números do dashboard).
+- **Assinaturas** (PNG transparente) usam fundo `#ffffff` fixo p/ aparecerem no dark.
+- `campo/` e `cliente/` já eram dark-aware (classes `dark:`). **`index.html` (login) e `rdo-print.html` ficam sempre claros** (não carregam `ui.js`/dark; login é split claro/escuro por design; print é p/ papel).
 
 ## Dev — rodar localmente
 - Servir a partir da raiz (favicons usam caminho absoluto `/faviconemodular/...`): `node _serve.js` → http://localhost:8123/

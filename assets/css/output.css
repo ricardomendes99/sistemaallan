@@ -569,6 +569,42 @@ html.dark {
   color-scheme: dark;
 }
 
+/* Tokens de cor (tema) — usados pelo conteúdo do admin p/ adaptar ao dark */
+
+:root {
+  --c-text: #1e293b;
+  --c-text-2: #334155;
+  --c-text-3: #64748b;
+  --c-muted: #94a3b8;
+  --c-surface: #ffffff;
+  --c-surface-2: #f8fafc;
+  --c-border: #e2e8f0;
+}
+
+html.dark {
+  --c-text: #e2e8f0;
+  --c-text-2: #cbd5e1;
+  --c-text-3: #94a3b8;
+  --c-muted: #64748b;
+  --c-surface: #1e293b;
+  --c-surface-2: #0f172a;
+  --c-border: #334155;
+}
+
+/* Impressão sempre clara (não imprimir escuro no papel) */
+
+@media print {
+  :root, html.dark {
+    --c-text: #1e293b;
+    --c-text-2: #334155;
+    --c-text-3: #64748b;
+    --c-muted: #94a3b8;
+    --c-surface: #ffffff;
+    --c-surface-2: #f8fafc;
+    --c-border: #e2e8f0;
+  }
+}
+
 body{
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
@@ -576,6 +612,10 @@ body{
   color: rgb(30 41 59 / var(--tw-text-opacity, 1));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+ .dark .admin-content body,     .dark .modal-box body,        .dark .report body {
+  color: #e2e8f0;
 }
 
 body:is(.dark *){
@@ -796,6 +836,10 @@ input[type="number"]::-webkit-inner-spin-button,
   color: rgb(30 41 59 / var(--tw-text-opacity, 1));
 }
 
+ .dark .admin-content .card-header,     .dark .modal-box .card-header,        .dark .report .card-header {
+  color: #e2e8f0;
+}
+
 .card-header:is(.dark *){
   --tw-border-opacity: 1;
   border-color: rgb(51 65 85 / var(--tw-border-opacity, 1));
@@ -849,6 +893,16 @@ input[type="number"]::-webkit-inner-spin-button,
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+ .dark .admin-content .field input,     .dark .modal-box .field input,        .dark .report .field input, .dark .admin-content 
+  .field select,     .dark .modal-box 
+  .field select,        .dark .report 
+  .field select, .dark .admin-content 
+  .field textarea,     .dark .modal-box 
+  .field textarea,        .dark .report 
+  .field textarea {
+  color: #e2e8f0;
 }
 
 .field input:focus,
@@ -949,6 +1003,11 @@ input[type="number"]::-webkit-inner-spin-button,
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 100ms;
+}
+
+.dark .admin-content .tbl td,
+.dark .modal-box .tbl td {
+  color: #cbd5e1;
 }
 
 .tbl td:is(.dark *){
@@ -1364,6 +1423,10 @@ input[type="number"]::-webkit-inner-spin-button,
   color: rgb(30 41 59 / var(--tw-text-opacity, 1));
 }
 
+ .dark .admin-content .hora-label,     .dark .modal-box .hora-label,        .dark .report .hora-label {
+  color: #e2e8f0;
+}
+
 .hora-label:is(.dark *){
   --tw-text-opacity: 1;
   color: rgb(226 232 240 / var(--tw-text-opacity, 1));
@@ -1586,6 +1649,10 @@ input[type="number"]::-webkit-inner-spin-button,
   color: rgb(71 85 105 / var(--tw-text-opacity, 1));
 }
 
+ .dark .admin-content .aprov-pendente,     .dark .modal-box .aprov-pendente {
+  color: #cbd5e1;
+}
+
 .aprov-pendente:is(.dark *){
   --tw-bg-opacity: 1;
   background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1));
@@ -1780,6 +1847,11 @@ input[type="number"]::-webkit-inner-spin-button,
   --tw-shadow: 0 24px 64px 0 rgb(0 0 0 / .22);
   --tw-shadow-colored: 0 24px 64px 0 var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.dark .admin-content .toast,
+.dark .modal-box .toast {
+  color: #cbd5e1;
 }
 
 .toast:is(.dark *){
@@ -3026,6 +3098,19 @@ input[type="number"]::-webkit-inner-spin-button,
 
 .dark .admin-topbar .text-slate-900 {
   color: rgb(241 245 249);
+}
+
+/* Dark mode — utilitários de texto/fundo fixos dentro do conteúdo admin/modais/relatório */
+
+.dark .admin-content .text-slate-900, .dark .admin-content .text-slate-800,
+.dark .modal-box .text-slate-900,     .dark .modal-box .text-slate-800,
+.dark .report .text-slate-900,        .dark .report .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+.dark .admin-content .text-slate-700, .dark .admin-content .text-slate-600,
+.dark .modal-box .text-slate-700,     .dark .modal-box .text-slate-600 {
+  color: #cbd5e1 !important;
 }
 
 .last\:border-0:last-child{

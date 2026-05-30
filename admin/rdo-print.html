@@ -278,13 +278,15 @@
         <!-- SIGNATURES -->
         <div class="sig-row">
           <div class="sig-cell">
+            ${rdo.assinatura_modular_base64 ? `<img src="${rdo.assinatura_modular_base64}" class="sig-img">` : ''}
             <div class="sig-line"></div>
-            <div class="sig-label">Modular</div>
+            <div class="sig-label">Nome e Assinatura do Responsável Modular:</div>
+            <div class="sig-name">${rdo.assinatura_modular_nome||''}</div>
           </div>
           <div class="sig-cell">
             ${rdo.assinatura_cliente_base64 ? `<img src="${rdo.assinatura_cliente_base64}" class="sig-img">` : ''}
             <div class="sig-line"></div>
-            <div class="sig-label">Nome e Assinatura do Cliente:</div>
+            <div class="sig-label">Nome e Assinatura do Responsável pela Obra:</div>
             <div class="sig-name">${rdo.assinatura_nome_confirmacao||''}</div>
           </div>
         </div>

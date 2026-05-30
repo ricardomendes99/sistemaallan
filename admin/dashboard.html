@@ -194,7 +194,7 @@
     });
 
     function assinaturaBadge(status) {
-      if (!status || status === 'nao_enviado') return '<span style="color:#94A3B8;font-size:.75rem">—</span>';
+      if (!status || status === 'nao_enviado') return '<span style="color:var(--c-muted);font-size:.75rem">—</span>';
       const map = {
         enviado:   ['#DBEAFE','#1E40AF','Aguardando'],
         assinado:  ['#DCFCE7','#166534','Assinado'],

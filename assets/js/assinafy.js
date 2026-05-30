@@ -30,7 +30,7 @@ const Assinafy = (() => {
     const form = new FormData();
     form.append('name', nomeArquivo);
     form.append('file', pdfBlob, nomeArquivo + '.pdf');
-    const doc = await _request('POST', `/accounts/${accId}/documents`, form, true);
+    const doc = await _request('POST', `/workspaces/${accId}/documents`, form, true);
     return doc.id;
   }
 
@@ -38,11 +38,11 @@ const Assinafy = (() => {
   async function createSigner(fullName, email) {
     const accId = _accountId();
     try {
-      const signer = await _request('POST', `/accounts/${accId}/signers`, { full_name: fullName, email });
+      const signer = await _request('POST', `/workspaces/${accId}/signers`, { full_name: fullName, email });
       return signer.id;
     } catch (e) {
       // Signer with this email already exists — find and reuse
-      const list = await _request('GET', `/accounts/${accId}/signers`);
+      const list = await _request('GET', `/workspaces/${accId}/signers`);
       const existing = (list || []).find(s => s.email === email);
       if (existing) return existing.id;
       throw e;
@@ -64,10 +64,17 @@ const Assinafy = (() => {
     return doc; // { id, status, ... }
   }
 
-  // Download the signed (certificated) PDF as a Blob via nginx proxy
+  // Download the signed (certificated) PDF as a Blob
   async function downloadSignedDocument(documentId) {
-    const res = await fetch(`${PROXY}/documents/${documentId}/download`, { method: 'GET' });
-    if (!res.ok) throw new Error(`Erro ao baixar documento assinado: ${res.status}`);
+    const doc = await _request('GET', `/documents/${documentId}`);
+    // Assinafy retorna as URLs dos artefatos em doc.artifacts
+    const artifacts = doc.artifacts || {};
+    const artifactUrl = artifacts.certificated || artifacts.bundle || artifacts.original;
+    if (!artifactUrl) throw new Error('URL de download não encontrada no documento.');
+    // Extrai o path e roteia pelo proxy local (que injeta o API key)
+    const apiPath = new URL(artifactUrl).pathname.replace('/v1', '');
+    const res = await fetch(`${PROXY}${apiPath}`);
+    if (!res.ok) throw new Error(`Erro ao baixar arquivo certificado: ${res.status}`);
     return res.blob();
   }
 
@@ -80,17 +87,29 @@ const Assinafy = (() => {
     // 1. Generate PDF as Blob
     const pdfBlob = PDFGen.generateBlob(rdo, obra, criador, linhas);
     const nomeArq = `RDO_${obra.codigo_of || 'DOC'}_${rdo.data_apontamento || ''}`;
+    console.log('[Assinafy] 1. PDF gerado:', nomeArq, pdfBlob.size, 'bytes');
 
     // 2. Upload document
-    const documentId = await uploadDocument(pdfBlob, nomeArq);
+    let documentId;
+    try {
+      documentId = await uploadDocument(pdfBlob, nomeArq);
+      console.log('[Assinafy] 2. Upload OK — documentId:', documentId);
+    } catch (e) { throw new Error('Erro no upload do PDF: ' + e.message); }
 
     // 3. Create all signers in parallel
-    const signerIds = await Promise.all(
-      signatarios.map(sig => createSigner(sig.nome || sig.email, sig.email))
-    );
+    let signerIds;
+    try {
+      signerIds = await Promise.all(
+        signatarios.map(sig => createSigner(sig.nome || sig.email, sig.email))
+      );
+      console.log('[Assinafy] 3. Signatários OK:', signerIds);
+    } catch (e) { throw new Error('Erro ao criar signatário: ' + e.message); }
 
     // 4. One assignment request with all signers — sends email to each
-    await requestAssignment(documentId, signerIds);
+    try {
+      await requestAssignment(documentId, signerIds);
+      console.log('[Assinafy] 4. Assignment OK');
+    } catch (e) { throw new Error('Erro ao solicitar assinatura: ' + e.message); }
 
     return documentId;
   }

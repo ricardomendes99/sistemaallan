@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
-  <title>Assinatura do Cliente — RDO Digital</title>
+  <title>Assinatura do Responsável — RDO Digital</title>
   <link rel="stylesheet" href="../assets/css/output.css">
 </head>
 <body class="bg-slate-50 min-h-screen pb-8">
@@ -44,8 +44,7 @@
   <script>
     const params = new URLSearchParams(location.search);
     const rdoId  = params.get('rdo');
-    let sigPad = null;
-    let isEmpty = true;
+    let padObra = null;
     let me = null;
 
     DB.init().then(() => {
@@ -104,19 +103,19 @@
 
         <!-- Nome do responsável -->
         <div class="field mb-5">
-          <label for="f-nome-cliente">Nome do Responsável pela Assinatura *</label>
-          <input type="text" id="f-nome-cliente" name="nome_responsavel" placeholder="Nome completo do cliente/responsável" autocomplete="name">
+          <label for="f-nome-cliente">Nome do Responsável pela Obra *</label>
+          <input type="text" id="f-nome-cliente" name="nome_responsavel" placeholder="Nome completo do responsável pela obra" autocomplete="name">
         </div>
 
-        <!-- Assinatura -->
+        <!-- Assinatura: Responsável pela Obra -->
         <div class="mb-5">
-          <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Assinatura do Cliente</p>
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Assinatura do Responsável pela Obra *</p>
           <p class="text-xs text-slate-400 mb-2">Assine no espaço abaixo usando o dedo ou caneta touch:</p>
           <div class="sig-wrap">
-            <canvas id="sig-canvas" role="img" aria-label="Área de assinatura do cliente — desenhe com o dedo ou caneta touch" style="display:block;width:100%;height:220px;touch-action:none;cursor:crosshair;border-radius:.5rem;border:2px dashed #CBD5E1;background:#fff;"></canvas>
+            <canvas id="sig-canvas" role="img" aria-label="Área de assinatura do responsável pela obra — desenhe com o dedo ou caneta touch" style="display:block;width:100%;height:200px;touch-action:none;cursor:crosshair;border-radius:.5rem;border:2px dashed #CBD5E1;background:#fff;"></canvas>
           </div>
           <p id="sig-status" role="status" aria-live="polite" class="text-xs text-center mt-2 transition-colors text-slate-400">Aguardando assinatura…</p>
-          <button class="btn btn-ghost btn-sm w-full mt-2" onclick="clearSig()">
+          <button type="button" class="btn btn-ghost btn-sm w-full mt-2" onclick="clearSig('obra')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             Limpar assinatura
           </button>
@@ -129,88 +128,69 @@
         </button>
       `;
 
-      initSigPad();
+      padObra = createPad('sig-canvas', 'sig-status');
     }
 
-    function initSigPad() {
-      const canvas = document.getElementById('sig-canvas');
-      const ctx    = canvas.getContext('2d');
-      const dpr    = window.devicePixelRatio || 1;
-
-      // Set canvas resolution
+    // Fábrica de pad de assinatura — cada pad tem seu próprio estado
+    function createPad(canvasId, statusId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       canvas.width  = rect.width  * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
-
       ctx.strokeStyle = '#1E293B';
-      ctx.lineWidth   = 2.2;
-      ctx.lineCap     = 'round';
-      ctx.lineJoin    = 'round';
+      ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-      let drawing = false;
-      let lastX = 0, lastY = 0;
-
-      function getPos(e) {
-        const r = canvas.getBoundingClientRect();
-        const src = e.touches ? e.touches[0] : e;
-        return { x: src.clientX - r.left, y: src.clientY - r.top };
-      }
-
-      function start(e) {
-        e.preventDefault();
-        drawing = true;
-        const p = getPos(e);
-        lastX = p.x; lastY = p.y;
-        ctx.beginPath(); ctx.moveTo(lastX, lastY);
-      }
+      let drawing = false, empty = true, lastX = 0, lastY = 0;
+      const pos = e => { const r = canvas.getBoundingClientRect(); const s = e.touches ? e.touches[0] : e; return { x: s.clientX - r.left, y: s.clientY - r.top }; };
+      function start(e) { e.preventDefault(); drawing = true; const p = pos(e); lastX = p.x; lastY = p.y; ctx.beginPath(); ctx.moveTo(lastX, lastY); }
       function move(e) {
         e.preventDefault();
         if (!drawing) return;
-        const p = getPos(e);
-        ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-        lastX = p.x; lastY = p.y;
-        if (!isEmpty) return;
-        isEmpty = false;
-        canvas.classList.add('has-sig');
-        document.getElementById('sig-status').textContent = 'Assinatura capturada ✓';
-        document.getElementById('sig-status').style.color = '#16A34A';
+        const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); lastX = p.x; lastY = p.y;
+        if (!empty) return;
+        empty = false; canvas.classList.add('has-sig');
+        const st = document.getElementById(statusId);
+        if (st) { st.textContent = 'Assinatura capturada ✓'; st.style.color = '#16A34A'; }
       }
       function stop(e) { e.preventDefault(); drawing = false; ctx.beginPath(); }
-
       canvas.addEventListener('mousedown', start);
       canvas.addEventListener('mousemove', move);
       canvas.addEventListener('mouseup', stop);
       canvas.addEventListener('touchstart', start, { passive: false });
       canvas.addEventListener('touchmove',  move,  { passive: false });
       canvas.addEventListener('touchend',   stop,  { passive: false });
+
+      return {
+        isEmpty: () => empty,
+        dataURL: () => canvas.toDataURL('image/png'),
+        clear: () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.classList.remove('has-sig');
+          empty = true;
+          const st = document.getElementById(statusId);
+          if (st) { st.textContent = 'Aguardando assinatura…'; st.style.color = ''; }
+        }
+      };
     }
 
     function clearSig() {
-      const canvas = document.getElementById('sig-canvas');
-      const ctx    = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      canvas.classList.remove('has-sig');
-      isEmpty = true;
-      const status = document.getElementById('sig-status');
-      status.textContent = 'Aguardando assinatura…';
-      status.style.color = '';
+      if (padObra) padObra.clear();
     }
 
     function finalizar() {
       const nome = (document.getElementById('f-nome-cliente')?.value || '').trim();
-      if (!nome) { Utils.toast('Informe o nome do responsável.', 'error'); return; }
-      if (isEmpty) { Utils.toast('Colete a assinatura do cliente antes de finalizar.', 'error'); return; }
-
-      const canvas = document.getElementById('sig-canvas');
-      const sigB64 = canvas.toDataURL('image/png');
+      if (!nome) { Utils.toast('Informe o nome do responsável pela obra.', 'error'); return; }
+      if (!padObra || padObra.isEmpty()) { Utils.toast('Colete a assinatura do responsável pela obra antes de finalizar.', 'error'); return; }
 
       DB.updateRDO(rdoId, {
-        status_documento:          'Finalizado',
-        assinatura_cliente_base64: sigB64,
+        status_documento:            'Finalizado',
+        assinatura_cliente_base64:   padObra.dataURL(),
         assinatura_nome_confirmacao: nome,
-        data_fechamento:           new Date().toISOString()
+        data_fechamento:             new Date().toISOString()
       });
 
       Utils.toast('RDO finalizado com sucesso!', 'success');

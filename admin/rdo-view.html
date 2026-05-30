@@ -16,25 +16,25 @@
   <style>
     .info-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 1.25rem; }
     @media(min-width:640px){ .info-grid { grid-template-columns: repeat(3,1fr); } }
-    .info-box { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: .5rem; padding: .75rem 1rem; }
-    .info-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; color: #64748B; letter-spacing: .05em; }
-    .info-value { font-size: .95rem; font-weight: 600; color: #1E293B; margin-top: .2rem; }
+    .info-box { background:var(--c-surface-2); border: 1px solid #E2E8F0; border-radius: .5rem; padding: .75rem 1rem; }
+    .info-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; color:var(--c-text-3); letter-spacing: .05em; }
+    .info-value { font-size: .95rem; font-weight: 600; color:var(--c-text); margin-top: .2rem; }
     .hora-view  { display: flex; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid #F1F5F9; align-items: flex-start; }
     .hora-view:last-child { border-bottom: none; }
-    .hora-view .ht { font-size: .95rem; font-weight: 700; color: #1E293B; min-width: 50px; }
-    .hora-view .hd { flex: 1; font-size: .875rem; color: #334155; line-height: 1.5; }
+    .hora-view .ht { font-size: .95rem; font-weight: 700; color:var(--c-text); min-width: 50px; }
+    .hora-view .hd { flex: 1; font-size: .875rem; color:var(--c-text-2); line-height: 1.5; }
     .status-pill { padding: .25rem .75rem; border-radius: 9999px; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
     .s-ini { background:#DBEAFE; color:#1E40AF; }
     .s-and { background:#FEF3C7; color:#92400E; }
     .s-con { background:#DCFCE7; color:#166534; }
     .section-label { background: #1E293B; color: #fff; padding: .6rem 1rem; font-size: .8rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border-radius: .5rem .5rem 0 0; }
-    .section-body  { border: 1px solid #E2E8F0; border-top: none; border-radius: 0 0 .5rem .5rem; min-height: 70px; padding: 1rem; font-size: .9rem; color: #334155; white-space: pre-wrap; }
-    .link-box { display: flex; align-items: center; gap: .5rem; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: .5rem; padding: .5rem .75rem; }
-    .link-box input { flex: 1; border: none; background: transparent; font-size: .78rem; color: #334155; font-family: monospace; }
+    .section-body  { border: 1px solid #E2E8F0; border-top: none; border-radius: 0 0 .5rem .5rem; min-height: 70px; padding: 1rem; font-size: .9rem; color:var(--c-text-2); white-space: pre-wrap; }
+    .link-box { display: flex; align-items: center; gap: .5rem; background:var(--c-surface-2); border: 1.5px solid #E2E8F0; border-radius: .5rem; padding: .5rem .75rem; }
+    .link-box input { flex: 1; border: none; background: transparent; font-size: .78rem; color:var(--c-text-2); font-family: monospace; }
     .link-box input:focus-visible { outline: 2px solid #F97316; outline-offset: 2px; border-radius: .25rem; }
     .aprov-aprovado   { background:#DCFCE7; color:#166534; padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
     .aprov-ressalvas  { background:#FEF3C7; color:#92400E; padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
-    .aprov-pendente   { background:#F1F5F9; color:#64748B; padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
+    .aprov-pendente   { background:var(--c-surface-2); color:var(--c-text-3); padding:.35rem .85rem; border-radius:9999px; font-size:.8rem; font-weight:700; display:inline-block; }
   </style>
 </head>
 <body class="bg-slate-50">
@@ -105,7 +105,7 @@
 
     <main id="conteudo" tabindex="-1" class="admin-content w-full">
       <div id="main-content">
-        <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
+        <div style="text-align:center;padding:3rem;color:var(--c-muted)">Carregando…</div>
       </div>
     </main>
   </div>
@@ -119,7 +119,7 @@
   <script src="../assets/js/utils.js?v=3"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="../assets/js/pdf-gen.js"></script>
-  <script src="../assets/js/assinafy.js"></script>
+  <script src="../assets/js/assinafy.js?v=5"></script>
   <script src="../assets/js/ui.js"></script>
   <script>
     const params = new URLSearchParams(location.search);
@@ -147,25 +147,38 @@
     function renderAssinaturaCard(rdo, obra) {
       const sigs = obra.emails_signatarios || [];
       const status = rdo.assinafy_status || 'nao_enviado';
+      const bloqueioEnvio = sigs.length === 0
+        ? 'Cadastre signatários na obra primeiro'
+        : !rdo.assinatura_cliente_base64
+          ? 'O Responsável pela Obra ainda não assinou no campo'
+          : (!rdo.assinatura_modular_nome ? 'O Responsável Modular (gerente) precisa validar e assinar antes de enviar ao cliente' : '');
 
       const statusBadge = {
-        nao_enviado: '<span style="background:#F1F5F9;color:#64748B;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Não enviado</span>',
+        nao_enviado: '<span style="background:var(--c-surface-2);color:var(--c-text-3);padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Não enviado</span>',
         enviado:     '<span style="background:#DBEAFE;color:#1E40AF;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">✉ Aguardando assinatura</span>',
         assinado:    '<span style="background:#DCFCE7;color:#166534;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">✅ Assinado</span>',
         rejeitado:   '<span style="background:#FEE2E2;color:#991B1B;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Rejeitado</span>',
       }[status] || '';
 
       const sigList = sigs.length === 0
-        ? '<p style="font-size:.825rem;color:#94A3B8;margin:.5rem 0">Nenhum signatário configurado. Acesse <strong>Obras → Signatários</strong> para cadastrar.</p>'
-        : sigs.map(s => `<div style="display:flex;align-items:center;gap:.5rem;font-size:.825rem;color:#334155;margin:.25rem 0">
+        ? '<p style="font-size:.825rem;color:var(--c-muted);margin:.5rem 0">Nenhum signatário ainda — adicione o e-mail do cliente abaixo.</p>'
+        : sigs.map((s, i) => `<div style="display:flex;align-items:center;gap:.5rem;font-size:.825rem;color:var(--c-text-2);margin:.25rem 0">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span><strong>${s.nome}</strong> — ${s.email}</span>
+            <span style="flex:1"><strong>${s.nome || '—'}</strong> — ${s.email}</span>
+            ${status === 'nao_enviado' ? `<button type="button" aria-label="Remover signatário ${s.email}" title="Remover" onclick="removeSignatarioRDO(${i})" style="background:none;border:none;cursor:pointer;color:#EF4444;font-size:1.05rem;line-height:1">×</button>` : ''}
           </div>`).join('');
 
+      const addForm = status === 'nao_enviado' ? `
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem">
+          <input type="text" id="sig-add-nome" placeholder="Nome (opcional)" autocomplete="off" style="flex:1;min-width:120px;padding:.4rem .6rem;border:1px solid var(--c-border);border-radius:.4rem;font-size:.8rem;background:var(--c-surface);color:var(--c-text)">
+          <input type="email" id="sig-add-email" placeholder="email@cliente.com *" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();addSignatarioRDO();}" style="flex:1.4;min-width:160px;padding:.4rem .6rem;border:1px solid var(--c-border);border-radius:.4rem;font-size:.8rem;background:var(--c-surface);color:var(--c-text)">
+          <button type="button" class="btn btn-primary btn-sm" onclick="addSignatarioRDO()">+ Adicionar signatário</button>
+        </div>` : '';
+
       const actionArea = status === 'nao_enviado'
-        ? `<button class="btn btn-primary btn-sm" id="btn-assinar" onclick="enviarAssinatura()" ${sigs.length === 0 ? 'disabled title="Cadastre signatários na obra primeiro"' : ''}>
+        ? `<button class="btn btn-primary btn-sm" id="btn-assinar" onclick="enviarAssinatura()" ${bloqueioEnvio ? `disabled title="${bloqueioEnvio}"` : ''}>
              Enviar para Assinatura Digital
-           </button>`
+           </button>${bloqueioEnvio ? `<p style="font-size:.75rem;color:#92400E;margin-top:.5rem">⚠ ${bloqueioEnvio}.</p>` : ''}`
         : status === 'enviado'
         ? `<div style="display:flex;gap:.5rem;flex-wrap:wrap">
              <button class="btn btn-ghost btn-sm" onclick="verificarStatusAssinafy()">Verificar Status</button>
@@ -177,10 +190,15 @@
              <button class="btn btn-primary btn-sm" onclick="baixarDocumentoAssinado()">Baixar RDO Assinado</button>
              <span style="font-size:.825rem;color:#166534">Assinado em ${rdo.assinafy_signed_at ? new Date(rdo.assinafy_signed_at).toLocaleString('pt-BR') : '—'}</span>
            </div>`
+        : status === 'rejeitado'
+        ? `<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+             <button class="btn btn-primary btn-sm" onclick="reenviarAssinatura()">Reenviar para Assinatura</button>
+             <span style="font-size:.75rem;color:#991B1B">O cliente recusou — corrija e reenvie.</span>
+           </div>`
         : '';
 
       const enviadoInfo = (status !== 'nao_enviado' && rdo.assinafy_sent_at)
-        ? `<p style="font-size:.75rem;color:#64748B;margin-top:.5rem">Enviado em ${new Date(rdo.assinafy_sent_at).toLocaleString('pt-BR')}</p>` : '';
+        ? `<p style="font-size:.75rem;color:var(--c-text-3);margin-top:.5rem">Enviado em ${new Date(rdo.assinafy_sent_at).toLocaleString('pt-BR')}</p>` : '';
 
       return `
         <div class="card" style="margin-bottom:1.25rem">
@@ -189,10 +207,108 @@
             ${statusBadge}
           </div>
           <div style="padding:1rem 1.25rem">
-            <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#64748B;margin-bottom:.4rem">Signatários</p>
+            <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--c-text-3);margin-bottom:.4rem">Signatários (e-mails do cliente p/ assinatura)</p>
             ${sigList}
+            ${addForm}
             ${enviadoInfo}
             <div style="margin-top:.85rem">${actionArea}</div>
+          </div>
+        </div>`;
+    }
+
+    // Cadastro de signatário (e-mail do cliente) direto na tela do RDO — salva na obra
+    function addSignatarioRDO() {
+      const nome  = (document.getElementById('sig-add-nome')?.value || '').trim();
+      const email = (document.getElementById('sig-add-email')?.value || '').trim().toLowerCase();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { Toast.error('Informe um e-mail válido.'); const el = document.getElementById('sig-add-email'); if (el) el.focus(); return; }
+      const rdo = DB.getRDOById(rdoId); const obra = rdo && DB.getObraById(rdo.id_obra);
+      if (!obra) { Toast.error('Obra não encontrada.'); return; }
+      const lista = [...(obra.emails_signatarios || [])];
+      if (lista.find(s => s.email === email)) { Toast.warning('Este e-mail já está na lista.'); return; }
+      lista.push({ nome: nome || email.split('@')[0], email });
+      DB.updateObra(obra.id_obra, { emails_signatarios: lista });
+      Toast.success('Signatário adicionado!');
+      setTimeout(() => load(), 400);
+    }
+    function removeSignatarioRDO(idx) {
+      const rdo = DB.getRDOById(rdoId); const obra = rdo && DB.getObraById(rdo.id_obra);
+      if (!obra) return;
+      const lista = [...(obra.emails_signatarios || [])];
+      lista.splice(idx, 1);
+      DB.updateObra(obra.id_obra, { emails_signatarios: lista });
+      Toast.warning('Signatário removido.');
+      setTimeout(() => load(), 400);
+    }
+
+    // ── Assinatura do Responsável Modular (gerente) — validada e assinada no admin ──
+    let _padGerente = null;
+    function createPad(canvasId, statusId) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return null;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width  = rect.width  * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.strokeStyle = '#1E293B';
+      ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      let drawing = false, empty = true, lastX = 0, lastY = 0;
+      const pos = e => { const r = canvas.getBoundingClientRect(); const s = e.touches ? e.touches[0] : e; return { x: s.clientX - r.left, y: s.clientY - r.top }; };
+      function start(e) { e.preventDefault(); drawing = true; const p = pos(e); lastX = p.x; lastY = p.y; ctx.beginPath(); ctx.moveTo(lastX, lastY); }
+      function move(e) {
+        e.preventDefault(); if (!drawing) return;
+        const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); lastX = p.x; lastY = p.y;
+        if (!empty) return; empty = false; canvas.classList.add('has-sig');
+        const st = document.getElementById(statusId); if (st) { st.textContent = 'Assinatura capturada ✓'; st.style.color = '#16A34A'; }
+      }
+      function stop(e) { e.preventDefault(); drawing = false; ctx.beginPath(); }
+      canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', stop);
+      canvas.addEventListener('touchstart', start, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', stop, { passive: false });
+      return {
+        isEmpty: () => empty,
+        dataURL: () => canvas.toDataURL('image/png'),
+        clear: () => { ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.classList.remove('has-sig'); empty = true; const st = document.getElementById(statusId); if (st) { st.textContent = 'Aguardando assinatura…'; st.style.color = ''; } }
+      };
+    }
+    function initGerentePad() { _padGerente = createPad('sig-canvas-gerente', 'sig-status-gerente'); }
+    function clearGerente() { if (_padGerente) _padGerente.clear(); }
+    function saveGerente() {
+      const nome = (document.getElementById('f-nome-gerente')?.value || '').trim();
+      if (!nome) { Toast.error('Informe o nome do Responsável Modular (gerente).'); const el = document.getElementById('f-nome-gerente'); if (el) el.focus(); return; }
+      const atual = DB.getRDOById(rdoId) || {};
+      let base64 = atual.assinatura_modular_base64 || null;      // mantém a atual por padrão
+      if (_padGerente && !_padGerente.isEmpty()) base64 = _padGerente.dataURL();  // assinou de novo → substitui
+      DB.updateRDO(rdoId, { assinatura_modular_nome: nome, assinatura_modular_base64: base64 });
+      Toast.success('Assinatura do gerente salva!');
+      setTimeout(() => load(), 400);
+    }
+    function renderGerenteCard(rdo) {
+      const assinado = !!rdo.assinatura_modular_nome;
+      const badge = assinado
+        ? '<span style="background:#DCFCE7;color:#166534;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Validado / Assinado</span>'
+        : '<span style="background:#FEF3C7;color:#92400E;padding:.25rem .75rem;border-radius:9999px;font-size:.75rem;font-weight:700">Pendente de validação</span>';
+      return `
+        <div class="card" style="margin-bottom:1.25rem">
+          <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Validação e Assinatura — Responsável Modular (Gerente)</span>
+            ${badge}
+          </div>
+          <div style="padding:1rem 1.25rem">
+            ${assinado && rdo.assinatura_modular_base64 ? `<div style="margin-bottom:.75rem"><p style="font-size:.7rem;text-transform:uppercase;color:var(--c-text-3);font-weight:700;margin-bottom:.25rem">Assinatura atual</p><img src="${rdo.assinatura_modular_base64}" style="max-height:70px;background:#ffffff;border:1px solid #E2E8F0;border-radius:.5rem"></div>` : ''}
+            <div class="field" style="margin-bottom:.75rem">
+              <label for="f-nome-gerente">Nome do Responsável Modular *</label>
+              <input type="text" id="f-nome-gerente" name="nome_modular" autocomplete="name" placeholder="Nome completo do gerente / responsável Modular" value="${(rdo.assinatura_modular_nome || '').replace(/"/g, '&quot;')}">
+            </div>
+            <p style="font-size:.75rem;color:var(--c-muted);margin-bottom:.4rem">Assine abaixo (opcional — pode deixar só o nome). Para substituir, assine novamente.</p>
+            <div class="sig-wrap">
+              <canvas id="sig-canvas-gerente" role="img" aria-label="Área de assinatura do responsável Modular" style="display:block;width:100%;height:160px;touch-action:none;cursor:crosshair;border-radius:.5rem;border:2px dashed #CBD5E1;background:#ffffff;"></canvas>
+            </div>
+            <p id="sig-status-gerente" role="status" aria-live="polite" style="font-size:.75rem;text-align:center;margin-top:.4rem;color:var(--c-muted)">Aguardando assinatura…</p>
+            <div style="display:flex;gap:.5rem;margin-top:.5rem">
+              <button class="btn btn-ghost btn-sm" onclick="clearGerente()">Limpar</button>
+              <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveGerente()">Salvar assinatura do gerente</button>
+            </div>
           </div>
         </div>`;
     }
@@ -222,8 +338,8 @@
       const html = `
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem">
           <div>
-            <p style="font-size:1.15rem;font-weight:700;color:#1E293B">${obra.nome_obra || 'Obra não encontrada'}</p>
-            <p style="font-size:.85rem;color:#64748B">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)} · OF: ${obra.codigo_of||'—'}</p>
+            <p style="font-size:1.15rem;font-weight:700;color:var(--c-text)">${obra.nome_obra || 'Obra não encontrada'}</p>
+            <p style="font-size:.85rem;color:var(--c-text-3)">${Utils.getDayOfWeek(rdo.data_apontamento)}, ${Utils.formatDate(rdo.data_apontamento)} · OF: ${obra.codigo_of||'—'}</p>
           </div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
             ${Utils.statusBadge(rdo.status_documento)}
@@ -231,6 +347,8 @@
             <button class="btn btn-primary btn-sm" onclick="downloadPDF()">Baixar PDF</button>
           </div>
         </div>
+
+        ${renderGerenteCard(rdo)}
 
         ${renderAssinaturaCard(rdo, obra)}
 
@@ -249,7 +367,7 @@
         <div class="card" style="margin-bottom:1.25rem">
           <div class="card-header">Efetivo da Equipe</div>
           <div style="display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem">
-            ${efRows.map(([r,v]) => `<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.5rem;padding:.5rem .85rem;font-size:.875rem"><strong>${v}</strong> ${r}</div>`).join('')}
+            ${efRows.map(([r,v]) => `<div style="background:var(--c-surface-2);border:1px solid #E2E8F0;border-radius:.5rem;padding:.5rem .85rem;font-size:.875rem"><strong>${v}</strong> ${r}</div>`).join('')}
             <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:.5rem;padding:.5rem .85rem;font-size:.875rem"><strong>${total}</strong> Total</div>
           </div>
         </div>
@@ -264,7 +382,7 @@
             return `<div class="hora-view">
               <span class="ht">${slot}</span>
               <div class="hd">
-                ${l.referencia_modulo ? `<span style="font-size:.72rem;font-weight:600;color:#94A3B8">${l.referencia_modulo}</span><br>` : ''}
+                ${l.referencia_modulo ? `<span style="font-size:.72rem;font-weight:600;color:var(--c-muted)">${l.referencia_modulo}</span><br>` : ''}
                 ${l.descricao_detalhada || '—'}
               </div>
               ${l.status_atividade ? `<span class="status-pill ${statusClass(l.status_atividade)}">${l.status_atividade}</span>` : ''}
@@ -274,14 +392,14 @@
 
         <div style="margin-bottom:1.25rem">
           <div class="section-label">Campo Observações e Desvios</div>
-          <div class="section-body">${rdo.observacoes_desvios || '<span style="color:#94A3B8">Sem observações.</span>'}</div>
+          <div class="section-body">${rdo.observacoes_desvios || '<span style="color:var(--c-muted)">Sem observações.</span>'}</div>
         </div>
 
         ${rdo.assinatura_cliente_base64 ? `
         <div class="card" style="margin-bottom:1.25rem;padding:1rem">
-          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#64748B;margin-bottom:.5rem">Assinatura do Cliente</p>
-          <img src="${rdo.assinatura_cliente_base64}" style="max-height:100px;border:1px solid #E2E8F0;border-radius:.5rem">
-          <p style="font-size:.875rem;color:#334155;margin-top:.4rem"><strong>${rdo.assinatura_nome_confirmacao || ''}</strong></p>
+          <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--c-text-3);margin-bottom:.5rem">Assinatura do Responsável pela Obra</p>
+          <img src="${rdo.assinatura_cliente_base64}" style="max-height:100px;background:#ffffff;border:1px solid #E2E8F0;border-radius:.5rem">
+          <p class="text-slate-800 dark:text-slate-100" style="font-size:.875rem;margin-top:.4rem"><strong>${rdo.assinatura_nome_confirmacao || ''}</strong></p>
         </div>` : ''}
 
         ${rdo.fotos && rdo.fotos.length > 0 ? `
@@ -310,6 +428,7 @@
       `;
 
       document.getElementById('main-content').innerHTML = html;
+      initGerentePad();
 
       // Inicia polling automático se aguardando assinatura
       if (rdo.assinafy_status === 'enviado' && rdo.assinafy_document_id) {
@@ -374,6 +493,8 @@
       const sigs   = obra.emails_signatarios || [];
 
       if (sigs.length === 0) { Utils.toast('Cadastre signatários na obra primeiro.', 'warning'); return; }
+      if (!rdo.assinatura_cliente_base64) { Utils.toast('O Responsável pela Obra ainda não assinou no campo.', 'warning'); return; }
+      if (!rdo.assinatura_modular_nome) { Utils.toast('O Responsável Modular (gerente) precisa validar e assinar antes de enviar ao cliente.', 'warning'); return; }
 
       const btn = document.getElementById('btn-assinar');
       if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
@@ -430,6 +551,7 @@
     }
 
     async function visualizarDocumentoAssinado() {
+      const rdo = DB.getRDOById(rdoId);
       if (!rdo || !rdo.assinafy_document_id) return;
       const btn = event.target;
       const orig = btn.textContent;
@@ -450,6 +572,8 @@
     }
 
     async function baixarDocumentoAssinado() {
+      const rdo = DB.getRDOById(rdoId);
+      const obra = DB.getObraById(rdo?.id_obra) || {};
       if (!rdo || !rdo.assinafy_document_id) return;
       const btn = event.target;
       const orig = btn.textContent;

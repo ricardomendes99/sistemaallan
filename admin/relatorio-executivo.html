@@ -28,57 +28,57 @@
       .rep-header { border-radius: 0; }
       .rep-footer { border-radius: 0; }
       .sec-title a { display: none; }
-      body { background: #fff !important; }
+      body { background:var(--c-surface) !important; }
     }
 
     /* Report header */
     .rep-header { background: #0F172A; color: #fff; border-radius: .75rem .75rem 0 0; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
     .rep-header .brand { display: flex; align-items: center; gap: .75rem; }
     .rep-header h2 { font-size: 1.1rem; font-weight: 800; }
-    .rep-header .meta { text-align: right; font-size: .8rem; color: #64748B; }
-    .rep-header .meta strong { color: #94A3B8; font-size: .9rem; }
+    .rep-header .meta { text-align: right; font-size: .8rem; color:var(--c-text-3); }
+    .rep-header .meta strong { color:var(--c-muted); font-size: .9rem; }
 
     /* KPI strip */
     .kpi-strip { background: #1E293B; padding: 1rem 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
     .kpi { text-align: center; flex: 1; min-width: 100px; }
     .kpi-value { font-size: 1.8rem; font-weight: 900; color: #fff; line-height: 1; }
-    .kpi-label { font-size: .7rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: .05em; margin-top: .2rem; }
+    .kpi-label { font-size: .7rem; font-weight: 600; color:var(--c-text-3); text-transform: uppercase; letter-spacing: .05em; margin-top: .2rem; }
     .kpi.green  .kpi-value { color: #4ADE80; }
     .kpi.yellow .kpi-value { color: #FCD34D; }
     .kpi.red    .kpi-value { color: #F87171; }
     .kpi.blue   .kpi-value { color: #60A5FA; }
 
     /* Summary table */
-    .sum-table { width: 100%; border-collapse: collapse; background: #fff; font-size: .85rem; }
-    .sum-table thead th { background: #F8FAFC; font-weight: 700; color: #475569; text-align: left; padding: .7rem 1rem; border-bottom: 2px solid #E2E8F0; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
-    .sum-table tbody td { padding: .7rem 1rem; border-bottom: 1px solid #F1F5F9; color: #334155; vertical-align: top; }
+    .sum-table { width: 100%; border-collapse: collapse; background:var(--c-surface); font-size: .85rem; }
+    .sum-table thead th { background:var(--c-surface-2); font-weight: 700; color:var(--c-text-2); text-align: left; padding: .7rem 1rem; border-bottom: 2px solid #E2E8F0; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+    .sum-table tbody td { padding: .7rem 1rem; border-bottom: 1px solid #F1F5F9; color:var(--c-text-2); vertical-align: top; }
     .sum-table tbody tr:last-child td { border-bottom: none; }
     .sum-table tbody tr:hover td { background: #FAFAFA; }
-    .obra-name { font-weight: 700; color: #1E293B; }
-    .obra-sub  { font-size: .75rem; color: #94A3B8; }
+    .obra-name { font-weight: 700; color:var(--c-text); }
+    .obra-sub  { font-size: .75rem; color:var(--c-muted); }
     .status-fin  { background:#DCFCE7;color:#166534;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
     .status-rasc { background:#FEF3C7;color:#92400E;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
     .status-pend { background:#DBEAFE;color:#1E40AF;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
     .status-miss { background:#FEE2E2;color:#991B1B;padding:.15rem .55rem;border-radius:9999px;font-size:.7rem;font-weight:700; }
     .aprov-ok  { background:#DCFCE7;color:#166534;padding:.1rem .4rem;border-radius:9999px;font-size:.65rem;font-weight:700; }
     .aprov-res { background:#FEF3C7;color:#92400E;padding:.1rem .4rem;border-radius:9999px;font-size:.65rem;font-weight:700; }
-    .aprov-pend{ color:#94A3B8;font-size:.7rem;font-style:italic; }
+    .aprov-pend{ color:var(--c-muted);font-size:.7rem;font-style:italic; }
 
     /* Desvios section */
-    .desvios-section { background: #fff; }
+    .desvios-section { background:var(--c-surface); }
     .desvio-item { padding: .75rem 1rem; border-bottom: 1px solid #F1F5F9; display: flex; gap: .75rem; align-items: flex-start; }
     .desvio-item:last-child { border-bottom: none; }
     .desvio-dot { width: 8px; height: 8px; background: #F97316; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-    .desvio-obra { font-size: .72rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: .04em; }
-    .desvio-text { font-size: .85rem; color: #334155; margin-top: .1rem; }
-    .no-desvios  { padding: 1.5rem; text-align: center; color: #94A3B8; font-size: .875rem; }
+    .desvio-obra { font-size: .72rem; font-weight: 700; color:var(--c-text-3); text-transform: uppercase; letter-spacing: .04em; }
+    .desvio-text { font-size: .85rem; color:var(--c-text-2); margin-top: .1rem; }
+    .no-desvios  { padding: 1.5rem; text-align: center; color:var(--c-muted); font-size: .875rem; }
 
     /* Section title bar */
     .sec-title { background: #1E293B; color: #fff; padding: .6rem 1rem; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; justify-content: space-between; }
     .sec-title a { color: #F97316; font-size: .72rem; text-decoration: none; }
 
     /* Print footer */
-    .rep-footer { background: #F8FAFC; border-top: 1px solid #E2E8F0; padding: .75rem 1.5rem; font-size: .75rem; color: #94A3B8; display: flex; justify-content: space-between; border-radius: 0 0 .75rem .75rem; }
+    .rep-footer { background:var(--c-surface-2); border-top: 1px solid #E2E8F0; padding: .75rem 1.5rem; font-size: .75rem; color:var(--c-muted); display: flex; justify-content: space-between; border-radius: 0 0 .75rem .75rem; }
 
     /* Wrapper box */
     .rep-box { border: 1px solid #E2E8F0; border-radius: .75rem; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.06); }
@@ -150,14 +150,14 @@
       <div class="flex items-center gap-3">
         <label for="date-picker" class="text-xs text-slate-500 hidden sm:block">Referência:</label>
         <input type="date" id="date-picker" onchange="render()" aria-label="Data de referência do relatório"
-               style="padding:.35rem .65rem;border:1.5px solid #CBD5E1;border-radius:.5rem;font-size:.875rem;color:#1E293B">
+               style="padding:.35rem .65rem;border:1.5px solid #CBD5E1;border-radius:.5rem;font-size:.875rem;color:var(--c-text)">
         <button class="btn btn-primary btn-sm" onclick="window.print()">Imprimir</button>
       </div>
     </header>
 
     <main id="conteudo" tabindex="-1" class="admin-content w-full">
       <div class="report" id="report">
-        <div style="text-align:center;padding:3rem;color:#94A3B8">Carregando…</div>
+        <div style="text-align:center;padding:3rem;color:var(--c-muted)">Carregando…</div>
       </div>
     </main>
   </div>
@@ -214,7 +214,7 @@
             <div class="brand">
               <img src="../assets/img/logo.png" alt="Modular Service" width="3759" height="2115" style="height:28px;width:auto;border-radius:4px;">
               <div>
-                <div style="font-size:.7rem;color:#64748B;font-weight:600">MODULAR SERVICE</div>
+                <div style="font-size:.7rem;color:var(--c-text-3);font-weight:600">MODULAR SERVICE</div>
                 <h2>Relatório Executivo de Obras</h2>
               </div>
             </div>
@@ -257,7 +257,7 @@
                 if (!rdo) return `
                   <tr>
                     <td><div class="obra-name">${obra.nome_obra}</div><div class="obra-sub">${obra.cliente_nome} · OF: ${obra.codigo_of}</div></td>
-                    <td colspan="6" style="color:#94A3B8;font-style:italic">Sem apontamento no dia</td>
+                    <td colspan="6" style="color:var(--c-muted);font-style:italic">Sem apontamento no dia</td>
                     <td></td>
                   </tr>`;
 
@@ -282,7 +282,7 @@
                   <td style="font-size:.8rem;white-space:nowrap">${rdo.horario_inicio||'?'} – ${rdo.horario_termino||'?'}</td>
                   <td style="font-size:.78rem">${clima}</td>
                   <td>${statusTag}</td>
-                  <td>${aprovTag}${rdo.comentario_cliente ? `<br><span style="font-size:.7rem;color:#64748B">${rdo.comentario_cliente.slice(0,50)}${rdo.comentario_cliente.length>50?'…':''}</span>` : ''}</td>
+                  <td>${aprovTag}${rdo.comentario_cliente ? `<br><span style="font-size:.7rem;color:var(--c-text-3)">${rdo.comentario_cliente.slice(0,50)}${rdo.comentario_cliente.length>50?'…':''}</span>` : ''}</td>
                   <td style="text-align:center">
                     <a href="rdo-view.html?id=${rdo.id_rdo}" style="color:#F97316;font-size:.8rem;font-weight:700;text-decoration:none">Ver</a>
                   </td>

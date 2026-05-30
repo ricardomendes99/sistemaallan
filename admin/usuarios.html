@@ -113,7 +113,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <span id="modal-title">Novo Usuário</span>
-        <button onclick="closeModal()" aria-label="Fechar" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#94A3B8">×</button>
+        <button onclick="closeModal()" aria-label="Fechar" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--c-muted)">×</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="edit-id">
@@ -191,7 +191,7 @@
       tbody.innerHTML = users.map(u => `
         <tr>
           <td style="font-weight:600">${u.nome_completo}</td>
-          <td style="color:#64748B;font-size:.875rem">${u.email}</td>
+          <td style="color:var(--c-text-3);font-size:.875rem">${u.email}</td>
           <td style="font-size:.875rem">${u.funcao_principal || '—'}</td>
           <td><span class="perfil-badge ${u.perfil === 'ADMIN' ? 'perfil-admin' : 'perfil-user'}">${u.perfil}</span></td>
           <td><span class="${u.ativo ? 'status-ativo' : 'status-inativo'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>

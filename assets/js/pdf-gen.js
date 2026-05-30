@@ -294,17 +294,28 @@ const PDFGen = (() => {
     rect(ML, y, CW, sigH, white, [203,213,225]);
 
     doc.setDrawColor(30,41,59); doc.setLineWidth(0.4);
-    doc.line(ML+10, y+20, ML+CW/2-5, y+20);
-    text('Modular', ML+CW/4, y+22, { size: 8, bold: true, color: dark, align: 'center' });
 
+    // Esquerda — Responsável Modular (gerente)
+    if (rdo.assinatura_modular_base64) {
+      try { doc.addImage(rdo.assinatura_modular_base64, 'PNG', ML+10, y+3, 80, 16); } catch {}
+    }
+    doc.line(ML+10, y+20, ML+CW/2-5, y+20);
+    const sigModular = rdo.assinatura_modular_nome
+      ? `Nome e Assinatura do Responsável Modular: ${rdo.assinatura_modular_nome}`
+      : 'Nome e Assinatura do Responsável Modular:';
+    text(sigModular, ML+CW/4, y+22, { size: 7.5, bold: true, color: dark, align: 'center' });
+
+    // Direita — Responsável pela Obra
     if (rdo.assinatura_cliente_base64) {
       try { doc.addImage(rdo.assinatura_cliente_base64, 'PNG', ML+CW/2+5, y+3, 80, 16); } catch {}
     }
     doc.line(ML+CW/2+10, y+20, PW-MR-10, y+20);
-    const sigLabel = rdo.assinatura_nome_confirmacao
-      ? `Nome e Assinatura do Cliente: ${rdo.assinatura_nome_confirmacao}`
-      : 'Nome e Assinatura do Cliente:';
-    text(sigLabel, ML+CW*0.75, y+22, { size: 8, bold: true, color: dark, align: 'center' });
+    const sigObra = rdo.assinatura_nome_confirmacao
+      ? `Nome e Assinatura do Responsável pela Obra: ${rdo.assinatura_nome_confirmacao}`
+      : 'Nome e Assinatura do Responsável pela Obra:';
+    text(sigObra, ML+CW*0.75, y+22, { size: 7.5, bold: true, color: dark, align: 'center' });
+
+    y += sigH;
 
     // ── FOTOS ─────────────────────────────────────────
     if (rdo.fotos && rdo.fotos.length > 0) {
