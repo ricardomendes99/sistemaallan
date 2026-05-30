@@ -13,7 +13,7 @@ EOF
 
 # Write Assinafy API key as nginx proxy header snippet (key never reaches the browser)
 mkdir -p /etc/nginx/snippets
-printf 'proxy_set_header X-Api-Key "%s";\n' "${ASSINAFY_API_KEY:-}" \
+printf 'proxy_set_header Authorization "Bearer %s";\n' "${ASSINAFY_API_KEY:-}" \
   > /etc/nginx/snippets/assinafy_key.conf
 
 exec nginx -g 'daemon off;'
