@@ -8,7 +8,8 @@ services:
       - TZ=America/Sao_Paulo
       - VITE_SUPABASE_URL=https://supabase.b2btaxipremium.com.br
       - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogImFub24iLAogICJpc3MiOiAic3VwYWJhc2UiLAogICJpYXQiOiAxNzE1MDUwODAwLAogICJleHAiOiAxODcyODE3MjAwCn0.R6vNyomYgFqgngQhxOMSRCrlpGkIkELQDuxNnu1kSOY
-      - ASSINAFY_API_KEY=REDACTED_CHAVE_ROTACIONADA
+      # Chave SECRETA — fornecida pelo ambiente/.env da VPS (gitignorado). NUNCA hardcode aqui.
+      - ASSINAFY_API_KEY=${ASSINAFY_API_KEY}
 
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/index.html"]
