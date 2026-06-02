@@ -2467,6 +2467,11 @@ input[type="number"]::-webkit-inner-spin-button,
   border-color: rgb(249 115 22 / var(--tw-border-opacity, 1));
 }
 
+.border-emerald-200{
+  --tw-border-opacity: 1;
+  border-color: rgb(167 243 208 / var(--tw-border-opacity, 1));
+}
+
 .border-red-200{
   --tw-border-opacity: 1;
   border-color: rgb(254 202 202 / var(--tw-border-opacity, 1));
@@ -2534,6 +2539,11 @@ input[type="number"]::-webkit-inner-spin-button,
 .bg-emerald-400{
   --tw-bg-opacity: 1;
   background-color: rgb(52 211 153 / var(--tw-bg-opacity, 1));
+}
+
+.bg-emerald-50{
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 253 245 / var(--tw-bg-opacity, 1));
 }
 
 .bg-red-100{
