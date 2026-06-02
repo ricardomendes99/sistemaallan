@@ -156,10 +156,20 @@
     });
 
     DB.init().then(() => {
+      const u = Auth.getCurrentUser();
+      if (u) {
+        // Sessão ativa: feedback visual antes de redirecionar (UX: success-feedback + aria-live)
+        _loginBtn.disabled = false;
+        _loginBtn.style.cssText = 'background:#10b981;border-color:#10b981;color:#fff;cursor:default;pointer-events:none';
+        _loginBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Redirecionando…';
+        const banner = document.getElementById('err');
+        banner.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><polyline points="20 6 9 17 4 12"/></svg><span>Sessão ativa — redirecionando para o painel…</span>';
+        banner.className = 'mb-4 flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 text-sm';
+        setTimeout(() => { location.href = u.perfil === 'ADMIN' ? 'admin/dashboard.html' : 'campo/home.html'; }, 500);
+        return;
+      }
       _loginBtn.disabled = false;
       _loginBtn.textContent = 'Entrar';
-      const u = Auth.getCurrentUser();
-      if (u) location.href = u.perfil === 'ADMIN' ? 'admin/dashboard.html' : 'campo/home.html';
 
       document.getElementById('form').addEventListener('submit', function(e) {
         e.preventDefault();
