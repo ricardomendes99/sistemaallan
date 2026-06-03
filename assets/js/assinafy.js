@@ -30,7 +30,7 @@ const Assinafy = (() => {
     const form = new FormData();
     form.append('name', nomeArquivo);
     form.append('file', pdfBlob, nomeArquivo + '.pdf');
-    const doc = await _request('POST', `/workspaces/${accId}/documents`, form, true);
+    const doc = await _request('POST', `/accounts/${accId}/documents`, form, true);
     return doc.id;
   }
 
@@ -38,11 +38,11 @@ const Assinafy = (() => {
   async function createSigner(fullName, email) {
     const accId = _accountId();
     try {
-      const signer = await _request('POST', `/workspaces/${accId}/signers`, { full_name: fullName, email });
+      const signer = await _request('POST', `/accounts/${accId}/signers`, { full_name: fullName, email });
       return signer.id;
     } catch (e) {
       // Signer with this email already exists — find and reuse
-      const list = await _request('GET', `/workspaces/${accId}/signers`);
+      const list = await _request('GET', `/accounts/${accId}/signers`);
       const existing = (list || []).find(s => s.email === email);
       if (existing) return existing.id;
       throw e;

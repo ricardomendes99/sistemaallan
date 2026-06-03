@@ -63,6 +63,14 @@ const DB = (() => {
     return Promise.resolve({ error: null });
   }
 
+  // supabase-js, sem rede, NÃO lança exceção: retorna {error} com "Failed to fetch".
+  // Distingue erro de REDE (manter item p/ reenviar) de erro de SERVIDOR (descartar).
+  function _isNetErr(error) {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
+    const m = ((error && error.message) || '').toString().toLowerCase();
+    return m.includes('fetch') || m.includes('network') || m.includes('load failed') || m.includes('timeout');
+  }
+
   // Registra uma escrita: enfileira (offline) ou dispara direto (online clássico)
   function _queue(table, type, payload, match) {
     if (_offline) {
@@ -83,13 +91,19 @@ const DB = (() => {
     try {
       const items = await IDB.all('outbox'); // ordenados por _key (ordem de inserção)
       for (const item of items) {
+        let res;
         try {
-          const res = await _apply(item);
-          if (res && res.error) console.error('[sync] erro do servidor, descartando item:', item.table, res.error);
-          await IDB.del('outbox', item._key); // sucesso OU erro de servidor → remove (evita travar a fila)
+          res = await _apply(item);
         } catch (netErr) {
-          drained = false; _online = false; break; // falha de rede → mantém item e para
+          drained = false; _online = false; break; // falha de rede (exceção) → mantém item e para
         }
+        if (res && res.error) {
+          // supabase-js, OFFLINE, retorna {error} "Failed to fetch" em vez de lançar:
+          // tratar como rede (manter o item e parar), NÃO descartar como erro de servidor.
+          if (_isNetErr(res.error)) { drained = false; _online = false; break; }
+          console.error('[sync] erro do servidor, descartando item:', item.table, res.error);
+        }
+        await IDB.del('outbox', item._key); // sucesso OU erro REAL de servidor → remove (evita travar a fila)
       }
       _pending = await IDB.count('outbox');
       if (drained) _online = true;

@@ -129,12 +129,14 @@ Fluxo: **campo preenche+assina → gerente valida+assina no admin → envia ao c
 
 Exibidas em `rdo-view.html`, `rdo-print.html` e no **PDF (`pdf-gen.js`)** — esquerda = Responsável Modular (gerente), direita = Responsável pela Obra.
 
-### Integração Assinafy — estado técnico (2026-05-30)
+### Integração Assinafy — estado técnico (2026-05-30; corrigido 2026-06-03)
+
+> [!warning] Correção 2026-06-03: os endpoints com escopo de conta são **`/accounts/{id}/...`**, NÃO `/workspaces/{id}/...` (este dava 404 "Página não encontrada"). Validado por probe: `GET /accounts` retorna o id `10302ff66...`; `/accounts/{id}/documents` e `/accounts/{id}/signers` → 200. Corrigido em `assinafy.js` (upload + signers). `ASSINAFY_ACCOUNT_ID` é um **Account ID**.
 
 **Configuração (.env):**
 ```
 ASSINAFY_API_KEY=<chave>
-ASSINAFY_ACCOUNT_ID=<workspace_id>   ← é o Workspace ID (não Account ID)
+ASSINAFY_ACCOUNT_ID=<account_id>     ← é o ACCOUNT ID (confirmado via GET /accounts); endpoints usam /accounts/{id}
 ```
 
 **Proxy local (`_serve.js`):**  
@@ -143,9 +145,9 @@ O servidor de dev expõe `/assinafy-proxy/*` que injeta `Authorization: Bearer <
 **Endpoints usados (paths sem `/assinafy-proxy`):**
 | Ação | Método | Path |
 |------|--------|------|
-| Upload PDF | POST | `/workspaces/{id}/documents` |
-| Criar signatário | POST | `/workspaces/{id}/signers` |
-| Listar signatários (reuso) | GET | `/workspaces/{id}/signers` |
+| Upload PDF | POST | `/accounts/{id}/documents` |
+| Criar signatário | POST | `/accounts/{id}/signers` |
+| Listar signatários (reuso) | GET | `/accounts/{id}/signers` |
 | Criar assignment | POST | `/documents/{id}/assignments` |
 | Verificar status | GET | `/documents/{id}` |
 | Download assinado | GET | `/documents/{id}/download/certificated` |
