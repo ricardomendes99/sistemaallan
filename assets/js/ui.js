@@ -91,11 +91,27 @@ function updateDarkToggleIcon() {
 initDarkMode();
 
 // ── Sidebar toggle (admin) ───────────────────────────────
+const SIDEBAR_W = { open: 256, collapsed: 64 }; // px (16rem / 4rem)
+const EDGE_HALF = 14;                            // metade da largura do botão (28px) → centra na borda
+const CHEVRON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+
 function initSidebar() {
   const sidebar  = document.getElementById('sidebar');
   const mainWrap = document.getElementById('admin-wrap');
-  const toggle   = document.getElementById('sidebar-toggle');
-  if (!sidebar || !toggle) return;
+  if (!sidebar) return;
+
+  // Ícone pequeno antigo da topbar → escondido (substituído pelo botão flutuante da borda)
+  const oldToggle = document.getElementById('sidebar-toggle');
+  if (oldToggle) oldToggle.style.display = 'none';
+
+  // Botão flutuante de recolher/expandir, ancorado na "costura" da sidebar (estilo LiveClin)
+  const edge = document.createElement('button');
+  edge.id = 'sidebar-edge-toggle';
+  edge.type = 'button';
+  edge.className = 'sidebar-edge-toggle';
+  edge.innerHTML = CHEVRON_SVG;
+  edge.style.transition = 'none'; // evita "voo" inicial; reativado após posicionar
+  document.body.appendChild(edge);
 
   // One-time migration: reset stuck state from old broken code
   if (!localStorage.getItem('sidebar-v2')) {
@@ -105,12 +121,15 @@ function initSidebar() {
 
   const collapsed = localStorage.getItem('sidebar-collapsed') === '1';
   applySidebarState(collapsed, true);
+  requestAnimationFrame(() => { edge.style.transition = ''; }); // anima nos próximos toggles
 
-  toggle.addEventListener('click', () => {
+  function toggle() {
     const isCollapsed = sidebar.style.width === '4rem';
     applySidebarState(!isCollapsed);
     localStorage.setItem('sidebar-collapsed', !isCollapsed ? '1' : '0');
-  });
+  }
+  edge.addEventListener('click', toggle);
+  if (oldToggle) oldToggle.addEventListener('click', toggle); // ainda funciona se algum layout o exibir
 
   // Inject dark mode toggle button into sidebar footer
   const logoutBtn = sidebar.querySelector('[aria-label="Sair"]');
@@ -156,6 +175,14 @@ function initSidebar() {
       if (userRow)  { userRow.classList.add('gap-2.5','px-2'); userRow.classList.remove('flex-col','gap-1','py-1'); }
       if (logoutBtn){ logoutBtn.style.padding = ''; }
     }
+
+    // Reposiciona o botão da borda na nova "costura" e gira o chevron
+    const seam = collapse ? SIDEBAR_W.collapsed : SIDEBAR_W.open;
+    edge.style.left = (seam - EDGE_HALF) + 'px';
+    edge.classList.toggle('is-collapsed', collapse);
+    edge.title = collapse ? 'Expandir menu' : 'Recolher menu';
+    edge.setAttribute('aria-label', collapse ? 'Expandir menu lateral' : 'Recolher menu lateral');
+    edge.setAttribute('aria-expanded', collapse ? 'false' : 'true');
   }
 }
 

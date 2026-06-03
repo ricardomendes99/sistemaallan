@@ -1,7 +1,7 @@
 # STATUS — RDO Digital
 
 **Data:** 2026-05-16  
-**Última atualização:** 2026-05-30 — integração Assinafy corrigida end-to-end (proxy local, trava de envio, download do PDF assinado via artifacts.certificated)  
+**Última atualização:** 2026-06-03 — botão de recolher/expandir a sidebar refeito (chevron flutuante na borda, estilo LiveClin); endpoint Assinafy corrigido p/ `/accounts/{id}` (era `/workspaces`, dava 404 no envio); bug de perda de escrita offline corrigido no `db.js`; offline validado em navegador real (Playwright)  
 **Fase:** MVP v2 — completo e pronto para uso local
 
 ## Arquivos do sistema
@@ -60,6 +60,15 @@ cliente/
 - Token de acesso cliente (sem login, link com token único)
 - Relatório executivo com KPIs, desvios, ressalvas de clientes
 
+## Botão de recolher/expandir a sidebar — 2026-06-03
+
+O antigo toggle era um ícone "painel" 20×20 solto na topbar branca (sem caixa/padding) → parecia pequeno e desalinhado. Refeito como **botão circular flutuante na "costura" entre sidebar e conteúdo**, com chevron `‹`/`›` que gira ao abrir/fechar (padrão tipo LiveClin).
+
+- **CSS** (`tailwind.css`, `@layer components`): `.sidebar-edge-toggle` — círculo 28px, branco/borda no claro, slate no escuro, sombra, hover com leve `scale`, `:focus-visible` com ring. `.is-collapsed svg` gira 180°. **Recompilar:** `npm run build:css`.
+- **JS** (`ui.js` → `initSidebar`): injeta o botão no `body` (aparece em **todas** as páginas admin), esconde o `#sidebar-toggle` antigo, reposiciona o botão na borda (`left = largura − 14px`) e gira o chevron a cada toggle. Estado persiste em `localStorage` (`sidebar-collapsed`).
+- **Config** (`tailwind.config.js`): `sidebar-edge-toggle` e `is-collapsed` adicionados à `safelist` (classe gerada por JS — o `content` não escaneia `.js`, então sem isso o purge removia as regras base).
+- **Logos** (7 páginas admin): `logo.png` e `M logo.png` originais eram canvas 3759×2115 quase vazios → logo renderizava minúsculo. Recortados nos bounding boxes justos (script Node temporário, decode/encode PNG puro c/ zlib). M → `M logo.png` quadrado **1178×1178**, recolhido em `h-12` (48px). Wordmark → **novo** `assets/img/logo-wordmark.png` **764×271** (recorte tight + downscale 1/4), aberto em `h-16` (64px). A `logo.png` original foi **mantida** intacta (compartilhada por login, cliente, campo e PDFs — recortá-la mudaria a proporção em todos).
+
 ## Passe de acessibilidade — 2026-05-29 (Web Interface Guidelines)
 
 Revisão das 13 páginas + CSS contra as Vercel Web Interface Guidelines.
@@ -100,7 +109,7 @@ Implementado para o **uso de campo** (login + listar obras + preencher RDO hora-
 - **Anexos/plantas (Storage)** continuam exigindo internet (tela de admin).
 - Conflitos: "última escrita vence" via `updated_at`.
 
-**Como testar offline (Chrome):** abrir 1x online → DevTools ▸ Network ▸ **Offline** → recarregar (app abre) → preencher e assinar um RDO (badge "Offline") → voltar online → badge "Sincronizando…" some e o RDO aparece no admin/Supabase. Validado por harness de lógica (mock Supabase+IndexedDB): preencher offline → reabrir offline (dados persistem) → reconectar → sobe na ordem correta.
+**Como testar offline (Chrome):** abrir 1x online → DevTools ▸ Network ▸ **Offline** → recarregar (app abre) → preencher e assinar um RDO (badge "Offline") → voltar online → badge "Sincronizando…" some e o RDO aparece no admin/Supabase. Validado por harness de lógica (mock) **E em navegador real (Playwright) em 2026-06-03 — 10/10**: SW cacheia o shell (18 itens), snapshot persiste no IndexedDB (usuários/obras baixados), app abre offline, escrita offline fica na outbox. ⚠️ **Bug corrigido nesse teste:** o `supabase-js` OFFLINE retorna `{error}` "Failed to fetch" em vez de lançar exceção — o `sync()` antigo tratava como erro de servidor e **descartava a escrita offline** (o RDO sumia ao reconectar). Fix em `db.js`: `_isNetErr()` separa erro de rede (mantém o item) de erro de servidor (descarta). Smoke test: `pw-offline-test.cjs` na raiz.
 
 ## Banco — colunas da tabela `rdos` — ✅ todas aplicadas
 

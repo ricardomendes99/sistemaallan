@@ -20,6 +20,7 @@ module.exports = {
     'sig-wrap', 'has-sig',
     'aprov-ok', 'aprov-ressalvas', 'aprov-pendente',
     'aprov-selected-ok', 'aprov-selected-res',
+    'sidebar-edge-toggle', 'is-collapsed',
   ],
   theme: {
     extend: {
